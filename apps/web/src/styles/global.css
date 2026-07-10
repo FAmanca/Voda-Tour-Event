@@ -1,0 +1,117 @@
+/* ===========================================================================
+   Voda Tour & Event — Tailwind CSS Theme
+   Design System Reference: docs/frontend/design-system.md
+   =========================================================================== */
+
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Theme Configuration
+   Mapping design-system.md ke Tailwind utility classes.
+   --------------------------------------------------------------------------- */
+
+@theme {
+  /* ---- Colors ---- */
+  --color-navy-900: #0B2340;
+  --color-navy-800: #0F2C4C;
+  --color-navy-700: #173A5E;
+  --color-navy-600: #2A527A;
+  --color-orange-600: #EE7D0F;
+  --color-orange-500: #F5900F;
+  --color-orange-100: #FFE9D2;
+  --color-ink: #0B2340;
+  --color-body: #5B6B80;
+  --color-body-light: #8A97A8;
+  --color-mist: #F5F7FA;
+  --color-line: #E6EAF0;
+  --color-paper: #FFFFFF;
+
+  /* ---- Font Families ---- */
+  --font-display: "Poppins", sans-serif;
+  --font-accent: "Playfair Display", serif;
+  --font-body: "Inter", sans-serif;
+
+  /* ---- Border Radius ---- */
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+
+  /* ---- Shadows ---- */
+  --shadow-soft: 0 10px 30px -14px rgba(11, 35, 64, 0.18);
+  --shadow-card: 0 20px 40px -18px rgba(11, 35, 64, 0.25);
+}
+
+/* ---------------------------------------------------------------------------
+   Base Styles
+   --------------------------------------------------------------------------- */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-body);
+  background: var(--color-paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-orange-600);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-mist);
+}
+::-webkit-scrollbar-thumb {
+  background: #b0c4de;
+  border-radius: 4px;
+}
+
+/* ---------------------------------------------------------------------------
+   Reusable Class Patterns
+   (Dipisah dari utilities biar gak bentrok sama Tailwind)
+   --------------------------------------------------------------------------- */
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 12.5px;
+  color: var(--color-orange-600);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.eyebrow::before {
+  content: "";
+  width: 22px;
+  height: 2px;
+  background: var(--color-orange-600);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.accent-italic {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-orange-600);
+}
+
+.wrap {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+@media (max-width: 1080px) {
+  .wrap {
+    padding: 0 24px;
+  }
+}
