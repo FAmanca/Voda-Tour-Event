@@ -1,0 +1,82 @@
+---
+// Voda Tour & Event — PackageGrid Component
+// Grid of 4 latest packages fetched from Directus
+
+import PackageCard from "./PackageCard.astro";
+import SkeletonCard from "./SkeletonCard.astro";
+
+interface Props {
+  /** Pre-fetched packages from Directus — kalau ada skip fetch client-side */
+  packages?: any[];
+}
+
+const { packages: fetched } = Astro.props;
+
+// SSR fetch dari Directus (fallback kalau props kosong)
+let packages = fetched;
+let loadError = false;
+
+if (!packages) {
+  try {
+    const directusUrl = process.env.DIRECTUS_URL || 'http://localhost:8055';
+    const res = await fetch(`${directusUrl}/items/paket?limit=4&sort[]=id&filter[status][_eq]=published`);
+    if (res.ok) {
+      const json = await res.json();
+      packages = json.data || [];
+    } else {
+      loadError = true;
+    }
+  } catch {
+    loadError = true;
+  }
+}
+---
+
+{
+  loadError && (
+    <div class="rounded-[--radius-md] bg-red-50 border border-red-200 p-[16px] text-red-700 text-[14px]">
+      <i class="fa-solid fa-circle-exclamation mr-[8px]"></i>
+      Gagal memuat paket. Silakan coba lagi nanti.
+      <button
+        class="ml-[12px] text-red-700 font-semibold underline bg-transparent border-none cursor-pointer text-[13px]"
+        onclick="window.location.reload()"
+      >
+        Muat ulang
+      </button>
+    </div>
+  )
+}
+
+{
+  !loadError && packages && packages.length > 0 && (
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
+      {packages.map((pkg) => (
+        <PackageCard
+          title={pkg.nama_paket}
+          description={pkg.deskripsi_singkat}
+          slug={pkg.slug}
+          priceFrom={pkg.harga_mulai}
+          icon={pkg.icon || 'fa-solid fa-map-marked-alt'}
+          category={pkg.kategori || 'wisata'}
+        />
+      ))}
+    </div>
+  )
+}
+
+{
+  !loadError && packages && packages.length === 0 && (
+    <div class="text-center py-[40px]">
+      <i class="fa-solid fa-box-open text-[40px] text-body-light"></i>
+      <p class="text-body-light text-[15px] mt-[12px]">Belum ada paket tersedia.</p>
+    </div>
+  )
+}
+
+{
+  !loadError && !packages && (
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
+      {[1, 2, 3, 4].map((i) => <SkeletonCard variant="package" />)}
+    </div>
+  )
+}
