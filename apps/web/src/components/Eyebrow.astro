@@ -1,0 +1,18 @@
+---
+// Voda Tour & Event — Eyebrow Component
+// Small orange label with ::before horizontal rule
+
+interface Props {
+  /** Text to display */
+  text: string;
+}
+
+const { text } = Astro.props;
+---
+
+<div class="flex items-center gap-[10px]">
+  <span class="block w-[22px] h-[2px] bg-orange-600 rounded-full shrink-0"></span>
+  <span class="font-[family-name:var(--font-body)] font-bold tracking-[0.14em] uppercase text-[12.5px] text-orange-600 leading-none">
+    {text}
+  </span>
+</div>

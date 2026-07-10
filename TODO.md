@@ -51,56 +51,56 @@
   - [x] Meta tags base (charset, viewport, lang="id")
   - [x] SEO meta (title, description, og:image generator)
   - [x] Preconnect Google Fonts + Font Awesome CDN
-  - [ ] Google Fonts inline `@font-face` atau link
-  - [ ] Font Awesome CDN script
-  - [ ] Global CSS import
-  - [ ] `<Header />` + `<Footer />` wrapper
-  - [ ] `<slot />` untuk content
-  - [ ] Scrollbar styling
-  - [ ] Selection color (navy/orange)
+  - [x] Google Fonts inline `@font-face` atau link
+  - [x] Font Awesome CDN script
+  - [x] Global CSS import
+  - [x] `<Header />` + `<Footer />` wrapper
+  - [x] `<slot />` untuk content
+  - [x] Scrollbar styling
+  - [x] Selection color (navy/orange)
 
 ---
 
 ## Phase 2: Shared Components
 
 ### 2.1 Header (`src/components/Header.astro`)
-- [ ] Sticky white header, 88px (76px mobile)
-- [ ] Logo lockup: rotated square + plane icon + "VODA" bold / "TOUR & EVENT" tracked
-- [ ] Nav links: Beranda, Paket Wisata ▼, Gathering & Event ▼, Destinasi ▼, Tentang Kami, Kontak
-- [ ] Active state: orange underline offset 10px, 2.5px
-- [ ] Right side: phone pill (outline) + WA pill (solid orange)
-- [ ] Mobile: hamburger menu, dropdown nav
-- [ ] Dropdown untuk Paket Wisata, Gathering & Event, Destinasi (CSS)
+- [x] Sticky white header, 88px (76px mobile)
+- [x] Logo lockup: rotated square + plane icon + "VODA" bold / "TOUR & EVENT" tracked
+- [x] Nav links: Beranda, Paket Wisata ▼, Gathering & Event ▼, Destinasi ▼, Tentang Kami, Kontak
+- [x] Active state: orange underline offset 10px, 2.5px
+- [x] Right side: phone pill (outline) + WA pill (solid orange)
+- [x] Mobile: hamburger menu, dropdown nav
+- [x] Dropdown untuk Paket Wisata, Gathering & Event, Destinasi (CSS)
 
 ### 2.2 Footer (`src/components/Footer.astro`)
-- [ ] Navy-900 background
-- [ ] 3-column: logo + deskripsi, navigasi, kontak & sosial
-- [ ] WhatsApp, email, Instagram link
-- [ ] Copyright bar
+- [x] Navy-900 background
+- [x] 3-column: logo + deskripsi, navigasi, kontak & sosial
+- [x] WhatsApp, email, Instagram link
+- [x] Copyright bar
 
 ### 2.3 WaButton (`src/components/WaButton.astro`)
-- [ ] Props: phone, message, label, variant, fullWidth, icon
-- [ ] Variant: primary (orange solid), outline (orange border), pill
-- [ ] WA icon + label
-- [ ] Hover: translateY(-2px)
+- [x] Props: phone, message, label, variant, fullWidth, icon
+- [x] Variant: primary (orange solid), outline (orange border), pill
+- [x] WA icon + label
+- [x] Hover: translateY(-2px)
 
 ### 2.4 Eyebrow (`src/components/Eyebrow.astro`)
-- [ ] Orange uppercase text, 12.5px, 700, tracking-widest
-- [ ] `::before` 22px horizontal rule
+- [x] Orange uppercase text, 12.5px, 700, tracking-widest
+- [x] `::before` 22px horizontal rule
 
 ### 2.5 IconBadge (`src/components/IconBadge.astro`)
-- [ ] Props: icon, size (sm/md/lg), shape (circle/rounded-square), variant (navy/outline/glass)
-- [ ] Font Awesome icon di dalam shape
+- [x] Props: icon, size (sm/md/lg), shape (circle/rounded-square), variant (navy/outline/glass)
+- [x] Font Awesome icon di dalam shape
 
 ### 2.6 PriceDisplay (`src/components/PriceDisplay.astro`)
-- [ ] Format rupiah: "Rp 850.000" atau "850rb"
-- [ ] Props: amount, prefix, format, perPax, size
-- [ ] Font Poppins bold, orange
+- [x] Format rupiah: "Rp 850.000" atau "850rb"
+- [x] Props: amount, prefix, format, perPax, size
+- [x] Font Poppins bold, orange
 
 ### 2.7 SkeletonCard (`src/components/SkeletonCard.astro`)
-- [ ] Animated pulse placeholder
-- [ ] Variant: package, destinasi, feature
-- [ ] `animate-pulse` + `bg-gray-200`
+- [x] Animated pulse placeholder
+- [x] Variant: package, destinasi, feature
+- [x] `animate-pulse` + `bg-gray-200`
 
 ---
 
