@@ -1,70 +1,100 @@
 ---
+// Voda Tour & Event — Landing Page (index.astro)
+// SSR fetch from Directus, then render all sections
+
 import Layout from "../layouts/Layout.astro";
-import Eyebrow from "../components/Eyebrow.astro";
-import WaButton from "../components/WaButton.astro";
-import PriceDisplay from "../components/PriceDisplay.astro";
-import SkeletonCard from "../components/SkeletonCard.astro";
-import IconBadge from "../components/IconBadge.astro";
+import Hero from "../components/Hero.astro";
+import FeatureStrip from "../components/FeatureStrip.astro";
+import SectionHeader from "../components/SectionHeader.astro";
+import PackageGrid from "../components/PackageGrid.astro";
+import StatsBar from "../components/StatsBar.astro";
+import CTABand from "../components/CTABand.astro";
+
+// -----------------------------------------------------------------------
+// SSR fetch dari Directus
+// -----------------------------------------------------------------------
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+
+interface Setting {
+  key: string;
+  value: string;
+}
+
+let settings: Record<string, string> = {};
+let destinations: any[] = [];
+let packages: any[] = [];
+let activityTypes: any[] = [];
+let fetchError = false;
+
+try {
+  const base = `${DIRECTUS_URL}/items`;
+
+  const [settingsRes, destRes, pkgRes, actRes] = await Promise.all([
+    fetch(`${base}/settings`).then((r) => (r.ok ? r.json() : { data: [] })),
+    fetch(`${base}/destinasi?limit=10&sort=name`).then((r) => (r.ok ? r.json() : { data: [] })),
+    fetch(`${base}/paket?limit=4&sort=-id`).then((r) => (r.ok ? r.json() : { data: [] })),
+    fetch(`${base}/activity_types?limit=20&sort=name`).then((r) => (r.ok ? r.json() : { data: [] })),
+  ]);
+
+  // Settings → flat key-value map
+  if (settingsRes.data) {
+    (settingsRes.data as Setting[]).forEach((s: Setting) => {
+      settings[s.key] = s.value;
+    });
+  }
+
+  destinations = destRes.data || [];
+  packages = pkgRes.data || [];
+  activityTypes = actRes.data || [];
+} catch (e) {
+  console.error("SSR fetch error:", e);
+  fetchError = true;
+}
 ---
 
-<Layout title="Beranda | Voda Tour & Event" active="beranda">
+<Layout
+  title="Voda Tour & Event | Perjalanan Berkesan, Momen Tak Terlupakan"
+  description="Solusi perjalanan wisata, gathering, dan event terbaik. Private tour, corporate gathering, dan outbound dengan pengalaman tak terlupakan."
+  active="beranda"
+>
   <main>
+    <!-- 3.1 Hero + SearchCard -->
+    <Hero
+      settings={settings}
+      destinations={destinations}
+      activityTypes={activityTypes}
+    />
 
-    <!-- Hero placeholder -->
-    <section class="wrap py-[80px] max-lg:py-[50px]">
-      <Eyebrow text="VODA TOUR &amp; EVENT" />
-      <h1 class="font-[family-name:var(--font-display)] text-navy-900 font-bold text-[48px] max-lg:text-[34px] leading-[1.15] mt-[14px] max-w-[700px]">
-        Perjalanan Berkesan, <span class="accent-italic">Tak Terlupakan</span>
-      </h1>
-      <p class="text-body text-[16px] leading-relaxed max-w-[500px] mt-[14px]">
-        Dari private trip sampai corporate gathering — kami hadirkan pengalaman terbaik untuk setiap momen spesial Anda.
-      </p>
-      <div class="flex flex-wrap gap-[14px] mt-[28px]">
-        <WaButton phone="6282112345678" variant="primary" />
-        <a href="/paket" class="inline-flex items-center gap-[10px] px-[26px] py-[14px] rounded-[999px] font-semibold text-[14.5px] border-[1.5px] border-navy-800 text-navy-800 no-underline transition-all duration-[0.18s] hover:-translate-y-[2px]">
-          Lihat Paket <i class="fa-solid fa-arrow-right"></i>
-        </a>
+    <!-- 3.2 FeatureStrip -->
+    <FeatureStrip />
+
+    <!-- 3.3 + 3.4 PackageGrid -->
+    <section id="paket" class="wrap py-[90px] max-lg:py-[60px]">
+      <SectionHeader
+        eyebrow="PAKET PILIHAN"
+        title="Destinasi & Paket Favorit"
+        description="Temukan paket perjalanan dan event terbaik untuk momen spesial Anda."
+        layout="default"
+      />
+      <div class="mt-[28px]">
+        {fetchError ? (
+          <div class="rounded-[--radius-md] bg-red-50 border border-red-200 p-[16px] text-red-700 text-[14px]">
+            <i class="fa-solid fa-circle-exclamation mr-[8px]"></i>
+            Gagal memuat data. Pastikan Directus sudah berjalan.
+          </div>
+        ) : (
+          <PackageGrid packages={packages} />
+        )}
       </div>
     </section>
 
-    <!-- Test Eyebrow -->
-    <section class="wrap pb-[60px]">
-      <Eyebrow text="PAKET PILIHAN" />
-      <h2 class="font-[family-name:var(--font-display)] text-navy-900 font-bold text-[34px] mt-[14px]">Destinasi Favorit</h2>
+    <!-- 3.5 StatsBar + Testimonial -->
+    <StatsBar />
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-[28px]">
-        <div class="bg-white rounded-[--radius-md] shadow-[--shadow-soft] p-6">
-          <IconBadge icon="fa-solid fa-mountain" size="md" variant="navy" />
-          <h3 class="font-[family-name:var(--font-display)] text-navy-800 font-semibold text-[15.5px] mt-[14px]">Bandung</h3>
-          <p class="text-body text-[14px] mt-[6px]">Kota kembang dengan pesona alam pegunungan...</p>
-          <div class="mt-[14px]"><PriceDisplay amount={850000} prefix="Mulai" format="full" perPax={true} size="sm" /></div>
-        </div>
-        <div class="bg-white rounded-[--radius-md] shadow-[--shadow-soft] p-6">
-          <IconBadge icon="fa-solid fa-umbrella-beach" size="md" variant="navy" />
-          <h3 class="font-[family-name:var(--font-display)] text-navy-800 font-semibold text-[15.5px] mt-[14px]">Bali</h3>
-          <p class="text-body text-[14px] mt-[6px]">Pulau dewata dengan budaya dan pantai eksotis...</p>
-          <div class="mt-[14px]"><PriceDisplay amount={2500000} prefix="Mulai" format="auto" perPax={true} size="sm" /></div>
-        </div>
-        <div class="bg-white rounded-[--radius-md] shadow-[--shadow-soft] p-6">
-          <IconBadge icon="fa-solid fa-temple" size="md" variant="navy" />
-          <h3 class="font-[family-name:var(--font-display)] text-navy-800 font-semibold text-[15.5px] mt-[14px]">Yogyakarta</h3>
-          <p class="text-body text-[14px] mt-[6px]">Kota budaya dengan candi dan kuliner legendaris...</p>
-          <div class="mt-[14px]"><PriceDisplay amount={1200000} prefix="Dari" format="short" perPax={true} size="sm" /></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Test SkeletonCard -->
-    <section class="bg-mist py-[60px]">
-      <div class="wrap">
-        <h3 class="font-[family-name:var(--font-display)] text-navy-900 font-bold text-[19px] mb-[20px]">Loading State Example</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <SkeletonCard variant="package" />
-          <SkeletonCard variant="destinasi" />
-          <SkeletonCard variant="feature" count={2} />
-        </div>
-      </div>
-    </section>
-
+    <!-- 3.6 CTABand -->
+    <CTABand
+      ctaLabel="Konsultasi Gratis"
+      ctaUrl={`https://wa.me/${settings.whatsapp || "6282112345678"}?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20paket%20Anda.`}
+    />
   </main>
 </Layout>

@@ -1,0 +1,41 @@
+---
+// Voda Tour & Event — FeatureStrip Component
+// Overlapping white card with 4 feature items
+
+interface Props {
+  features?: {
+    icon: string;
+    title: string;
+    description: string;
+  }[];
+}
+
+const defaultFeatures = [
+  { icon: "fa-solid fa-award", title: "Berpengalaman", description: "Lebih dari 10 tahun melayani perjalanan dan event." },
+  { icon: "fa-solid fa-users", title: "Tim Profesional", description: "Tim berpengalaman, ramah, dan siap membantu Anda." },
+  { icon: "fa-solid fa-tag", title: "Harga Terbaik", description: "Harga kompetitif dengan kualitas pelayanan terbaik." },
+  { icon: "fa-solid fa-headset", title: "24/7 Support", description: "Siap membantu Anda kapan pun, di mana pun." },
+];
+
+const features = Astro.props.features || defaultFeatures;
+---
+
+<div class="relative z-20 -mt-[64px] max-lg:-mt-0 max-lg:pt-[40px]">
+  <div class="wrap">
+    <div class="bg-white rounded-[--radius-lg] shadow-[--shadow-card] p-[34px] max-lg:p-[24px]">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[28px] max-lg:gap-[20px]">
+        {features.map((f) => (
+          <div class="flex items-start gap-[16px]">
+            <div class="w-[52px] h-[52px] bg-navy-800 rounded-full flex items-center justify-center text-orange-500 text-[22px] shrink-0">
+              <i class={f.icon}></i>
+            </div>
+            <div>
+              <h4 class="font-[family-name:var(--font-display)] text-navy-800 font-semibold text-[15px] leading-tight">{f.title}</h4>
+              <p class="text-body text-[13px] leading-relaxed mt-[4px]">{f.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>

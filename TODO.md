@@ -107,76 +107,76 @@
 ## Phase 3: Landing Page (`index.astro`)
 
 ### 3.1 Hero + SearchCard
-- [ ] **Hero.astro:**
-  - [ ] Full-bleed teal/ocean gradient background (`0A3B52` → `8FD6B4`)
-  - [ ] 2-column grid: copy left, SearchCard right
-  - [ ] Eyebrow "VODA TOUR & EVENT" (light orange)
-  - [ ] H1 putih + Playfair italic accent phrase
-  - [ ] Subheadline putih, max-width 440px
-  - [ ] 2 CTA buttons: "Cari Paket" (orange) + "Hubungi Kami" (outline white)
-  - [ ] `hero::before` decorative circles
-  - [ ] `hero::after` bottom gradient fade
-  - [ ] Responsive: stack ke 1 kolom di tablet
+- [x] **Hero.astro:**
+  - [x] Full-bleed teal/ocean gradient background (`0A3B52` → `8FD6B4`)
+  - [x] 2-column grid: copy left, SearchCard right
+  - [x] Eyebrow "VODA TOUR & EVENT" (light orange)
+  - [x] H1 putih + Playfair italic accent phrase
+  - [x] Subheadline putih, max-width 440px
+  - [x] 2 CTA buttons: "Cari Paket" (orange) + "Hubungi Kami" (outline white)
+  - [x] `hero::before` decorative circles
+  - [x] `hero::after` bottom gradient fade
+  - [x] Responsive: stack ke 1 kolom di tablet
 
-- [ ] **SearchCard.astro:**
-  - [ ] Navy gradient card (`navy-800` → `navy-900`), `radius-lg`
-  - [ ] Title "Cari Paket Impianmu" + orange underline
-  - [ ] 2x2 grid: Destinasi (autocomplete), Kegiatan (dropdown), Peserta (number), Tanggal (date)
-  - [ ] Form fields styling: glassmorphism (`rgba(255,255,255,.06)` bg, border)
-  - [ ] Submit button "🔍 Cari Paket" orange full-width
-  - [ ] On submit → redirect ke `/cari?params=`
+- [x] **SearchCard.astro:**
+  - [x] Navy gradient card (`navy-800` → `navy-900`), `radius-lg`
+  - [x] Title "Cari Paket Impianmu" + orange underline
+  - [x] 2x2 grid: Destinasi (autocomplete), Kegiatan (dropdown), Peserta (number), Tanggal (date)
+  - [x] Form fields styling: glassmorphism (`rgba(255,255,255,.06)` bg, border)
+  - [x] Submit button "🔍 Cari Paket" orange full-width
+  - [x] On submit → redirect ke `/cari?params=`
 
 ### 3.2 FeatureStrip
-- [ ] **FeatureStrip.astro:**
-  - [ ] White card, `radius-lg`, `shadow-card`
-  - [ ] Negative margin `-64px` overlap hero
-  - [ ] 4-column grid icon + text
-  - [ ] Icon = 52px navy circle + orange FA icon
-  - [ ] Features: "Destinasi Terkurasi", "Harga Transparan", "Tim Profesional", "24/7 Support"
+- [x] **FeatureStrip.astro:**
+  - [x] White card, `radius-lg`, `shadow-card`
+  - [x] Negative margin `-64px` overlap hero
+  - [x] 4-column grid icon + text
+  - [x] Icon = 52px navy circle + orange FA icon
+  - [x] Features: "Destinasi Terkurasi", "Harga Transparan", "Tim Profesional", "24/7 Support"
 
 ### 3.3 SectionHeader
-- [ ] **SectionHeader.astro:**
-  - [ ] Eyebrow (orange rule + text)
-  - [ ] H2 Poppins 700 34px
-  - [ ] Description optional
-  - [ ] Layout: "default" (stack) atau "split" (title left, CTA right)
+- [x] **SectionHeader.astro:**
+  - [x] Eyebrow (orange rule + text)
+  - [x] H2 Poppins 700 34px
+  - [x] Description optional
+  - [x] Layout: "default" (stack) atau "split" (title left, CTA right)
 
 ### 3.4 PackageGrid (Paket Pilihan)
-- [ ] **PackageCard.astro:**
-  - [ ] White card, `radius-md`, `shadow-soft`
-  - [ ] Photo gradient area (150px) — color varies by kategori
-  - [ ] Circular icon badge pinned top-left, overlapping photo edge
-  - [ ] Body: title (15.5px/600), 2-line description (12.8px)
-  - [ ] Dashed divider
-  - [ ] Price row: "Mulai dari" label + bold orange price + navy circle arrow button
-  - [ ] Hover: translateY(-6px) + deeper shadow
+- [x] **PackageCard.astro:**
+  - [x] White card, `radius-md`, `shadow-soft`
+  - [x] Photo gradient area (150px) — color varies by kategori
+  - [x] Circular icon badge pinned top-left, overlapping photo edge
+  - [x] Body: title (15.5px/600), 2-line description (12.8px)
+  - [x] Dashed divider
+  - [x] Price row: "Mulai dari" label + bold orange price + navy circle arrow button
+  - [x] Hover: translateY(-6px) + deeper shadow
 
-- [ ] **PackageGrid.astro:**
-  - [ ] Fetch 4 latest packages dari Directus
-  - [ ] 4-col grid (2-col tablet, 1-col mobile)
-  - [ ] Loading: 4 SkeletonCard
-  - [ ] Empty: "Belum ada paket tersedia"
-  - [ ] Error: alert merah + retry
+- [x] **PackageGrid.astro:**
+  - [x] Fetch 4 latest packages dari Directus
+  - [x] 4-col grid (2-col tablet, 1-col mobile)
+  - [x] Loading: 4 SkeletonCard
+  - [x] Empty: "Belum ada paket tersedia"
+  - [x] Error: alert merah + retry
 
 ### 3.5 StatsBar + Testimonial
-- [ ] **StatsBar.astro:**
-  - [ ] Full-width navy-900 section
-  - [ ] 4 stat clusters (outlined circle icon + bold number + 2-line label)
-  - [ ] Vertical hairline rules separator
-  - [ ] Right column: testimonial card
-  - [ ] Testimonial: quote icon, 5 orange stars, name + company, circular avatar with orange ring
+- [x] **StatsBar.astro:**
+  - [x] Full-width navy-900 section
+  - [x] 4 stat clusters (outlined circle icon + bold number + 2-line label)
+  - [x] Vertical hairline rules separator
+  - [x] Right column: testimonial card
+  - [x] Testimonial: quote icon, 5 orange stars, name + company, circular avatar with orange ring
 
 ### 3.6 CTABand
-- [ ] **CTABand.astro:**
-  - [ ] Gradient dark section (`122A3D` → `356E78`)
-  - [ ] Top: heading + description + CTA button, separated by bottom border
-  - [ ] Bottom: 4 feature chips (rounded-square 38px icon + label)
-  - [ ] Primary orange CTA button
+- [x] **CTABand.astro:**
+  - [x] Gradient dark section (`122A3D` → `356E78`)
+  - [x] Top: heading + description + CTA button, separated by bottom border
+  - [x] Bottom: 4 feature chips (rounded-square 38px icon + label)
+  - [x] Primary orange CTA button
 
 ### 3.7 Landing Page Assembly (`index.astro`)
-- [ ] Import all components
-- [ ] SSR fetch: settings, destinations, packages, activity_types
-- [ ] Render: Header → Hero + SearchCard → FeatureStrip → SectionHeader → PackageGrid → StatsBar → CTABand → Footer
+- [x] Import all components
+- [x] SSR fetch: settings, destinations, packages, activity_types
+- [x] Render: Header → Hero + SearchCard → FeatureStrip → SectionHeader → PackageGrid → StatsBar → CTABand → Footer
 - [ ] Loading/error/empty state untuk tiap section
 - [ ] Responsive: verifikasi breakpoint 1080px & 640px
 
