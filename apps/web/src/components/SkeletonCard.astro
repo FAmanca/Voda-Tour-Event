@@ -1,0 +1,61 @@
+---
+// Voda Tour & Event — SkeletonCard Component
+// Loading placeholder with animate-pulse
+
+interface Props {
+  /** Visual variant: package card, destinasi card, feature card */
+  variant?: 'package' | 'destinasi' | 'feature';
+  /** Row count for feature variant */
+  count?: number;
+}
+
+const { variant = 'package', count = 3 } = Astro.props;
+
+const animate = 'animate-pulse bg-[#e2e6ec] rounded-[--radius-md]';
+---
+
+{
+  variant === 'package' && (
+    <div class="bg-white rounded-[--radius-md] shadow-[--shadow-soft] overflow-hidden">
+      <div class={`${animate} h-[200px] w-full`}></div>
+      <div class="p-5 space-y-3">
+        <div class={`${animate} h-4 w-3/4`}></div>
+        <div class={`${animate} h-3 w-full`}></div>
+        <div class={`${animate} h-3 w-5/6`}></div>
+        <div class="flex justify-between items-center pt-2">
+          <div class={`${animate} h-5 w-[100px]`}></div>
+          <div class={`${animate} h-[38px] w-[38px] rounded-full`}></div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+{
+  variant === 'destinasi' && (
+    <div class="bg-white rounded-[--radius-md] shadow-[--shadow-soft] overflow-hidden">
+      <div class={`${animate} h-[180px] w-full`}></div>
+      <div class="p-4 space-y-2">
+        <div class={`${animate} h-4 w-1/2`}></div>
+        <div class={`${animate} h-3 w-full`}></div>
+      </div>
+    </div>
+  )
+}
+
+{
+  variant === 'feature' && (
+    <div class="space-y-4">
+      {Array.from({ length: count }).map((_) => (
+        <div class="flex items-start gap-4">
+          <div class={`${animate} w-[46px] h-[46px] rounded-full shrink-0`}></div>
+          <div class="flex-1 space-y-2 pt-1">
+            <div class={`${animate} h-4 w-1/3`}></div>
+            <div class={`${animate} h-3 w-full`}></div>
+            <div class={`${animate} h-3 w-4/5`}></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
