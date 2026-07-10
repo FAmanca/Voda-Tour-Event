@@ -21,7 +21,7 @@ const sizeMap: Record<string, string> = {
   lg: 'w-[54px] h-[54px] text-[24px]',
 };
 
-const shapeClass = shape === 'circle' ? 'rounded-full' : 'rounded-[--radius-sm]';
+const shapeClass = shape === 'circle' ? 'rounded-full' : 'rounded-[var(--radius-sm)]';
 
 const variantClass: Record<string, string> = {
   navy: 'bg-navy-800 text-white',

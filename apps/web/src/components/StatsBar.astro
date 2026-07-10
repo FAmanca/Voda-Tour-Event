@@ -35,8 +35,9 @@ const stats = Astro.props.stats || defaultStats;
 const testimonial = Astro.props.testimonial || defaultTestimonial;
 ---
 
-<section class="bg-navy-900">
-  <div class="wrap py-[70px] max-lg:py-[50px]">
+<div class="relative z-20 -mt-[64px] max-lg:-mt-0 max-lg:pt-[40px]">
+  <div class="wrap">
+    <div class="bg-navy-900 rounded-[var(--radius-lg)] shadow-[var(--shadow-card)] p-[34px] max-lg:p-[24px]">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-[40px] max-lg:gap-[34px]">
 
       <!-- Stats column (2/3) -->
@@ -81,4 +82,6 @@ const testimonial = Astro.props.testimonial || defaultTestimonial;
 
     </div>
   </div>
-</section>
+    </div>
+  </div>
+</div>

@@ -11,8 +11,8 @@ interface Props {
 }
 
 const {
-  heading = "Siap untuk Pengalaman Tak Terlupakan?",
-  description = "Hubungi kami sekarang dan dapatkan penawaran terbaik untuk perjalanan atau event Anda.",
+  heading = "Butuh Paket Custom untuk Perushaan Anda?",
+  description = "Kami siap merancang perjalanan dan event yang sesuai kebutuhan Anda.",
   ctaLabel = "Hubungi Kami",
   ctaUrl,
   features: featureProps,
@@ -33,7 +33,7 @@ const whatsappUrl = ctaUrl || "https://wa.me/6282112345678?text=Halo%20Voda%20To
   <div class="wrap py-[70px] max-lg:py-[50px]">
     <!-- Top: heading + description + CTA -->
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-[24px] pb-[34px] border-b border-white/10">
-      <div class="max-w-[600px]">
+      <div class="max-w-[600px] my-5">
         <h2 class="font-[family-name:var(--font-display)] text-white font-bold text-[34px] max-lg:text-[28px] leading-[1.15]">{heading}</h2>
         <p class="text-white/65 text-[15px] leading-relaxed mt-[8px]">{description}</p>
       </div>
@@ -49,7 +49,7 @@ const whatsappUrl = ctaUrl || "https://wa.me/6282112345678?text=Halo%20Voda%20To
     </div>
 
     <!-- Bottom: feature chips -->
-    <div class="flex flex-wrap gap-[20px] mt-[30px]">
+    <div class="flex flex-wrap gap-[20px] mt-[30px] ">
       {features.map((f) => (
         <div class="flex items-center gap-[10px] bg-white/10 rounded-[999px] px-[14px] py-[8px]">
           <div class="w-[32px] h-[32px] bg-white/15 rounded-[8px] flex items-center justify-center text-orange-400 text-[14px]">
