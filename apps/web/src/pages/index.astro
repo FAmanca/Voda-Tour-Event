@@ -1,0 +1,49 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Beranda | Voda Tour & Event">
+  <main>
+    <!-- Header placeholder -->
+    <header class="wrap" style="padding-top: 24px; padding-bottom: 24px;">
+      <h1 class="font-display text-ink font-bold text-3xl md:text-5xl">
+        Voda Tour & Event
+      </h1>
+      <p class="text-body mt-2">
+        Perjalanan Berkesan, <span class="accent-italic">Tak Terlupakan</span>
+      </p>
+    </header>
+
+    <!-- Test: Tailwind theme colors -->
+    <section class="wrap py-16">
+      <div class="eyebrow">PAKET PILIHAN</div>
+      <h2 class="font-display text-ink font-bold text-[34px] mt-4">
+        Destinasi Favorit
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        <div class="bg-white rounded-[--radius-md] shadow-[--shadow-soft] p-6">
+          <h3 class="font-display text-navy-800 font-semibold">Bandung</h3>
+          <p class="text-body text-sm mt-2">Kota kembang dengan pesona alam pegunungan...</p>
+        </div>
+        <div class="bg-white rounded-[--radius-md] shadow-[--shadow-soft] p-6">
+          <h3 class="font-display text-navy-800 font-semibold">Bali</h3>
+          <p class="text-body text-sm mt-2">Pulau dewata dengan budaya dan pantai eksotis...</p>
+        </div>
+        <div class="bg-white rounded-[--radius-md] shadow-[--shadow-soft] p-6">
+          <h3 class="font-display text-navy-800 font-semibold">Yogyakarta</h3>
+          <p class="text-body text-sm mt-2">Kota budaya dengan candi dan kuliner legendaris...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Test: Button -->
+    <section class="wrap py-8 text-center">
+      <a
+        href="#"
+        class="inline-flex items-center gap-2 px-6 py-3 rounded-[999px] font-semibold text-sm bg-orange-600 text-white shadow-[0_14px_28px_-10px_rgba(238,125,15,0.55)] transition-all duration-[0.18s] hover:-translate-y-[2px] hover:shadow-[0_18px_34px_-10px_rgba(238,125,15,0.65)]"
+      >
+        <i class="fa-solid fa-whatsapp"></i> Hubungi Kami
+      </a>
+    </section>
+  </main>
+</Layout>

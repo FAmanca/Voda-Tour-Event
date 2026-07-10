@@ -1,0 +1,34 @@
+# Node
+node_modules/
+node/
+.pnpm-store/
+
+# Astro
+dist/
+.cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+apps/web/.env
+infrastructure/.env
+!*.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Logs
+*.log
+/tmp/
+
+# Docker
+.docker/
+
+# Git
+.git/

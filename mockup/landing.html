@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VODA Tour & Event — Perjalanan Berkesan, Momen Tak Terlupakan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Playfair+Display:ital@1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  :root{
+    --navy-900:#0B2340;
+    --navy-800:#0F2C4C;
+    --navy-700:#173A5E;
+    --navy-600:#2A527A;
+    --orange-600:#EE7D0F;
+    --orange-500:#F5900F;
+    --orange-100:#FFE9D2;
+    --ink:#0B2340;
+    --body:#5B6B80;
+    --body-light:#8A97A8;
+    --paper:#FFFFFF;
+    --mist:#F5F7FA;
+    --line:#E6EAF0;
+    --radius-lg:20px;
+    --radius-md:14px;
+    --radius-sm:10px;
+    --shadow-card:0 20px 40px -18px rgba(11,35,64,0.25);
+    --shadow-soft:0 10px 30px -14px rgba(11,35,64,0.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter',sans-serif;
+    color:var(--body);
+    background:var(--paper);
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%;display:block;}
+  a{text-decoration:none;color:inherit;}
+  ul{list-style:none;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 40px;}
+  h1,h2,h3,h4{font-family:'Poppins',sans-serif;color:var(--ink);line-height:1.15;}
+  .eyebrow{
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-size:12.5px;
+    color:var(--orange-600);
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:22px;height:2px;background:var(--orange-600);border-radius:2px;}
+  .accent-italic{font-family:'Playfair Display',serif;font-style:italic;font-weight:400;color:var(--orange-600);}
+
+  /* Buttons */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    padding:14px 26px;border-radius:999px;font-weight:600;font-size:14.5px;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+    white-space:nowrap;
+  }
+  .btn-primary{background:var(--orange-600);color:#fff;box-shadow:0 14px 28px -10px rgba(238,125,15,.55);}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 18px 34px -10px rgba(238,125,15,.65);}
+  .btn-outline-dark{background:transparent;border:1.5px solid rgba(255,255,255,.55);color:#fff;}
+  .btn-outline-dark:hover{background:rgba(255,255,255,.12);transform:translateY(-2px);}
+  .btn-navy{background:var(--navy-800);color:#fff;}
+  .btn-navy:hover{background:var(--navy-900);transform:translateY(-2px);}
+  .btn-icon-circle{
+    width:40px;height:40px;border-radius:50%;background:var(--navy-800);color:#fff;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    transition:background .18s ease, transform .18s ease;
+  }
+  .btn-icon-circle:hover{background:var(--orange-600);transform:translateX(2px);}
+
+  /* ---------- HEADER ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:#fff;border-bottom:1px solid var(--line);
+  }
+  .nav-row{display:flex;align-items:center;justify-content:space-between;height:88px;gap:24px;}
+  .logo{display:flex;align-items:center;gap:10px;font-family:'Poppins',sans-serif;}
+  .logo-mark{
+    width:42px;height:42px;border-radius:12px;
+    background:linear-gradient(135deg,var(--navy-800),var(--navy-900));
+    display:flex;align-items:center;justify-content:center;color:var(--orange-500);font-size:18px;
+    transform:rotate(-8deg);
+  }
+  .logo-text{line-height:1;}
+  .logo-text .top{font-size:22px;font-weight:800;color:var(--navy-900);letter-spacing:.02em;}
+  .logo-text .bottom{font-size:9.5px;font-weight:700;color:var(--orange-600);letter-spacing:.24em;}
+  nav.main-nav{display:flex;align-items:center;gap:34px;}
+  nav.main-nav a{
+    font-size:14.5px;font-weight:600;color:var(--ink);
+    display:flex;align-items:center;gap:6px;position:relative;padding-bottom:6px;
+  }
+  nav.main-nav a i{font-size:10px;color:var(--body-light);}
+  nav.main-nav a.active{color:var(--orange-600);}
+  nav.main-nav a.active::after{
+    content:"";position:absolute;left:0;bottom:-10px;width:100%;height:2.5px;background:var(--orange-600);border-radius:2px;
+  }
+  .header-actions{display:flex;align-items:center;gap:14px;}
+  .phone-pill{
+    display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);
+    border-radius:999px;padding:10px 18px;font-weight:600;font-size:14px;color:var(--ink);
+  }
+  .phone-pill i{color:var(--orange-600);}
+  .burger{display:none;font-size:22px;color:var(--navy-900);}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;overflow:hidden;
+    background:
+      radial-gradient(ellipse at 15% 20%, rgba(255,255,255,.10), transparent 45%),
+      linear-gradient(115deg,#0A3B52 0%,#0E5E73 28%,#1C8C96 52%,#3FB6A6 72%,#8FD6B4 100%);
+    padding:88px 0 130px;
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;
+    background-image:
+      radial-gradient(circle at 78% 78%, rgba(255,255,255,.20) 0, rgba(255,255,255,.20) 60px, transparent 61px),
+      radial-gradient(circle at 66% 88%, rgba(255,255,255,.14) 0, rgba(255,255,255,.14) 34px, transparent 35px);
+    opacity:.6;
+  }
+  .hero::after{
+    content:"";position:absolute;left:0;right:0;bottom:-6%;height:46%;
+    background:linear-gradient(180deg, rgba(11,60,60,0) 0%, rgba(4,38,42,.35) 100%);
+  }
+  .hero-grid{
+    position:relative;z-index:2;
+    display:grid;grid-template-columns:1.05fr 0.85fr;gap:48px;align-items:start;
+  }
+  .hero-copy .eyebrow{color:#FFD9A6;margin-bottom:22px;}
+  .hero-copy .eyebrow::before{background:#FFD9A6;}
+  .hero-copy h1{font-size:48px;font-weight:700;color:#fff;margin-bottom:22px;}
+  .hero-copy p{font-size:16.5px;color:rgba(255,255,255,.86);max-width:440px;margin-bottom:34px;line-height:1.7;}
+  .hero-btn-row{display:flex;gap:16px;flex-wrap:wrap;}
+
+  /* Search Card */
+  .search-card{
+    background:linear-gradient(160deg,var(--navy-800),var(--navy-900) 80%);
+    border-radius:var(--radius-lg);
+    padding:34px 32px 30px;
+    box-shadow:0 40px 70px -30px rgba(4,20,38,.65);
+    margin-top:6px;
+  }
+  .search-card h3{color:#fff;font-size:19px;font-weight:700;margin-bottom:4px;}
+  .search-card .eyebrow-line{width:34px;height:2.5px;background:var(--orange-500);border-radius:2px;margin-bottom:22px;}
+  .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+  .field label{
+    display:block;font-size:12px;font-weight:600;color:rgba(255,255,255,.65);
+    margin-bottom:9px;letter-spacing:.02em;
+  }
+  .field .control{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:11px;padding:13px 15px;color:rgba(255,255,255,.55);font-size:13.5px;
+  }
+  .field .control i{color:rgba(255,255,255,.45);font-size:13px;}
+  .search-btn{
+    width:100%;background:var(--orange-600);color:#fff;border-radius:11px;
+    padding:15px;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:10px;
+    box-shadow:0 16px 30px -12px rgba(238,125,15,.55);
+    transition:filter .18s ease, transform .18s ease;
+  }
+  .search-btn:hover{filter:brightness(1.06);transform:translateY(-2px);}
+
+  /* Feature strip (overlapping) */
+  .feature-strip-wrap{position:relative;z-index:3;margin-top:-64px;}
+  .feature-strip{
+    background:#fff;border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-card);
+    padding:36px 44px;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:28px;
+  }
+  .feature-item{display:flex;gap:16px;align-items:flex-start;}
+  .feature-icon{
+    width:52px;height:52px;border-radius:50%;flex-shrink:0;
+    background:var(--navy-800);color:var(--orange-500);
+    display:flex;align-items:center;justify-content:center;font-size:19px;
+  }
+  .feature-item h4{font-size:15.5px;margin-bottom:5px;}
+  .feature-item p{font-size:13.3px;color:var(--body);line-height:1.55;}
+
+  /* ---------- PACKAGES ---------- */
+  .packages{background:var(--mist);padding:110px 0 90px;}
+  .packages-head{
+    display:grid;grid-template-columns:0.62fr 1.38fr;gap:56px;align-items:end;margin-bottom:50px;
+  }
+  .packages-head h2{font-size:34px;font-weight:700;margin:16px 0 18px;}
+  .packages-head p{font-size:14.5px;line-height:1.7;color:var(--body);margin-bottom:26px;}
+
+  .pkg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;}
+  .pkg-card{
+    background:#fff;border-radius:var(--radius-md);overflow:hidden;
+    box-shadow:var(--shadow-soft);
+    transition:transform .22s ease, box-shadow .22s ease;
+  }
+  .pkg-card:hover{transform:translateY(-6px);box-shadow:0 26px 46px -18px rgba(11,35,64,.28);}
+  .pkg-media{
+    position:relative;height:150px;
+  }
+  .pkg-media .badge{
+    position:absolute;left:16px;top:16px;width:38px;height:38px;border-radius:50%;
+    background:rgba(255,255,255,.92);color:var(--navy-800);
+    display:flex;align-items:center;justify-content:center;font-size:15px;
+    box-shadow:0 6px 14px -4px rgba(0,0,0,.25);
+  }
+  .pkg-body{padding:20px 20px 22px;}
+  .pkg-body h4{font-size:15.5px;line-height:1.35;margin-bottom:8px;}
+  .pkg-body p{font-size:12.8px;color:var(--body);line-height:1.6;margin-bottom:16px;min-height:52px;}
+  .pkg-price-row{display:flex;align-items:flex-end;justify-content:space-between;border-top:1px dashed var(--line);padding-top:14px;}
+  .pkg-price-row .label{font-size:11px;color:var(--body-light);display:block;margin-bottom:3px;}
+  .pkg-price-row .price{font-size:16px;font-weight:700;color:var(--orange-600);font-family:'Poppins',sans-serif;}
+  .pkg-price-row .price span{font-size:11px;font-weight:500;color:var(--body-light);}
+
+  .media-seribu{background:linear-gradient(150deg,#0E5E73,#3FB6A6 60%,#BFE6C9);}
+  .media-bandung{background:linear-gradient(150deg,#3A2C22,#8C6A4F 55%,#D9BFA0);}
+  .media-gathering{background:linear-gradient(150deg,#0B2340,#2A527A 55%,#7FA6C7);}
+  .media-outbound{background:linear-gradient(150deg,#123822,#3E8054 55%,#B9D98C);}
+
+  /* ---------- STATS / TESTIMONIAL ---------- */
+  .stats-bar{background:var(--navy-900);padding:0;}
+  .stats-inner{
+    display:grid;grid-template-columns:repeat(4,auto) 1.5fr;gap:0;align-items:center;
+    padding:34px 40px;
+  }
+  .stat{display:flex;align-items:center;gap:14px;padding-right:34px;border-right:1px solid rgba(255,255,255,.12);}
+  .stat:nth-child(4){border-right:1px solid rgba(255,255,255,.12);}
+  .stat-icon{
+    width:44px;height:44px;border-radius:50%;border:1.5px solid var(--orange-500);
+    display:flex;align-items:center;justify-content:center;color:var(--orange-500);font-size:17px;flex-shrink:0;
+  }
+  .stat .num{font-family:'Poppins',sans-serif;color:#fff;font-weight:700;font-size:19px;line-height:1.2;}
+  .stat .lbl{font-size:12px;color:rgba(255,255,255,.62);line-height:1.4;}
+  .testimonial{display:flex;align-items:center;gap:18px;padding-left:34px;}
+  .testimonial .quote-icon{color:var(--orange-500);font-size:20px;opacity:.9;}
+  .testimonial p{font-size:13.3px;color:rgba(255,255,255,.88);line-height:1.6;margin-bottom:8px;}
+  .stars{color:var(--orange-500);font-size:12px;margin-bottom:6px;letter-spacing:2px;}
+  .testimonial .who{font-size:12px;color:rgba(255,255,255,.55);}
+  .testimonial .who b{color:#fff;font-weight:600;}
+  .avatar{
+    width:54px;height:54px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(150deg,#E7A15C,#C97A3D);
+    border:3px solid var(--orange-500);
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-family:'Poppins',sans-serif;
+  }
+
+  /* ---------- CTA FOOTER ---------- */
+  .cta-band{
+    position:relative;overflow:hidden;
+    background:
+      linear-gradient(180deg, rgba(6,20,34,.55), rgba(6,20,34,.86)),
+      linear-gradient(160deg,#122A3D,#1E4258 45%,#356E78 100%);
+    padding:70px 0 0;
+    color:#fff;
+  }
+  .cta-top{
+    display:flex;align-items:center;justify-content:space-between;gap:40px;
+    padding-bottom:44px;border-bottom:1px solid rgba(255,255,255,.14);
+    flex-wrap:wrap;
+  }
+  .cta-top h2{color:#fff;font-size:27px;font-weight:700;max-width:480px;margin-bottom:10px;}
+  .cta-top p{font-size:14px;color:rgba(255,255,255,.72);max-width:460px;}
+  .cta-mid{
+    display:grid;grid-template-columns:repeat(4,1fr) auto;gap:30px;align-items:center;
+    padding:30px 0 46px;
+  }
+  .cta-feat{display:flex;align-items:center;gap:12px;}
+  .cta-feat i{
+    width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.08);
+    display:flex;align-items:center;justify-content:center;color:var(--orange-500);font-size:15px;flex-shrink:0;
+  }
+  .cta-feat span{font-size:13px;font-weight:600;color:rgba(255,255,255,.9);line-height:1.35;}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:1080px){
+    .wrap{padding:0 24px;}
+    nav.main-nav{display:none;}
+    .burger{display:block;}
+    .hero-grid{grid-template-columns:1fr;}
+    .search-card{max-width:520px;}
+    .feature-strip{grid-template-columns:repeat(2,1fr);}
+    .packages-head{grid-template-columns:1fr;}
+    .pkg-grid{grid-template-columns:repeat(2,1fr);}
+    .stats-inner{grid-template-columns:repeat(2,1fr);row-gap:24px;}
+    .stat{border-right:none;padding-right:0;}
+    .testimonial{grid-column:1/-1;padding-left:0;border-top:1px solid rgba(255,255,255,.12);padding-top:22px;margin-top:6px;}
+    .cta-mid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:640px){
+    .nav-row{height:76px;}
+    .phone-pill{display:none;}
+    .hero{padding:48px 0 96px;}
+    .hero-copy h1{font-size:33px;}
+    .field-grid{grid-template-columns:1fr;}
+    .feature-strip{grid-template-columns:1fr;padding:28px;}
+    .pkg-grid{grid-template-columns:1fr;}
+    .cta-mid{grid-template-columns:1fr;}
+    .cta-top{flex-direction:column;align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav-row">
+    <a href="#" class="logo">
+      <div class="logo-mark"><i class="fa-solid fa-plane"></i></div>
+      <div class="logo-text">
+        <div class="top">VODA</div>
+        <div class="bottom">TOUR &amp; EVENT</div>
+      </div>
+    </a>
+    <nav class="main-nav">
+      <a href="#" class="active">Beranda</a>
+      <a href="#">Paket Wisata <i class="fa-solid fa-chevron-down"></i></a>
+      <a href="#">Gathering &amp; Event <i class="fa-solid fa-chevron-down"></i></a>
+      <a href="#">Destinasi <i class="fa-solid fa-chevron-down"></i></a>
+      <a href="#">Tentang Kami</a>
+      <a href="#">Kontak</a>
+    </nav>
+    <div class="header-actions">
+      <a href="tel:0821-1234-5678" class="phone-pill"><i class="fa-solid fa-phone"></i> 0821-1234-5678</a>
+      <a href="#" class="btn btn-primary"><i class="fa-brands fa-whatsapp"></i> Konsultasi Gratis</a>
+      <button class="burger"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <div class="eyebrow">VODA TOUR &amp; EVENT</div>
+      <h1>Perjalanan Berkesan,<br>Momen <span class="accent-italic">Tak Terlupakan</span></h1>
+      <p>Solusi perjalanan wisata, gathering, dan event terbaik untuk Anda dan perusahaan.</p>
+      <div class="hero-btn-row">
+        <a href="#paket" class="btn btn-primary">Lihat Paket <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="#" class="btn btn-outline-dark"><i class="fa-brands fa-whatsapp"></i> Konsultasi Gratis</a>
+      </div>
+    </div>
+
+    <div class="search-card">
+      <h3>Cari Paket Terbaik untuk Anda</h3>
+      <div class="eyebrow-line"></div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Tujuan Destinasi</label>
+          <div class="control"><span>Pilih destinasi</span><i class="fa-solid fa-location-dot"></i></div>
+        </div>
+        <div class="field">
+          <label>Jenis Kegiatan</label>
+          <div class="control"><span>Pilih jenis kegiatan</span><i class="fa-solid fa-chevron-down"></i></div>
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Tanggal Berangkat</label>
+          <div class="control"><span>Pilih tanggal</span><i class="fa-regular fa-calendar"></i></div>
+        </div>
+        <div class="field">
+          <label>Jumlah Peserta</label>
+          <div class="control"><span>Jumlah peserta</span><i class="fa-regular fa-user"></i></div>
+        </div>
+      </div>
+      <button class="search-btn">Cari Paket <i class="fa-solid fa-magnifying-glass"></i></button>
+    </div>
+  </div>
+</section>
+
+<div class="feature-strip-wrap">
+  <div class="wrap">
+    <div class="feature-strip">
+      <div class="feature-item">
+        <div class="feature-icon"><i class="fa-solid fa-award"></i></div>
+        <div>
+          <h4>Berpengalaman</h4>
+          <p>Lebih dari 10 tahun melayani perjalanan dan event.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon"><i class="fa-solid fa-users"></i></div>
+        <div>
+          <h4>Tim Profesional</h4>
+          <p>Tim berpengalaman, ramah, dan siap membantu Anda.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon"><i class="fa-solid fa-tag"></i></div>
+        <div>
+          <h4>Harga Terbaik</h4>
+          <p>Harga kompetitif dengan kualitas pelayanan terbaik.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <div>
+          <h4>Aman &amp; Terpercaya</h4>
+          <p>Keamanan dan kenyamanan adalah prioritas kami.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="packages" id="paket">
+  <div class="wrap">
+    <div class="packages-head">
+      <div>
+        <div class="eyebrow">PAKET PILIHAN</div>
+        <h2>Paket Terbaik untuk Setiap Kebutuhan</h2>
+        <p>Berbagai pilihan paket wisata dan event menarik untuk liburan pribadi, keluarga, hingga kebutuhan perusahaan.</p>
+        <a href="#" class="btn btn-navy">Lihat Semua Paket <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+
+      <div class="pkg-grid">
+        <div class="pkg-card">
+          <div class="pkg-media media-seribu"><div class="badge"><i class="fa-solid fa-plane"></i></div></div>
+          <div class="pkg-body">
+            <h4>Paket Wisata Kepulauan Seribu</h4>
+            <p>Nikmati indahnya pulau-pulau eksotis di Kepulauan Seribu.</p>
+            <div class="pkg-price-row">
+              <div><span class="label">Mulai dari</span><span class="price">Rp450.000 <span>/orang</span></span></div>
+              <div class="btn-icon-circle"><i class="fa-solid fa-arrow-right"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pkg-card">
+          <div class="pkg-media media-bandung"><div class="badge"><i class="fa-solid fa-briefcase"></i></div></div>
+          <div class="pkg-body">
+            <h4>City Tour Bandung</h4>
+            <p>Jelajahi destinasi terbaik di Bandung dalam satu hari penuh pengalaman seru.</p>
+            <div class="pkg-price-row">
+              <div><span class="label">Mulai dari</span><span class="price">Rp250.000 <span>/orang</span></span></div>
+              <div class="btn-icon-circle"><i class="fa-solid fa-arrow-right"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pkg-card">
+          <div class="pkg-media media-gathering"><div class="badge"><i class="fa-solid fa-people-group"></i></div></div>
+          <div class="pkg-body">
+            <h4>Paket Gathering Perusahaan</h4>
+            <p>Bangun kebersamaan, tingkatkan teamwork, dan ciptakan momen berharga bersama tim.</p>
+            <div class="pkg-price-row">
+              <div><span class="label">Mulai dari</span><span class="price">Rp300.000 <span>/orang</span></span></div>
+              <div class="btn-icon-circle"><i class="fa-solid fa-arrow-right"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pkg-card">
+          <div class="pkg-media media-outbound"><div class="badge"><i class="fa-solid fa-mountain-sun"></i></div></div>
+          <div class="pkg-body">
+            <h4>Outbound &amp; Team Building</h4>
+            <p>Kegiatan outbound seru untuk memperkuat kerja sama dan semangat tim.</p>
+            <div class="pkg-price-row">
+              <div><span class="label">Mulai dari</span><span class="price">Rp275.000 <span>/orang</span></span></div>
+              <div class="btn-icon-circle"><i class="fa-solid fa-arrow-right"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats-bar">
+  <div class="wrap stats-inner">
+    <div class="stat">
+      <div class="stat-icon"><i class="fa-solid fa-suitcase-rolling"></i></div>
+      <div><div class="num">200+</div><div class="lbl">Paket Wisata<br>Menarik</div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon"><i class="fa-solid fa-user-group"></i></div>
+      <div><div class="num">500+</div><div class="lbl">Event &amp; Gathering<br>Sukses</div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon"><i class="fa-regular fa-face-smile"></i></div>
+      <div><div class="num">1000+</div><div class="lbl">Pelanggan<br>Puas</div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon"><i class="fa-solid fa-location-dot"></i></div>
+      <div><div class="num">50+</div><div class="lbl">Destinasi<br>Populer</div></div>
+    </div>
+    <div class="testimonial">
+      <div>
+        <i class="fa-solid fa-quote-left quote-icon"></i>
+        <p>Pelayanan memuaskan, itinerary seru, dan tim sangat profesional!</p>
+        <div class="stars">★★★★★</div>
+        <div class="who"><b>Andi Pratama</b> — PT. Maju Bersama</div>
+      </div>
+      <div class="avatar">AP</div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <div class="cta-top">
+      <div>
+        <h2>Butuh Paket Custom untuk Perusahaan Anda?</h2>
+        <p>Kami siap merancang perjalanan dan event yang sesuai dengan kebutuhan Anda.</p>
+      </div>
+    </div>
+    <div class="cta-mid">
+      <div class="cta-feat"><i class="fa-solid fa-pen-ruler"></i><span>Rancang Paket<br>Sesuai Kebutuhan</span></div>
+      <div class="cta-feat"><i class="fa-solid fa-people-group"></i><span>Tim Event<br>Berpengalaman</span></div>
+      <div class="cta-feat"><i class="fa-solid fa-medal"></i><span>Pelayanan<br>Terbaik</span></div>
+      <div class="cta-feat"><i class="fa-solid fa-chart-line"></i><span>Hasil<br>Memuaskan</span></div>
+      <a href="#" class="btn btn-primary"><i class="fa-brands fa-whatsapp"></i> Hubungi Kami</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelector('.burger')?.addEventListener('click', () => {
+    const nav = document.querySelector('.main-nav');
+    const shown = nav.style.display === 'flex';
+    nav.style.display = shown ? 'none' : 'flex';
+    nav.style.flexDirection = 'column';
+    nav.style.position = 'absolute';
+    nav.style.top = '76px';
+    nav.style.left = '0';
+    nav.style.right = '0';
+    nav.style.background = '#fff';
+    nav.style.padding = '20px 24px';
+    nav.style.gap = '18px';
+    nav.style.borderBottom = '1px solid var(--line)';
+  });
+</script>
+
+</body>
+</html>

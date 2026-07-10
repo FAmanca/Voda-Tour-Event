@@ -1,0 +1,58 @@
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: voda-postgres
+    restart: unless-stopped
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-voda}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-voda123}
+      POSTGRES_DB: ${POSTGRES_DB:-voda_travel}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-voda} -d ${POSTGRES_DB:-voda_travel}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  directus:
+    image: directus/directus:11
+    container_name: voda-directus
+    restart: unless-stopped
+    ports:
+      - "${DIRECTUS_PORT:-8055}:8055"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_CLIENT: pg
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${POSTGRES_DB:-voda_travel}
+      DB_USER: ${POSTGRES_USER:-voda}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-voda123}
+
+      KEY: ${DIRECTUS_KEY:-voda-directus-key-change-in-production}
+      SECRET: ${DIRECTUS_SECRET:-voda-directus-secret-change-in-production}
+
+      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL:-admin@vodaevent.id}
+      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD:-admin123}
+
+      # File storage — local untuk development
+      STORAGE_LOCATIONS: ${STORAGE_LOCATIONS:-local}
+      STORAGE_LOCAL_DRIVER: ${STORAGE_LOCAL_DRIVER:-local}
+      STORAGE_LOCAL_ROOT: ${STORAGE_LOCAL_ROOT:-/directus/uploads}
+
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:4321,http://localhost:5173}
+    volumes:
+      - directus_uploads:/directus/uploads
+      - directus_database:/directus/database
+
+volumes:
+  postgres_data:
+  directus_uploads:
+  directus_database:
