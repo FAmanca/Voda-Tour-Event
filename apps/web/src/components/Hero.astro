@@ -14,10 +14,14 @@ const { settings = {}, destinations = [], activityTypes = [] } = Astro.props;
 const phone = settings.whatsapp || settings.phone || '6282112345678';
 ---
 
-<section class="relative overflow-hidden bg-gradient-to-br from-[#0A3B52] via-[#2A7A6E] to-[#8FD6B4]">
-  <div class="absolute top-[-80px] right-[-80px] w-[300px] h-[300px] rounded-full border-[1px] border-white/8 max-lg:hidden" aria-hidden="true"></div>
-  <div class="absolute bottom-[40px] left-[-60px] w-[200px] h-[200px] rounded-full border-[1px] border-white/6 max-lg:hidden" aria-hidden="true"></div>
-  <div class="absolute top-[30%] right-[10%] w-[120px] h-[120px] rounded-full bg-white/[0.04] max-lg:hidden" aria-hidden="true"></div>
+<section class="relative overflow-hidden">
+  <img
+    src="/images/beach.avif"
+    alt=""
+    class="absolute inset-0 w-full h-full object-cover"
+    aria-hidden="true"
+  />
+  <div class="absolute inset-0 bg-gradient-to-r from-[rgba(10,59,82,0.85)] via-[rgba(42,122,110,0.7)] to-[rgba(143,214,180,0.45)]" aria-hidden="true"></div>
 
   <div class="wrap relative z-10">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-[40px] py-[80px] max-lg:py-[50px] items-center">
