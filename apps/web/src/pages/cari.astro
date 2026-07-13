@@ -1,51 +1,74 @@
 ---
+// Voda Tour & Event — Halaman Pencarian
+// Static shell — semua state dikelola client-side oleh initSearchPage()
+
 import Layout from "../layouts/Layout.astro";
 import SearchForm from "../components/SearchForm.astro";
-import SearchResult from "../components/SearchResult.astro";
-import Eyebrow from "../components/Eyebrow.astro";
 
 const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-const { destinasi: ds, kegiatan: ks, pax: ps } = Astro.url.searchParams;
-
 const [dr, ar] = await Promise.all([
-  fetch(U + "/items/destinations?fields=*,region_id.*&filter[status][_eq]=published&sort=name"),
+  fetch(U + "/items/destinations?fields=slug,name&filter[status][_eq]=published&sort=name"),
   fetch(U + "/items/activity_types?filter[status][_eq]=published&sort=name"),
 ]);
 let alld = [], acts = [];
 if (dr.ok) { const j = await dr.json(); alld = j.data || []; }
 if (ar.ok) { const j = await ar.json(); acts = j.data || []; }
-
-let packages = [];
-let err = false;
-try {
-  let url = U + "/items/packages?fields=*,destination_id.*&filter[status][_eq]=published&sort=-id";
-  if (ds) url += "&filter[destination_id][slug][_eq]=" + ds;
-  if (ks) {
-    const jr = await fetch(U + "/items/packages_activity_types?fields=package_id&filter[activity_type_id][slug][_eq]=" + ks);
-    let ids = [];
-    if (jr.ok) { const jj = await jr.json(); ids = (jj.data || []).map((x) => x.package_id); }
-    if (ids.length > 0) url += "&filter[id][_in]=" + ids.join(",");
-    else packages = []; // no results
-  }
-  if (!ks || (ks && packages.length === 0 && false)) {  // skip re-assign
-    const r = await fetch(url);
-    if (r.ok) { const j = await r.json(); packages = j.data || []; }
-    else err = true;
-  }
-} catch { err = true; }
-
-const hasSearch = !!(ds || ks || ps);
 ---
 
-<Layout title={hasSearch ? "Hasil Pencarian | Voda Tour & Event" : "Cari Paket Wisata | Voda Tour & Event"} description="Cari paket wisata dan destinasi." active="paket">
+<Layout
+  title="Cari Paket Wisata | Voda Tour & Event"
+  description="Temukan paket wisata dan event terbaik untuk perjalanan Anda bersama Voda Tour & Event."
+  active="paket"
+>
   <main>
-    <section class="bg-navy-900 py-[70px] max-lg:py-[50px]">
-      <div class="wrap">
-        <Eyebrow text="Pencarian" />
-        <h1 class="font-[family-name:var(--font-display)] text-white text-[32px] max-lg:text-[24px] font-bold mt-[8px]">{hasSearch ? "Hasil Pencarian" : "Cari Paket Wisata"}</h1>
-        <div class="mt-[28px]"><SearchForm destinations={alld} activityTypes={acts} initialValues={{ destination: ds, activityType: ks, paxCount: ps ? parseInt(ps) : undefined }} /></div>
+    <!-- HERO -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-navy-900 via-navy-800 to-[#0A2A3D] py-[60px] max-lg:py-[45px]">
+      <div class="absolute top-[-80px] right-[-40px] w-[250px] h-[250px] rounded-full bg-orange-500/8 blur-[70px]" aria-hidden="true"></div>
+      <div class="absolute bottom-[-60px] left-[-30px] w-[180px] h-[180px] rounded-full bg-white/5 blur-[60px]" aria-hidden="true"></div>
+
+      <div class="wrap relative z-10">
+        <div class="max-w-[700px]">
+          <span class="text-[11px] font-semibold text-orange-400 uppercase tracking-[0.15em]">Pencarian</span>
+          <h1 class="font-[family-name:var(--font-display)] text-white text-[32px] max-lg:text-[24px] font-bold mt-[6px]">Cari Paket Wisata</h1>
+          <p class="text-white/60 text-[14px] mt-[6px]" id="search-subtitle">
+            Temukan paket perjalanan dan event sesuai keinginanmu.
+          </p>
+        </div>
+        <div class="mt-[28px] max-w-[860px]">
+          <SearchForm destinations={alld} activityTypes={acts} />
+        </div>
       </div>
     </section>
-    <section><div class="wrap py-[50px] max-lg:py-[30px]">{!hasSearch ? <div class="text-center py-[60px]"><i class="fa-solid fa-search text-[48px] text-navy-200 block mb-[16px]"></i><p class="text-navy-400 text-[15px]">Gunakan form di atas untuk mencari paket.</p></div> : <><p class="text-navy-500 text-[14px] mb-[24px]"><strong>{packages.length}</strong> paket ditemukan</p><SearchResult packages={packages} error={err ? "Gagal memuat hasil." : null} /></>}</div></section>
+
+    <!-- RESULTS CONTAINER — always rendered, JS handles content -->
+    <section class="py-[50px] max-lg:py-[35px]">
+      <div class="wrap">
+        <!-- Loading state (visible initially, JS replaces it) -->
+         <!-- Search count -->         <div id="search-count" class="text-navy-400 text-[13px] mb-[20px]"></div>          <!-- Active filter tags -->         <div id="filter-tags" class="flex flex-wrap gap-[8px] mb-[20px]"></div>
+        <div id="search-results" class="text-center py-[80px]">
+          <div class="w-[80px] h-[80px] rounded-full bg-navy-50 flex items-center justify-center mx-auto mb-[20px]">
+            <i class="fa-solid fa-magnifying-glass text-[32px] text-navy-300"></i>
+          </div>
+          <h2 class="font-[family-name:var(--font-display)] text-navy-500 text-[20px] font-semibold">Mulai Pencarian</h2>
+          <p class="text-navy-400 text-[14px] mt-[6px] max-w-[400px] mx-auto">
+            Gunakan form di atas untuk mencari paket wisata berdasarkan kata kunci, tanggal, kegiatan, atau jumlah peserta.
+          </p>
+          <div class="flex flex-wrap justify-center gap-[10px] mt-[24px]">
+            <a href="/paket" class="inline-flex items-center gap-[6px] text-orange-500 text-[13px] font-semibold no-underline hover:underline">
+              <i class="fa-solid fa-gift"></i>Lihat Semua Paket
+            </a>
+            <a href="/destinasi" class="inline-flex items-center gap-[6px] text-navy-500 text-[13px] font-semibold no-underline hover:underline">
+              <i class="fa-solid fa-location-dot"></i>Jelajahi Destinasi
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 </Layout>
+
+<script>
+import { initSearchPage } from "../lib/search";
+window.__DIRECTUS_URL__ = "{import.meta.env.DIRECTUS_URL || 'http://localhost:8055'}";
+document.addEventListener("DOMContentLoaded", initSearchPage);
+</script>

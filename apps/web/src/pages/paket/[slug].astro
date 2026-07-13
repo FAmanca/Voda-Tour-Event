@@ -40,6 +40,19 @@ try {
 
 const dname = pkg ? (typeof pkg.destination_id === "object" ? pkg.destination_id?.name : "") : "";
 const dslug = pkg ? (typeof pkg.destination_id === "object" ? pkg.destination_id?.slug : "") : "";
+// Activity types untuk badges (via junction table)
+const activityTypes = [];
+if (pkg) {
+  try {
+    const jat = await fetch(U + "/items/packages_activity_types?fields=activity_type_id.*&filter[package_id][_eq]=" + pkg.id + "&limit=10");
+    if (jat.ok) {
+      const jatd = await jat.json();
+      (jatd.data || []).forEach(function(j) {
+        if (j.activity_type_id) activityTypes.push(j.activity_type_id);
+      });
+    }
+  } catch {} // silently fail
+}
 const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
 ---
 
@@ -98,6 +111,21 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
                 </span>
               )}
             </div>
+
+            {activityTypes.length > 0 && (
+              <div class="flex flex-wrap items-center gap-[8px] mt-[14px]">
+                {activityTypes.map((at) => (
+                  <a
+                    href={"/cari?kegiatan=" + at.slug}
+                    class="inline-flex items-center gap-[5px] bg-orange-500/10 border border-orange-500/20 backdrop-blur-sm text-orange-300 text-[11.5px] font-medium px-[10px] py-[4px] rounded-full no-underline hover:bg-orange-500/20 transition-colors"
+                  >
+                    <i class="fa-solid fa-tag text-[9px]"></i>
+                    {at.name}
+                  </a>
+                ))}
+              </div>
+            )}
+
             {pkg.description && (
               <p class="text-white/60 text-[15px] leading-relaxed mt-[18px] max-w-[580px] line-clamp-3">{pkg.description}</p>
             )}
