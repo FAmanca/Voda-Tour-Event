@@ -7,14 +7,24 @@ import Footer from "../components/Footer.astro";
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
+  canonical?: string;
+  jsonld?: string;
   active?: 'beranda' | 'paket' | 'gathering' | 'destinasi' | 'tentang' | 'kontak';
 }
 
 const {
   title = "Voda Tour & Event",
   description = "Perjalanan Berkesan, Momen Tak Terlupakan",
+  image = "",
+  canonical = "",
+  jsonld = "",
   active,
 } = Astro.props;
+
+const siteUrl = "https://vodatour.event.id";
+const defaultImage = siteUrl + "/images/VodaTravelIcon.png";
+const ogImage = image || defaultImage;
 ---
 
 <!doctype html>
@@ -27,6 +37,42 @@ const {
     <title>{title}</title>
     <meta name="description" content={description} />
 
+  <!-- Open Graph -->
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:url" content={canonical || siteUrl} />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="id_ID" />
+  <meta property="og:site_name" content="Voda Tour & Event" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
+
+  <!-- Canonical -->
+  {canonical && <link rel="canonical" href={canonical} />}
+
+  <!-- Open Graph -->
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:url" content={canonical || siteUrl} />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="id_ID" />
+  <meta property="og:site_name" content="Voda Tour & Event" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
+
+  <!-- Canonical -->
+  {canonical && <link rel="canonical" href={canonical} />}
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -35,13 +81,38 @@ const {
       rel="stylesheet"
     />
 
-    <!-- Font Awesome 6 -->
+    <!-- Font Awesome 6 (async, non-blocking) -->
     <link
-      rel="stylesheet"
+      rel="preload"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
       crossorigin="anonymous"
     />
-  </head>
+    <noscript>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
+    </noscript>
+    <!-- JSON-LD Organization -->
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Voda Tour & Event",
+  "url": "https://vodatour.event.id",
+  "logo": "https://vodatour.event.id/images/VodaTravelIcon.png",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+62-821-1234-5678",
+    "contactType": "customer service",
+    "availableLanguage": ["Indonesia", "English"]
+  },
+  "sameAs": [
+    "https://www.instagram.com/vodatour_event",
+    "https://wa.me/6282112345678"
+  ]
+}</script>
+
+    {jsonld && <script type="application/ld+json" set:html={jsonld}></script>}
+</head>
   <body class="pt-[88px] max-lg:pt-[76px]">
     <Header {active} />
     <slot />
