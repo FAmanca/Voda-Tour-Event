@@ -1,8 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import PackageCard from "../components/PackageCard.astro";
-import Eyebrow from "../components/Eyebrow.astro";
-import CTABand from "../components/CTABand.astro";
 
 const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
 let packages = [];
@@ -24,24 +22,96 @@ try {
 } catch { err = true; }
 ---
 
-<Layout title="Gathering & Event | Voda Tour & Event" description="Solusi gathering perusahaan, outbound, team building." active="gathering">
+<Layout title="Gathering & Event | Voda Tour & Event" description="Solusi gathering perusahaan, outbound, team building profesional." active="gathering">
   <main>
-    <section class="relative min-h-[400px] flex items-center overflow-hidden bg-navy-900">
-      <div class="absolute inset-0 bg-gradient-to-r from-[rgba(10,59,82,0.95)] to-[rgba(10,59,82,0.85)]"></div>
-      <div class="wrap relative z-10 text-center py-[80px] max-lg:py-[50px]">
-        <Eyebrow text="Gathering & Event" />
-        <h1 class="font-[family-name:var(--font-display)] text-white text-[38px] max-lg:text-[28px] font-bold mt-[12px]">Acara Perusahaan Jadi Lebih Berkesan</h1>
-        <p class="text-white/70 text-[16px] max-lg:text-[14px] mt-[12px] max-w-[550px] mx-auto">Dari outbound seru hingga gathering elegan.</p>
-        <div class="flex flex-wrap justify-center gap-[30px] mt-[40px]">
-          <div class="text-center"><div class="w-[48px] h-[48px] mx-auto rounded-full bg-white/10 flex items-center justify-center text-orange-500 text-[20px]"><i class="fa-solid fa-people-group"></i></div><p class="text-white/70 text-[12px] mt-[8px]">Team Building</p></div>
-          <div class="text-center"><div class="w-[48px] h-[48px] mx-auto rounded-full bg-white/10 flex items-center justify-center text-orange-500 text-[20px]"><i class="fa-solid fa-chalkboard-user"></i></div><p class="text-white/70 text-[12px] mt-[8px]">Outbound</p></div>
-          <div class="text-center"><div class="w-[48px] h-[48px] mx-auto rounded-full bg-white/10 flex items-center justify-center text-orange-500 text-[20px]"><i class="fa-solid fa-utensils"></i></div><p class="text-white/70 text-[12px] mt-[8px]">Company Gathering</p></div>
-          <div class="text-center"><div class="w-[48px] h-[48px] mx-auto rounded-full bg-white/10 flex items-center justify-center text-orange-500 text-[20px]"><i class="fa-solid fa-champagne-glasses"></i></div><p class="text-white/70 text-[12px] mt-[8px]">Corporate Event</p></div>
+    <section class="relative overflow-hidden bg-gradient-to-br from-[#0A2A3D] via-navy-800 to-navy-900 py-[100px] max-lg:py-[60px]">
+      <div class="absolute inset-0 opacity-[0.04]" style="background-image: repeating-linear-gradient(0deg, transparent, transparent 40px, #fff 40px, #fff 41px), repeating-linear-gradient(90deg, transparent, transparent 40px, #fff 40px, #fff 41px);" aria-hidden="true"></div>
+      <div class="absolute top-[-80px] right-[-40px] w-[260px] h-[260px] rounded-full bg-orange-500/10 blur-[80px]" aria-hidden="true"></div>
+      <div class="absolute bottom-[-40px] left-[-80px] w-[200px] h-[200px] rounded-full bg-teal-400/10 blur-[60px]" aria-hidden="true"></div>
+      <div class="wrap relative z-10 text-center">
+        <div class="inline-flex items-center gap-[8px] bg-white/10 backdrop-blur-sm text-orange-400 text-[12px] font-semibold px-[14px] py-[5px] rounded-full mb-[16px]">
+          <i class="fa-solid fa-people-group"></i>GATHERING &amp; EVENT
+        </div>
+        <h1 class="font-[family-name:var(--font-display)] text-white text-[42px] max-lg:text-[30px] font-bold leading-tight">
+          Acara Perusahaan Jadi <span class="text-orange-400">Lebih Berkesan</span>
+        </h1>
+        <p class="text-white/65 text-[16px] max-lg:text-[14px] mt-[12px] max-w-[540px] mx-auto leading-relaxed">
+          Dari outbound seru sampai company gathering elegan &mdash; tim profesional siap bikin event Anda tak terlupakan.
+        </p>
+        <div class="flex flex-wrap justify-center gap-[12px] mt-[32px]">
+          <a href="#paket" class="inline-flex items-center gap-[8px] bg-orange-500 text-white rounded-[999px] px-[24px] py-[12px] font-semibold text-[13px] no-underline shadow-[0_10px_20px_-8px_rgba(238,125,15,0.4)] transition-all hover:-translate-y-[1px]">
+            Lihat Paket <i class="fa-solid fa-arrow-down"></i>
+          </a>
+          <a href="/kontak" class="inline-flex items-center gap-[8px] bg-white/10 text-white rounded-[999px] px-[24px] py-[12px] font-semibold text-[13px] no-underline border border-white/20 transition-all hover:bg-white/20">
+            <i class="fa-regular fa-calendar-check"></i>Konsultasi Gratis
+          </a>
         </div>
       </div>
     </section>
-    {err && <section><div class="wrap py-[60px]"><div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[20px] text-red-700 text-[14px] text-center"><i class="fa-solid fa-circle-exclamation mr-[8px]"></i>Gagal memuat paket.</div></div></section>}
-    {!err && <section><div class="wrap py-[70px] max-lg:py-[50px]">{packages.length > 0 ? <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">{packages.map((pkg) => <PackageCard package={pkg} showDestination />)}</div> : <div class="text-center py-[60px]"><i class="fa-regular fa-calendar text-[48px] text-navy-300 block mb-[16px]"></i><h3 class="font-[family-name:var(--font-display)] text-navy-600 text-[20px] font-semibold">Belum Ada Paket Gathering</h3><p class="text-navy-400 text-[14px] mt-[8px]">Paket akan segera hadir.</p></div>}</div></section>}
-    {!err && packages.length > 0 && <CTABand />}
+
+    <section class="py-[70px] max-lg:py-[50px]"><div class="wrap">
+      <div class="text-center mb-[40px]">
+        <span class="text-[11px] font-semibold text-orange-500 uppercase tracking-[0.15em]">Layanan Kami</span>
+        <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] max-lg:text-[22px] font-bold mt-[8px]">Solusi Event untuk Semua Kebutuhan</h2>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-[16px]">
+        <div class="bg-navy-50 rounded-[var(--radius-lg)] p-[24px] text-center hover:bg-orange-50 transition-colors group cursor-default">
+          <div class="w-[52px] h-[52px] mx-auto rounded-full bg-navy-800 flex items-center justify-center text-orange-400 text-[22px] group-hover:bg-orange-500 group-hover:text-white transition-all"><i class="fa-solid fa-people-group"></i></div>
+          <h3 class="font-[family-name:var(--font-display)] text-navy-700 text-[14px] font-semibold mt-[12px]">Team Building</h3>
+          <p class="text-navy-400 text-[12px] mt-[4px]">Games &amp; kerjasama tim</p>
+        </div>
+        <div class="bg-navy-50 rounded-[var(--radius-lg)] p-[24px] text-center hover:bg-orange-50 transition-colors group cursor-default">
+          <div class="w-[52px] h-[52px] mx-auto rounded-full bg-navy-800 flex items-center justify-center text-orange-400 text-[22px] group-hover:bg-orange-500 group-hover:text-white transition-all"><i class="fa-solid fa-person-hiking"></i></div>
+          <h3 class="font-[family-name:var(--font-display)] text-navy-700 text-[14px] font-semibold mt-[12px]">Outbound</h3>
+          <p class="text-navy-400 text-[12px] mt-[4px]">Aktivitas outdoor seru</p>
+        </div>
+        <div class="bg-navy-50 rounded-[var(--radius-lg)] p-[24px] text-center hover:bg-orange-50 transition-colors group cursor-default">
+          <div class="w-[52px] h-[52px] mx-auto rounded-full bg-navy-800 flex items-center justify-center text-orange-400 text-[22px] group-hover:bg-orange-500 group-hover:text-white transition-all"><i class="fa-solid fa-utensils"></i></div>
+          <h3 class="font-[family-name:var(--font-display)] text-navy-700 text-[14px] font-semibold mt-[12px]">Company Gathering</h3>
+          <p class="text-navy-400 text-[12px] mt-[4px]">Acara santai bersama</p>
+        </div>
+        <div class="bg-navy-50 rounded-[var(--radius-lg)] p-[24px] text-center hover:bg-orange-50 transition-colors group cursor-default">
+          <div class="w-[52px] h-[52px] mx-auto rounded-full bg-navy-800 flex items-center justify-center text-orange-400 text-[22px] group-hover:bg-orange-500 group-hover:text-white transition-all"><i class="fa-solid fa-champagne-glasses"></i></div>
+          <h3 class="font-[family-name:var(--font-display)] text-navy-700 text-[14px] font-semibold mt-[12px]">Corporate Event</h3>
+          <p class="text-navy-400 text-[12px] mt-[4px]">Event skala besar</p>
+        </div>
+      </div>
+    </div></section>
+
+    <section id="paket" class="py-[60px] max-lg:py-[40px] bg-[--color-bg-subtle]"><div class="wrap">
+      {err ? (
+        <div class="text-center py-[60px]">
+          <i class="fa-solid fa-circle-exclamation text-[36px] text-red-400 block mb-[12px]"></i>
+          <p class="text-red-600 text-[14px] font-medium">Gagal memuat paket.</p>
+        </div>
+      ) : packages.length > 0 ? (
+        <>
+          <div class="flex items-center justify-between mb-[28px]">
+            <div>
+              <span class="text-[11px] font-semibold text-orange-500 uppercase tracking-[0.15em]">Paket Gathering</span>
+              <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[24px] font-bold mt-[4px]">Pilihan Paket Kami</h2>
+            </div>
+            <p class="text-navy-400 text-[12px]"><strong class="text-navy-600">{packages.length}</strong> paket</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">
+            {packages.map((pkg) => <PackageCard package={pkg} showDestination />)}
+          </div>
+        </>
+      ) : (
+        <div class="text-center py-[80px]">
+          <i class="fa-regular fa-box-open text-[56px] text-navy-200 block mb-[16px]"></i>
+          <h3 class="font-[family-name:var(--font-display)] text-navy-600 text-[20px] font-semibold">Belum Ada Paket</h3>
+          <p class="text-navy-400 text-[14px] mt-[6px]">Paket gathering akan segera hadir.</p>
+        </div>
+      )}
+    </div></section>
+
+    <section class="py-[70px]"><div class="wrap text-center">
+      <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[24px] font-bold">Siap Rencanakan Event?</h2>
+      <p class="text-navy-500 text-[14px] mt-[8px] max-w-[400px] mx-auto">Tim kami siap bantu dari konsep sampai eksekusi.</p>
+      <a href="/kontak" class="inline-flex items-center gap-[8px] mt-[20px] bg-orange-500 text-white rounded-[999px] px-[28px] py-[12px] font-semibold text-[14px] no-underline shadow-[0_10px_20px_-8px_rgba(238,125,15,0.4)] transition-all hover:-translate-y-[2px]">
+        <i class="fa-brands fa-whatsapp"></i>Hubungi Via WA
+      </a>
+    </div></section>
   </main>
 </Layout>

@@ -1,68 +1,103 @@
 ---
-// Voda Tour & Event — Destinasi Page
-// List semua destinasi
-
 import Layout from "../layouts/Layout.astro";
 import Eyebrow from "../components/Eyebrow.astro";
 
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-
 let destinations = [];
+let regions = [];
 let fetchError = false;
 
 try {
-  const res = await fetch(DIRECTUS_URL + "/items/destinations?fields=*,region_id.*&filter[status][_eq]=published&sort=name");
-  if (res.ok) {
-    const json = await res.json();
-    destinations = json.data || [];
-  } else { fetchError = true; }
+  const [dstRes, regRes] = await Promise.all([
+    fetch(DIRECTUS_URL + "/items/destinations?fields=*,region_id.*&filter[status][_eq]=published&sort=name"),
+    fetch(DIRECTUS_URL + "/items/regions?fields=id,name,slug&filter[status][_eq]=published&sort=name"),
+  ]);
+  if (dstRes.ok) { const json = await dstRes.json(); destinations = json.data || []; }
+  if (regRes.ok) { const json = await regRes.json(); regions = json.data || []; }
 } catch { fetchError = true; }
 ---
 
-<Layout title="Destinasi Wisata | Voda Tour & Event" description="Jelajahi destinasi wisata terbaik untuk liburan, gathering, dan event perusahaan." active="destinasi">
+<Layout title="Destinasi Wisata | Voda Tour & Event" description="Jelajahi destinasi wisata terbaik." active="destinasi">
   <main>
-    <section class="bg-gradient-to-r from-[rgba(10,59,82,0.95)] to-[rgba(10,59,82,0.85)] py-[80px] max-lg:py-[50px]">
-      <div class="wrap text-center">
-        <Eyebrow text="Destinasi" />
-        <h1 class="font-[family-name:var(--font-display)] text-white text-[38px] max-lg:text-[28px] font-bold mt-[12px]">Jelajahi Destinasi</h1>
-        <p class="text-white/70 text-[16px] max-lg:text-[14px] mt-[10px] max-w-[500px] mx-auto">Temukan pengalaman tak terlupakan di berbagai destinasi pilihan kami.</p>
+    <section class="relative overflow-hidden bg-gradient-to-br from-[#0A3B52] via-navy-700 to-navy-800 py-[90px] max-lg:py-[60px]">
+      <div class="absolute inset-0 opacity-[0.05]" style="background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0); background-size: 30px 30px;" aria-hidden="true"></div>
+      <svg class="absolute bottom-0 left-0 right-0 text-white" viewBox="0 0 1440 48" preserveAspectRatio="none" aria-hidden="true"><path d="M0 48V24l120-8 180 16 240-20 200 10 300-24 200 18V48Z" fill="currentColor" opacity="0.06"/></svg>
+      <div class="wrap relative z-10">
+        <div class="max-w-[600px]">
+          <Eyebrow text="Destinasi" />
+          <h1 class="font-[family-name:var(--font-display)] text-white text-[42px] max-lg:text-[30px] font-bold mt-[14px] leading-tight">
+            Jelajahi <span class="text-orange-400">Destinasi</span> Pilihan
+          </h1>
+          <p class="text-white/65 text-[16px] max-lg:text-[14px] mt-[10px] leading-relaxed">
+            Temukan pengalaman tak terlupakan di berbagai destinasi terbaik.
+          </p>
+          <div class="flex flex-wrap gap-[12px] mt-[28px]">
+            {regions.map((r) => (
+              <a href={"?region=" + r.slug} class="inline-flex items-center gap-[5px] bg-white/10 hover:bg-white/20 text-white text-[12.5px] font-medium px-[14px] py-[6px] rounded-full no-underline transition-all backdrop-blur-sm border border-white/10">
+                <i class="fa-solid fa-location-dot text-orange-400 text-[9px]"></i>{r.name}
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
 
     {fetchError && (
-      <section><div class="wrap py-[60px]"><div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[20px] text-red-700 text-[14px] text-center"><i class="fa-solid fa-circle-exclamation mr-[8px]"></i>Gagal memuat destinasi.</div></div></section>
+      <section class="py-[80px]"><div class="wrap text-center">
+        <div class="max-w-[400px] mx-auto bg-red-50 border border-red-200 rounded-[var(--radius-lg)] p-[30px]">
+          <i class="fa-solid fa-circle-exclamation text-[36px] text-red-400 block mb-[12px]"></i>
+          <p class="text-red-700 text-[14px] font-medium">Gagal memuat destinasi.</p>
+        </div>
+      </div></section>
     )}
 
     {!fetchError && (
-      <section><div class="wrap py-[70px] max-lg:py-[50px]">
+      <section class="py-[70px] max-lg:py-[50px]"><div class="wrap">
         {destinations.length > 0 ? (
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">
-            {destinations.map((d) => {
-              const regionName = d.region_id?.name || "";
-              const imgUrl = d.image ? DIRECTUS_URL + "/assets/" + d.image + "?width=600&height=400&format=webp&quality=85" : null;
-              return (
-                <a href={"/destinasi/" + d.slug} class="group block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden hover:shadow-[var(--shadow-card)] transition-all duration-300 hover:-translate-y-[4px]">
-                  <div class="relative aspect-[4/3] overflow-hidden">
-                    {imgUrl ? (
-                      <img src={imgUrl} alt={d.name} class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />
-                    ) : (
-                      <div class="absolute inset-0 bg-navy-100 flex items-center justify-center text-navy-300 text-[40px]"><i class="fa-regular fa-image"></i></div>
-                    )}
-                    {regionName && (
-                      <span class="absolute top-[12px] left-[12px] bg-white/90 backdrop-blur-sm text-navy-700 text-[11px] font-semibold px-[10px] py-[3px] rounded-full">{regionName}</span>
-                    )}
-                  </div>
-                  <div class="p-[20px]">
-                    <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[18px] font-semibold group-hover:text-orange-500 transition-colors">{d.name}</h3>
-                    {d.description && <p class="text-navy-500 text-[13px] mt-[6px] line-clamp-2 leading-relaxed">{d.description}</p>}
-                    <span class="inline-flex items-center gap-[6px] text-orange-500 text-[13px] font-semibold mt-[12px] group-hover:gap-[10px] transition-all">Lihat Paket <i class="fa-solid fa-arrow-right text-[11px]"></i></span>
-                  </div>
-                </a>
-              );
-            })}
-          </div>
+          <>
+            <div class="flex items-center justify-between mb-[28px]">
+              <p class="text-navy-500 text-[13px]"><strong class="text-navy-800">{destinations.length}</strong> destinasi tersedia</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">
+              {destinations.map((d) => {
+                const regionName = d.region_id?.name || "";
+                const imgUrl = d.image ? DIRECTUS_URL + "/assets/" + d.image + "?width=600&height=400&fit=cover&format=webp&quality=85" : null;
+                return (
+                  <a href={"/destinasi/" + d.slug} class="group block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden no-underline hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-[6px]">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-navy-100">
+                      {imgUrl ? (
+                        <img src={imgUrl} alt={d.name} class="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-110" loading="lazy" />
+                      ) : (
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-navy-300">
+                          <i class="fa-regular fa-image text-[36px]"></i>
+                          <span class="text-[11px] mt-[6px] font-medium">No Image</span>
+                        </div>
+                      )}
+                      {regionName && (
+                        <span class="absolute top-[12px] left-[12px] bg-white/90 backdrop-blur-sm text-navy-700 text-[11px] font-semibold px-[10px] py-[3px] rounded-full shadow-sm">
+                          <i class="fa-solid fa-location-dot text-orange-500 text-[9px] mr-[3px]"></i>{regionName}
+                        </span>
+                      )}
+                    </div>
+                    <div class="p-[20px]">
+                      <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[16px] font-semibold group-hover:text-orange-500 transition-colors">{d.name}</h3>
+                      {d.description && <p class="text-navy-500 text-[13px] leading-relaxed mt-[4px] line-clamp-2">{d.description}</p>}
+                      <div class="flex items-center gap-[8px] mt-[14px] text-[12px] text-orange-500 font-medium">
+                        <span>Lihat Paket</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                      </div>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </>
         ) : (
-          <div class="text-center py-[60px]"><i class="fa-regular fa-map text-[48px] text-navy-300 block mb-[16px]"></i><p class="text-navy-500 text-[16px]">Belum ada destinasi tersedia.</p></div>
+          <div class="text-center py-[80px]">
+            <i class="fa-regular fa-map text-[56px] text-navy-200 block mb-[16px]"></i>
+            <h3 class="font-[family-name:var(--font-display)] text-navy-600 text-[20px] font-semibold">Belum Ada Destinasi</h3>
+            <p class="text-navy-400 text-[14px] mt-[6px]">Destinasi akan segera ditambahkan.</p>
+          </div>
         )}
       </div></section>
     )}
