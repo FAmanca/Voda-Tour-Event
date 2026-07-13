@@ -66,10 +66,10 @@ Urutan section di `index.astro` (cocok dengan mockup):
 │ └──────────────────────────────────┘ │
 │                                      │
 │ ┌──────────────────────────────────┐ │
-│ │ StatsBar (navy-900 full-width)  │ │
-│ │ ┌─────┬─────┬─────┬──────────┐ │ │
-│ │ │Stat1│Stat2│Stat3│Testimonial│ │ │
-│ │ └─────┴─────┴─────┴──────────┘ │ │
+│ │ StatsBar (white card, floating) │ │
+│ │ ┌──────┬──────┬──────┬────────┐ │ │
+│ │ │ Stat │ Stat │ Stat │  Stat  │ │ │
+│ │ └──────┴──────┴──────┴────────┘ │ │
 │ └──────────────────────────────────┘ │
 │                                      │
 │ ┌──────────────────────────────────┐ │
@@ -194,22 +194,17 @@ Photo gradient area (150px height, `--radius-md` top corners). Circular badge ic
 
 ```typescript
 interface Props {
-  stats: {
+  stats?: {
     icon: string;
-    value: string;    // e.g. "150+"
-    label: string;    // e.g. "Paket Tersedia"
+    value?: string;    // preferred — e.g. "150+"
+    number?: string;   // alias, backwards compat
+    label: string;     // e.g. "Paket Tersedia"
+    sublabel?: string; // e.g. "Terselenggara" — rendered as muted second line
   }[];
-  testimonial?: {
-    quote: string;
-    name: string;
-    company: string;
-    avatar?: string;
-    rating: number;   // 1-5
-  };
 }
 ```
 
-Full-width navy-900 section. Left: stat clusters in grid (outlined circle icon + bold number + 2-line label, separated by vertical hairline rules). Right: single testimonial with quote icon, 5 orange stars, name/company + circular avatar with orange ring border.
+White floating card (`bg-white`, `radius-lg`, `shadow-card`) dengan negative margin `-64px` overlap section sebelumnya — identik dengan FeatureStrip. 4-column horizontal grid (`grid-cols-4` desktop, `grid-cols-2` tablet, `grid-cols-1` mobile). Tiap item: 52px navy-800 circle icon (orange glyph) + bold navy number + label + optional sublabel muted. Testimonial dihapus dari komponen ini.
 
 #### CTABand (`src/components/CTABand.astro`)
 

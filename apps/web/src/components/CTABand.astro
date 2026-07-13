@@ -1,63 +1,85 @@
 ---
 // Voda Tour & Event — CTABand Component
-// Call-to-action band with heading, CTA button, and feature chips
+// Single-row CTA band on a photo background: heading+desc | feature list | WhatsApp CTA
 
 interface Props {
   heading?: string;
   description?: string;
   ctaLabel?: string;
   ctaUrl?: string;
+  bgImage?: string;
   features?: { icon: string; label: string }[];
 }
 
 const {
-  heading = "Butuh Paket Custom untuk Perushaan Anda?",
+  heading = "Butuh Paket Custom untuk Perusahaan Anda?",
   description = "Kami siap merancang perjalanan dan event yang sesuai kebutuhan Anda.",
   ctaLabel = "Hubungi Kami",
   ctaUrl,
+  bgImage = "/images/cta-band-bg.jpg",
   features: featureProps,
 } = Astro.props;
 
 const defaultFeatures = [
-  { icon: "fa-solid fa-map-marked-alt", label: "Destinasi Terkurasi" },
-  { icon: "fa-solid fa-tag", label: "Harga Transparan" },
-  { icon: "fa-solid fa-users", label: "Tim Profesional" },
-  { icon: "fa-solid fa-headset", label: "24/7 Support" },
+  { icon: "fa-solid fa-map-marked-alt", label: "Rancang Paket Sesuai Kebutuhan" },
+  { icon: "fa-solid fa-users", label: "Tim Event Berpengalaman" },
+  { icon: "fa-solid fa-medal", label: "Pelayanan Terbaik" },
+  { icon: "fa-solid fa-circle-check", label: "Hasil Memuaskan" },
 ];
 
 const features = featureProps || defaultFeatures;
 const whatsappUrl = ctaUrl || "https://wa.me/6282112345678?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20tertarik%20dengan%20penawaran%20Anda.";
 ---
 
-<section class="bg-gradient-to-r from-[#122A3D] to-[#356E78]">
-  <div class="wrap py-[70px] max-lg:py-[50px]">
-    <!-- Top: heading + description + CTA -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-[24px] pb-[34px] border-b border-white/10">
-      <div class="max-w-[600px] my-5">
-        <h2 class="font-[family-name:var(--font-display)] text-white font-bold text-[34px] max-lg:text-[28px] leading-[1.15]">{heading}</h2>
-        <p class="text-white/65 text-[15px] leading-relaxed mt-[8px]">{description}</p>
+<section class="relative overflow-hidden">
+  <!-- Background photo -->
+  <img
+    src={bgImage}
+    alt=""
+    class="absolute inset-0 w-full h-full object-cover"
+    loading="lazy"
+  />
+  <!-- Dark navy → teal overlay for text readability -->
+  <div class="absolute inset-0 bg-gradient-to-r from-[#0E2333]/95 via-[#173F4C]/85 to-[#2F6B74]/70"></div>
+
+  <div class="relative z-10 flex items-stretch min-h-[92px] max-lg:flex-col max-lg:min-h-0">
+
+    <!-- Left: heading + description + features -->
+    <div class="flex-1 flex items-center justify-between gap-[32px] pl-[24px] lg:pl-[48px] pr-[24px] py-[18px] flex-wrap lg:flex-nowrap max-lg:justify-start">
+
+      <!-- Heading + description -->
+      <div class="max-w-[280px] shrink-0 max-lg:max-w-full">
+        <h2 class="font-[family-name:var(--font-display)] text-white font-bold text-[19px] leading-[1.25]">
+          {heading}
+        </h2>
+        <p class="text-white/65 text-[12.5px] leading-relaxed mt-[4px]">
+          {description}
+        </p>
       </div>
-      <a
-        href={whatsappUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="inline-flex items-center gap-[10px] bg-orange-600 text-white rounded-[999px] px-[28px] py-[14px] font-semibold text-[14.5px] no-underline shadow-[0_14px_28px_-10px_rgba(238,125,15,0.55)] transition-all duration-[0.18s] hover:-translate-y-[2px] hover:shadow-[0_18px_34px_-10px_rgba(238,125,15,0.65)] shrink-0"
-      >
-        <i class="fa-brands fa-whatsapp text-[18px]"></i>
-        {ctaLabel}
-      </a>
+
+      <!-- Feature list: icon stacked above label -->
+      <div class="flex items-center gap-x-[28px] gap-y-[14px] flex-wrap justify-center max-lg:justify-start">
+        {features.map((f) => (
+          <div class="flex flex-col items-center gap-[6px] text-center w-[90px]">
+            <div class="w-[30px] h-[30px] rounded-full border border-white/30 flex items-center justify-center text-white text-[13px] shrink-0">
+              <i class={f.icon}></i>
+            </div>
+            <span class="text-white/85 text-[11.5px] font-medium leading-tight">{f.label}</span>
+          </div>
+        ))}
+      </div>
     </div>
 
-    <!-- Bottom: feature chips -->
-    <div class="flex flex-wrap gap-[20px] mt-[30px] ">
-      {features.map((f) => (
-        <div class="flex items-center gap-[10px] bg-white/10 rounded-[999px] px-[14px] py-[8px]">
-          <div class="w-[32px] h-[32px] bg-white/15 rounded-[8px] flex items-center justify-center text-orange-400 text-[14px]">
-            <i class={f.icon}></i>
-          </div>
-          <span class="text-white/85 text-[13px] font-medium">{f.label}</span>
-        </div>
-      ))}
-    </div>
+    <!-- Right: CTA button, edge-to-edge, full height -->
+    <a
+      href={whatsappUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="flex items-center justify-center gap-[10px] bg-orange-600 text-white px-[32px] py-[16px] font-semibold text-[14px] no-underline shrink-0 transition-colors duration-[0.18s] hover:bg-orange-500 max-lg:justify-start"
+    >
+      <i class="fa-brands fa-whatsapp text-[17px]"></i>
+      {ctaLabel}
+    </a>
+
   </div>
 </section>

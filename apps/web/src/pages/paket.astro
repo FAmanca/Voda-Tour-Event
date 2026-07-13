@@ -1,0 +1,55 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PackageCard from "../components/PackageCard.astro";
+import Eyebrow from "../components/Eyebrow.astro";
+
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+let packages = [];
+let activityTypes = [];
+let fetchError = false;
+
+try {
+  const [pkgRes, actRes] = await Promise.all([
+    fetch(DIRECTUS_URL + "/items/paket?fields=*,destination_id.*&limit=50&filter[status][_eq]=published&sort=-id"),
+    fetch(DIRECTUS_URL + "/items/activity_types?filter[status][_eq]=published&sort=name"),
+  ]);
+  if (pkgRes.ok) { const json = await pkgRes.json(); packages = json.data || []; }
+  if (actRes.ok) { const json = await actRes.json(); activityTypes = json.data || []; }
+} catch { fetchError = true; }
+---
+
+<Layout title="Paket Wisata | Voda Tour & Event" description="Lihat semua paket wisata, gathering, dan outbound." active="paket">
+  <main>
+    <section class="bg-gradient-to-r from-[rgba(10,59,82,0.95)] to-[rgba(10,59,82,0.85)] py-[80px] max-lg:py-[50px]">
+      <div class="wrap text-center">
+        <Eyebrow text="Paket Wisata" />
+        <h1 class="font-[family-name:var(--font-display)] text-white text-[38px] max-lg:text-[28px] font-bold mt-[12px]">Semua Paket Wisata</h1>
+        <p class="text-white/70 text-[16px] max-lg:text-[14px] mt-[10px] max-w-[500px] mx-auto">Dari private trip hingga corporate gathering, semua ada di sini.</p>
+      </div>
+    </section>
+
+    {!fetchError && activityTypes.length > 0 && (
+      <section class="border-b border-navy-100"><div class="wrap py-[20px]">
+        <div class="flex flex-wrap items-center gap-[10px]">
+          <span class="text-[12px] font-semibold text-navy-500 uppercase tracking-wider mr-[4px]">Filter:</span>
+          <a href="/paket" class="px-[14px] py-[6px] text-[13px] rounded-full border border-orange-500 bg-orange-50 text-orange-600 font-semibold">Semua</a>
+          {activityTypes.map((a) => <a href={"/cari?kegiatan=" + a.slug} class="px-[14px] py-[6px] text-[13px] rounded-full border border-navy-200 text-navy-600 hover:border-orange-500 hover:text-orange-600 transition-colors">{a.name}</a>)}
+        </div>
+      </div></section>
+    )}
+
+    {fetchError && (
+      <section><div class="wrap py-[60px]"><div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[20px] text-red-700 text-[14px] text-center"><i class="fa-solid fa-circle-exclamation mr-[8px]"></i>Gagal memuat paket.</div></div></section>
+    )}
+
+    {!fetchError && (
+      <section><div class="wrap py-[60px] max-lg:py-[40px]">
+        {packages.length > 0 ? (
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">{packages.map((pkg) => <PackageCard package={pkg} showDestination />)}</div>
+        ) : (
+          <div class="text-center py-[60px]"><i class="fa-regular fa-box-open text-[48px] text-navy-300 block mb-[16px]"></i><p class="text-navy-500 text-[16px]">Belum ada paket tersedia.</p></div>
+        )}
+      </div></section>
+    )}
+  </main>
+</Layout>

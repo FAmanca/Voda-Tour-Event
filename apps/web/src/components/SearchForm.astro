@@ -1,0 +1,93 @@
+---
+// Voda Tour & Event — SearchForm Component
+// Standalone search form untuk halaman /cari (full-width variant dari SearchCard)
+
+import type { Destination } from "../types/directus";
+import type { ActivityType } from "../types/directus";
+
+interface Props {
+  destinations: Destination[];
+  activityTypes: ActivityType[];
+  initialValues?: {
+    destination?: string;
+    activityType?: string;
+    paxCount?: number;
+  };
+}
+---
+
+<form
+  class="bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-card)] p-[28px] max-lg:p-[20px]"
+  method="GET"
+  action="/cari"
+>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[16px] items-end">
+    <!-- Destination -->
+    <div>
+      <label class="block text-[12px] font-semibold text-navy-600 mb-[6px] uppercase tracking-wider">
+        Destinasi
+      </label>
+      <select
+        name="destinasi"
+        class="w-full h-[44px] px-[14px] text-[14px] rounded-[var(--radius-sm)] border border-navy-200 bg-white text-navy-800 outline-none focus:border-orange-500 transition-colors"
+      >
+        <option value="">Semua Destinasi</option>
+        {Astro.props.destinations.map((d) => (
+          <option
+            value={d.slug}
+            selected={Astro.props.initialValues?.destination === d.slug}
+          >
+            {d.name}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <!-- Activity Type -->
+    <div>
+      <label class="block text-[12px] font-semibold text-navy-600 mb-[6px] uppercase tracking-wider">
+        Jenis Kegiatan
+      </label>
+      <select
+        name="kegiatan"
+        class="w-full h-[44px] px-[14px] text-[14px] rounded-[var(--radius-sm)] border border-navy-200 bg-white text-navy-800 outline-none focus:border-orange-500 transition-colors"
+      >
+        <option value="">Semua Kegiatan</option>
+        {Astro.props.activityTypes.map((a) => (
+          <option
+            value={a.slug}
+            selected={Astro.props.initialValues?.activityType === a.slug}
+          >
+            {a.name}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <!-- Pax Count -->
+    <div>
+      <label class="block text-[12px] font-semibold text-navy-600 mb-[6px] uppercase tracking-wider">
+        Jumlah Peserta
+      </label>
+      <input
+        type="number"
+        name="pax"
+        min="1"
+        placeholder="Mis: 10"
+        value={Astro.props.initialValues?.paxCount || ""}
+        class="w-full h-[44px] px-[14px] text-[14px] rounded-[var(--radius-sm)] border border-navy-200 bg-white text-navy-800 outline-none focus:border-orange-500 transition-colors placeholder:text-navy-300"
+      />
+    </div>
+
+    <!-- Submit -->
+    <div>
+      <button
+        type="submit"
+        class="w-full h-[44px] bg-orange-500 hover:bg-orange-600 text-white font-semibold text-[14px] rounded-[var(--radius-sm)] transition-colors flex items-center justify-center gap-[8px]"
+      >
+        <i class="fa-solid fa-search text-[14px]"></i>
+        Cari Paket
+      </button>
+    </div>
+  </div>
+</form>

@@ -185,58 +185,58 @@
 ## Phase 4: CRUD Pages
 
 ### 4.1 Destinasi List (`/destinasi`)
-- [ ] `src/pages/destinasi.astro`
-- [ ] SSR fetch: all destinations + regions
-- [ ] Grid layout
-- [ ] Filter by region (optional)
-- [ ] Search input (client-side filter)
+- [x] `src/pages/destinasi.astro`
+- [x] SSR fetch: all destinations + regions
+- [x] Grid layout
+- [x] Filter by region (optional)
+- [ ] Search input (client-side filter) — pindah ke halaman /cari
 
 ### 4.2 Destinasi Detail (`/destinasi/[slug]`)
-- [ ] `src/pages/destinasi/[slug].astro`
-- [ ] SSR fetch: destination by slug + related packages
-- [ ] Hero variant (DestinasiHeader) dengan gradient
-- [ ] Region badge
-- [ ] Description
-- [ ] GallerySection
-- [ ] Package list di bawah
-- [ ] 404 redirect kalo slug gak ditemukan
+- [x] `src/pages/destinasi/[slug].astro`
+- [x] SSR fetch: destination by slug + related packages
+- [x] Hero variant (DestinasiHeader) dengan gradient
+- [x] Region badge
+- [x] Description
+- [x] GallerySection
+- [x] Package list di bawah
+- [x] 404 handling kalo slug gak ditemukan (render not-found state)
 
 ### 4.3 Paket List (`/paket` + `/gathering`)
-- [ ] `src/pages/paket.astro` — all packages
-- [ ] `src/pages/gathering.astro` — packages dengan activity_type = corporate-gathering
-- [ ] SSR fetch + filter
-- [ ] Grid cards
-- [ ] Category filter tabs
+- [x] `src/pages/paket.astro` — all packages
+- [x] `src/pages/gathering.astro` — packages dengan activity_type = corporate-gathering
+- [x] SSR fetch + filter
+- [x] Grid cards
+- [x] Category filter tabs (client-side)
 
 ### 4.4 Paket Detail (`/paket/[slug]`)
-- [ ] `src/pages/paket/[slug].astro`
-- [ ] SSR fetch: package by slug + destination
-- [ ] **ItineraryTimeline:** vertical timeline
-  - [ ] Day 1, Day 2 markers
-  - [ ] Title + list activities
-- [ ] **PriceTable:** 
-  - [ ] Rows: min-max pax, price/pax, keterangan
-  - [ ] Highlight baris sesuai pax yg dipilih user
-  - [ ] Price calculator: input pax → hitung total
-- [ ] Facilities list (badges/chips)
-- [ ] Gallery foto
-- [ ] CTA: "Hubungi Kami via WhatsApp" dengan prefilled message
+- [x] `src/pages/paket/[slug].astro`
+- [x] SSR fetch: package by slug + destination
+- [x] **ItineraryTimeline:** vertical timeline
+  - [x] Day 1, Day 2 markers
+  - [x] Title + list activities
+- [x] **PriceTable:** 
+  - [x] Rows: min-max pax, price/pax, keterangan
+  - [ ] Highlight baris sesuai pax yg dipilih user — client-side JS masih perlu
+  - [ ] Price calculator: input pax → hitung total — client-side JS masih perlu
+- [x] Facilities list (badges/chips)
+- [x] Gallery foto
+- [x] CTA: WhatsApp dengan prefilled message
 
 ### 4.5 Galeri (`/galeri`)
-- [ ] `src/pages/galeri.astro`
-- [ ] **GallerySection.astro:** masonry grid
-- [ ] Fetch all images from packages & destinations
-- [ ] Lightbox (optional — bisa pake vanilla JS simple)
+- [x] `src/pages/galeri.astro`
+- [x] **GallerySection.astro:** masonry grid
+- [x] Fetch all images from packages & destinations
+- [ ] Lightbox (optional) — masih perlu vanilla JS
 
 ### 4.6 Static Pages
-- [ ] `src/pages/tentang.astro` — company profile
-- [ ] `src/pages/kontak.astro` — contact info + WA link + embed GMaps (optional)
+- [x] `src/pages/tentang.astro` — company profile
+- [x] `src/pages/kontak.astro` — contact info + WA link + embed GMaps (optional)
 
 ### 4.7 Sitemap
-- [ ] `src/pages/sitemap.xml.ts`
-- [ ] Generate all dynamic URLs (destinasi, paket)
-- [ ] Include static pages
-- [ ] Lastmod from updated_at
+- [x] `src/pages/sitemap.xml.ts`
+- [x] Generate all dynamic URLs (destinasi, paket)
+- [x] Include static pages
+- [x] Lastmod from updated_at
 
 ---
 
@@ -278,7 +278,7 @@
 ### 6.1 Collections
 Buat di Directus Admin Panel:
 
-- [ ] **regions**
+- [x] **regions**
   - Fields: id (UUID), name (string), slug (string, unique), description (text), image (file), status (select)
   - System: created_at, updated_at, created_by, updated_by
 
