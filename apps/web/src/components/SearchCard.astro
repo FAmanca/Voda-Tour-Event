@@ -1,0 +1,96 @@
+---
+// Voda Tour & Event — SearchCard Component
+// Search form inside a navy gradient card
+
+interface Props {
+  /** Semua data untuk dropdown (dari Directus fetch) */
+  destinations?: { id: number; name: string; slug: string }[];
+  activityTypes?: { id: number; name: string }[];
+}
+
+const { destinations = [], activityTypes = [] } = Astro.props;
+const params = new URLSearchParams();
+---
+
+<div class="bg-gradient-to-b from-navy-800 to-navy-900 rounded-[var(--radius-lg)] p-[28px] max-lg:p-[22px] shadow-[var(--shadow-card)]">
+  <h3 class="font-[family-name:var(--font-display)] text-white font-bold text-[17px]">Cari Paket Terbaik untuk Anda</h3>
+  <div class="w-[40px] h-[2px] bg-orange-600 rounded-full mt-[10px] mb-[20px]"></div>
+
+  <form method="GET" action="/cari" class="space-y-[14px]">
+    <!-- Row 1 -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-[14px]">
+      <!-- Destinasi -->
+      <div>
+        <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[6px]">Tujuan Destinasi</label>
+        <div class="relative">
+          <input
+            list="destinasi-list"
+            name="destinasi"
+            placeholder="Pilih destinasi"
+            autocomplete="off"
+            class="w-full bg-white/10 border border-white/15 rounded-[var(--radius-sm)] px-[14px] py-[11px] text-white text-[13px] placeholder:text-white/30 outline-none focus:border-orange-600/50 transition-colors"
+          />
+          <datalist id="destinasi-list">
+            {destinations.map((d) => <option value={d.name} />)}
+          </datalist>
+          <i class="fa-solid fa-location-dot absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
+        </div>
+      </div>
+
+      <!-- Kegiatan -->
+      <div>
+        <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[6px]">Jenis Kegiatan</label>
+        <div class="relative">
+          <select
+            name="kegiatan"
+            class="w-full bg-white/10 border border-white/15 rounded-[var(--radius-sm)] px-[14px] py-[11px] text-white/70 text-[13px] outline-none focus:border-orange-600/50 transition-colors appearance-none"
+          >
+            <option value="" disabled selected class="text-navy-800">Pilih kegiatan</option>
+            {activityTypes.map((a) => <option value={a.id}>{a.name}</option>)}
+          </select>
+          <i class="fa-solid fa-chevron-down absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[10px] pointer-events-none"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-[14px]">
+      <!-- Tanggal -->
+      <div>
+        <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[6px]">Tanggal Berangkat</label>
+        <div class="relative">
+          <input
+            type="date"
+            name="tanggal"
+            class="w-full bg-white/10 border border-white/15 rounded-[var(--radius-sm)] px-[14px] py-[11px] text-white text-[13px] outline-none focus:border-orange-600/50 transition-colors [color-scheme:dark]"
+          />
+          <i class="fa-regular fa-calendar absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
+        </div>
+      </div>
+
+      <!-- Peserta -->
+      <div>
+        <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[6px]">Jumlah Peserta</label>
+        <div class="relative">
+          <input
+            type="number"
+            name="peserta"
+            min="1"
+            placeholder="Jumlah peserta"
+            class="w-full bg-white/10 border border-white/15 rounded-[var(--radius-sm)] px-[14px] py-[11px] text-white text-[13px] placeholder:text-white/30 outline-none focus:border-orange-600/50 transition-colors"
+          />
+          <i class="fa-regular fa-user absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <button
+      type="submit"
+      class="w-full bg-orange-600 text-white rounded-[var(--radius-sm)] py-[13px] font-semibold text-[14px] transition-all duration-[0.18s] hover:-translate-y-[1px] hover:shadow-[0_10px_20px_-8px_rgba(238,125,15,0.5)] cursor-pointer border-none flex items-center justify-center gap-[8px]"
+    >
+      <i class="fa-solid fa-magnifying-glass"></i>
+      Cari Paket
+    </button>
+  </form>
+</div>

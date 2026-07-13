@@ -1,0 +1,37 @@
+---
+// Voda Tour & Event — IconBadge Component
+// Circular or rounded-square icon badge
+
+interface Props {
+  /** Font Awesome class: "fa-solid fa-ship" */
+  icon: string;
+  /** Size: sm=38px, md=46px, lg=54px */
+  size?: 'sm' | 'md' | 'lg';
+  /** Shape: circle or rounded-square */
+  shape?: 'circle' | 'rounded-square';
+  /** Variant: navy bg, outline, glass */
+  variant?: 'navy' | 'outline' | 'glass';
+}
+
+const { icon, size = 'md', shape = 'circle', variant = 'navy' } = Astro.props;
+
+const sizeMap: Record<string, string> = {
+  sm: 'w-[38px] h-[38px] text-[16px]',
+  md: 'w-[46px] h-[46px] text-[20px]',
+  lg: 'w-[54px] h-[54px] text-[24px]',
+};
+
+const shapeClass = shape === 'circle' ? 'rounded-full' : 'rounded-[var(--radius-sm)]';
+
+const variantClass: Record<string, string> = {
+  navy: 'bg-navy-800 text-white',
+  outline: 'bg-transparent border-[1.5px] border-white/40 text-white',
+  glass: 'bg-white/15 text-white backdrop-blur-sm',
+};
+
+const combined = `${sizeMap[size]} ${shapeClass} ${variantClass[variant] || variantClass.navy} inline-flex items-center justify-center shrink-0`;
+---
+
+<span class={combined}>
+  <i class={icon}></i>
+</span>

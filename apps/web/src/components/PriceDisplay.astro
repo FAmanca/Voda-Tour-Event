@@ -1,0 +1,43 @@
+---
+// Voda Tour & Event — PriceDisplay Component
+// Rupiah price formatter with prefix and per-pax label
+
+interface Props {
+  /** Price in IDR */
+  amount: number;
+  /** Prefix text: "Mulai", "Dari" */
+  prefix?: string;
+  /** Format: full = "Rp 850.000", short = "850rb", auto = both */
+  format?: 'full' | 'short' | 'auto';
+  /** Per-pax indicator */
+  perPax?: boolean;
+  /** Size: sm | md | lg */
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const { amount, prefix, format = 'full', perPax = false, size = 'md' } = Astro.props;
+
+const fmt = new Intl.NumberFormat('id-ID');
+const formatted = amount >= 1000000
+  ? `Rp ${fmt.format(amount)}`
+  : `Rp ${fmt.format(amount)}`;
+
+const shortForm = amount >= 1000000
+  ? `${(amount / 1000000).toFixed(1).replace('.0', '')}jt`
+  : amount >= 1000
+    ? `${Math.round(amount / 1000)}rb`
+    : String(amount);
+
+const sizeClass: Record<string, string> = {
+  sm: 'text-sm',
+  md: 'text-[15.5px]',
+  lg: 'text-xl',
+};
+---
+
+<span class:list={["font-[family-name:var(--font-display)] font-bold text-orange-600", sizeClass[size]]}>
+  {prefix && <span class="text-[0.75em] font-medium text-body-light">{prefix} </span>}
+  {format === 'full' || format === 'auto' ? formatted : shortForm}
+  {format === 'auto' && <span class="text-[0.75em] text-body-light"> ({shortForm})</span>}
+  {perPax && <span class="text-[0.7em] font-medium text-body-light"> /pax</span>}
+</span>

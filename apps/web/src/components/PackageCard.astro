@@ -1,0 +1,76 @@
+---
+// Voda Tour & Event — PackageCard Component
+// Individual package card with photo area, icon badge, price
+
+interface Props {
+  title: string;
+  description: string;
+  slug: string;
+  /** Price tier pertama sebagai harga mulai */
+  priceFrom?: number;
+  icon?: string;
+  /** Kategori untuk gradient warna: 'wisata' | 'gathering' | 'corporate' | 'outbound' */
+  category?: string;
+}
+
+const {
+  title,
+  description,
+  slug,
+  priceFrom,
+  icon = "fa-solid fa-map-marked-alt",
+  category = 'wisata',
+} = Astro.props;
+
+const gradientMap: Record<string, string> = {
+  wisata: 'from-[#0A3B52] to-[#2A7A6E]',
+  gathering: 'from-[#122A3D] to-[#356E78]',
+  corporate: 'from-[#0F2C4C] to-[#173A5E]',
+  outbound: 'from-[#2A527A] to-[#8FD6B4]',
+};
+
+const gradient = gradientMap[category] || gradientMap.wisata;
+
+const displayPrice = priceFrom
+  ? new Intl.NumberFormat('id-ID').format(priceFrom)
+  : null;
+---
+
+<a
+  href={`/paket/${slug}`}
+  class="group block bg-white rounded-[var(--radius-md)] shadow-[var(--shadow-soft)] overflow-hidden no-underline transition-all duration-[0.25s] hover:-translate-y-[6px] hover:shadow-[var(--shadow-card)]"
+>
+  <!-- Photo area -->
+  <div class={`relative h-[150px] bg-gradient-to-br ${gradient}`}>
+    <!-- Icon badge pinned top-left, overlapping edge -->
+    <div class="absolute top-[14px] left-[14px] w-[38px] h-[38px] bg-white rounded-full flex items-center justify-center text-navy-800 text-[16px] shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+      <i class={icon}></i>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="p-[18px]">
+    <h3 class="font-[family-name:var(--font-display)] text-navy-800 font-semibold text-[15.5px] leading-tight line-clamp-2">{title}</h3>
+    <p class="text-body text-[12.8px] leading-relaxed mt-[6px] line-clamp-2">{description}</p>
+
+    <!-- Dashed divider -->
+    <div class="border-t border-dashed border-[--color-line] my-[14px]"></div>
+
+    <!-- Price row -->
+    <div class="flex items-center justify-between">
+      <div>
+        {displayPrice ? (
+          <>
+            <span class="text-[11px] text-body-light font-medium block leading-none">Mulai dari</span>
+            <span class="font-[family-name:var(--font-display)] text-orange-600 font-bold text-[16px] leading-tight">Rp {displayPrice}</span>
+          </>
+        ) : (
+          <span class="text-[12px] text-body-light italic">Hubungi kami</span>
+        )}
+      </div>
+      <div class="w-[38px] h-[38px] bg-navy-800 rounded-full flex items-center justify-center text-white text-[14px] transition-transform duration-[0.2s] group-hover:bg-orange-600 group-hover:scale-110">
+        <i class="fa-solid fa-arrow-right"></i>
+      </div>
+    </div>
+  </div>
+</a>

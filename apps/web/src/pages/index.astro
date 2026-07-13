@@ -1,49 +1,100 @@
 ---
+// Voda Tour & Event — Landing Page (index.astro)
+// SSR fetch from Directus, then render all sections
+
 import Layout from "../layouts/Layout.astro";
+import Hero from "../components/Hero.astro";
+import FeatureStrip from "../components/FeatureStrip.astro";
+import SectionHeader from "../components/SectionHeader.astro";
+import PackageGrid from "../components/PackageGrid.astro";
+import StatsBar from "../components/StatsBar.astro";
+import CTABand from "../components/CTABand.astro";
+
+// -----------------------------------------------------------------------
+// SSR fetch dari Directus
+// -----------------------------------------------------------------------
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+
+interface Setting {
+  key: string;
+  value: string;
+}
+
+let settings: Record<string, string> = {};
+let destinations: any[] = [];
+let packages: any[] = [];
+let activityTypes: any[] = [];
+let fetchError = false;
+
+try {
+  const base = `${DIRECTUS_URL}/items`;
+
+  const [settingsRes, destRes, pkgRes, actRes] = await Promise.all([
+    fetch(`${base}/settings`).then((r) => (r.ok ? r.json() : { data: [] })),
+    fetch(`${base}/destinasi?limit=10&sort=name`).then((r) => (r.ok ? r.json() : { data: [] })),
+    fetch(`${base}/paket?limit=4&sort=-id`).then((r) => (r.ok ? r.json() : { data: [] })),
+    fetch(`${base}/activity_types?limit=20&sort=name`).then((r) => (r.ok ? r.json() : { data: [] })),
+  ]);
+
+  // Settings → flat key-value map
+  if (settingsRes.data) {
+    (settingsRes.data as Setting[]).forEach((s: Setting) => {
+      settings[s.key] = s.value;
+    });
+  }
+
+  destinations = destRes.data || [];
+  packages = pkgRes.data || [];
+  activityTypes = actRes.data || [];
+} catch (e) {
+  console.error("SSR fetch error:", e);
+  fetchError = true;
+}
 ---
 
-<Layout title="Beranda | Voda Tour & Event">
+<Layout
+  title="Voda Tour & Event | Perjalanan Berkesan, Momen Tak Terlupakan"
+  description="Solusi perjalanan wisata, gathering, dan event terbaik. Private tour, corporate gathering, dan outbound dengan pengalaman tak terlupakan."
+  active="beranda"
+>
   <main>
-    <!-- Header placeholder -->
-    <header class="wrap" style="padding-top: 24px; padding-bottom: 24px;">
-      <h1 class="font-display text-ink font-bold text-3xl md:text-5xl">
-        Voda Tour & Event
-      </h1>
-      <p class="text-body mt-2">
-        Perjalanan Berkesan, <span class="accent-italic">Tak Terlupakan</span>
-      </p>
-    </header>
+    <!-- 3.1 Hero + SearchCard -->
+    <Hero
+      settings={settings}
+      destinations={destinations}
+      activityTypes={activityTypes}
+    />
 
-    <!-- Test: Tailwind theme colors -->
-    <section class="wrap py-16">
-      <div class="eyebrow">PAKET PILIHAN</div>
-      <h2 class="font-display text-ink font-bold text-[34px] mt-4">
-        Destinasi Favorit
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        <div class="bg-white rounded-[--radius-md] shadow-[--shadow-soft] p-6">
-          <h3 class="font-display text-navy-800 font-semibold">Bandung</h3>
-          <p class="text-body text-sm mt-2">Kota kembang dengan pesona alam pegunungan...</p>
-        </div>
-        <div class="bg-white rounded-[--radius-md] shadow-[--shadow-soft] p-6">
-          <h3 class="font-display text-navy-800 font-semibold">Bali</h3>
-          <p class="text-body text-sm mt-2">Pulau dewata dengan budaya dan pantai eksotis...</p>
-        </div>
-        <div class="bg-white rounded-[--radius-md] shadow-[--shadow-soft] p-6">
-          <h3 class="font-display text-navy-800 font-semibold">Yogyakarta</h3>
-          <p class="text-body text-sm mt-2">Kota budaya dengan candi dan kuliner legendaris...</p>
-        </div>
+    <!-- 3.2 FeatureStrip -->
+    <FeatureStrip />
+
+    <!-- 3.3 + 3.4 PackageGrid -->
+    <section id="paket" class="wrap py-[90px] max-lg:py-[60px]">
+      <SectionHeader
+        eyebrow="PAKET PILIHAN"
+        title="Destinasi & Paket Favorit"
+        description="Temukan paket perjalanan dan event terbaik untuk momen spesial Anda."
+        layout="default"
+      />
+      <div class="mt-[28px]">
+        {fetchError ? (
+          <div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[16px] text-red-700 text-[14px]">
+            <i class="fa-solid fa-circle-exclamation mr-[8px]"></i>
+            Gagal memuat data. Pastikan Directus sudah berjalan.
+          </div>
+        ) : (
+          <PackageGrid packages={packages} />
+        )}
       </div>
     </section>
 
-    <!-- Test: Button -->
-    <section class="wrap py-8 text-center">
-      <a
-        href="#"
-        class="inline-flex items-center gap-2 px-6 py-3 rounded-[999px] font-semibold text-sm bg-orange-600 text-white shadow-[0_14px_28px_-10px_rgba(238,125,15,0.55)] transition-all duration-[0.18s] hover:-translate-y-[2px] hover:shadow-[0_18px_34px_-10px_rgba(238,125,15,0.65)]"
-      >
-        <i class="fa-solid fa-whatsapp"></i> Hubungi Kami
-      </a>
-    </section>
+    <!-- 3.5 StatsBar + Testimonial -->
+    <StatsBar />
+
+    <!-- 3.6 CTABand -->
+    <CTABand
+      ctaLabel="Konsultasi Gratis"
+      ctaUrl={`https://wa.me/${settings.whatsapp || "6282112345678"}?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20paket%20Anda.`}
+    />
   </main>
 </Layout>

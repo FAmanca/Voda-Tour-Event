@@ -1,0 +1,43 @@
+---
+// Voda Tour & Event — WaButton Component
+// WhatsApp CTA button with wa.me link
+
+interface Props {
+  phone: string;
+  message?: string;
+  label?: string;
+  variant?: 'primary' | 'outline' | 'pill';
+  fullWidth?: boolean;
+  icon?: boolean;
+}
+
+const {
+  phone,
+  message = 'Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20ingin%20tahu%20lebih%20lanjut...',
+  label = 'Hubungi Kami',
+  variant = 'primary',
+  fullWidth = false,
+  icon = true,
+} = Astro.props;
+
+const waUrl = `https://wa.me/${phone}?text=${message}`;
+
+const variantClass: Record<string, string> = {
+  primary: 'bg-orange-600 text-white rounded-[999px] px-6 py-3 shadow-[0_14px_28px_-10px_rgba(238,125,15,0.55)] hover:shadow-[0_18px_34px_-10px_rgba(238,125,15,0.65)]',
+  outline: 'bg-transparent text-orange-600 border-[1.5px] border-orange-600 rounded-[999px] px-6 py-3 hover:bg-orange-100',
+  pill: 'bg-orange-600 text-white rounded-[999px] px-5 py-[10px] shadow-[0_14px_28px_-10px_rgba(238,125,15,0.55)] hover:shadow-[0_18px_34px_-10px_rgba(238,125,15,0.65)]',
+};
+
+const baseClass = 'inline-flex items-center justify-center gap-2 font-semibold text-sm leading-none transition-all duration-[0.18s] hover:-translate-y-[2px]';
+const widthClass = fullWidth ? 'w-full' : '';
+---
+
+<a
+  href={waUrl}
+  target="_blank"
+  rel="noopener noreferrer"
+  class:list={[baseClass, variantClass[variant] || variantClass.primary, widthClass]}
+>
+  {icon && <i class="fa-brands fa-whatsapp text-[1.15em]"></i>}
+  {label}
+</a>

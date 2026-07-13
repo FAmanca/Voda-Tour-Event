@@ -1,0 +1,85 @@
+---
+// Voda Tour & Event — Header Component
+// Sticky white header: logo + nav + actions (phone + WA)
+
+interface Props {
+  active?: 'beranda' | 'paket' | 'gathering' | 'destinasi' | 'tentang' | 'kontak';
+  settings?: {
+    whatsapp?: string;
+    phone?: string;
+  };
+}
+
+const { active, settings = {} } = Astro.props;
+
+const navItems = [
+  { slug: 'beranda', label: 'Beranda', url: '/' },
+  { slug: 'paket', label: 'Paket Wisata', url: '#', hasDropdown: true },
+  { slug: 'gathering', label: 'Gathering & Event', url: '#', hasDropdown: true },
+  { slug: 'destinasi', label: 'Destinasi', url: '#', hasDropdown: true },
+  { slug: 'tentang', label: 'Tentang Kami', url: '/tentang' },
+  { slug: 'kontak', label: 'Kontak', url: '/kontak' },
+];
+
+const phone = settings.phone || '6282112345678';
+const phoneDisplay = settings.phone
+  ? settings.phone.replace(/^62/, '0').replace(/(\d{4})(\d{4})(\d{4})/, '$1-$2-$3')
+  : '0821-1234-5678';
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-[--color-line]">
+  <div class="wrap">
+    <div class="flex items-center justify-between h-[88px] max-lg:h-[76px] gap-6">
+
+      <!-- Logo -->
+      <a href="/" class="flex items-center shrink-0 no-underline">
+        <img src="/images/VodaTravelIcon.png" alt="Voda Tour & Event" class="h-[60px] w-auto max-lg:h-[48px]" />
+      </a>
+
+      <!-- Nav -->
+      <nav class="hidden lg:flex items-center gap-[14px]">
+        {navItems.map((item) => (
+          <a
+            href={item.url}
+            class:list={[
+              'relative px-[6px] py-[8px] font-[family-name:var(--font-body)] text-[14px] font-semibold transition-colors no-underline',
+              active === item.slug
+                ? 'text-orange-600 after:absolute after:bottom-[-2px] after:left-1/2 after:-translate-x-1/2 after:w-[calc(100%+8px)] after:h-[2.5px] after:bg-orange-600 after:rounded-full'
+                : 'text-navy-800 hover:text-orange-600',
+            ]}
+          >
+            {item.label}
+            {item.hasDropdown && <i class="fa-solid fa-chevron-down text-[10px] ml-[4px] opacity-50"></i>}
+          </a>
+        ))}
+      </nav>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-[14px] shrink-0">
+        <a
+          href={`tel:${phone}`}
+          class="hidden sm:inline-flex items-center gap-[8px] px-[16px] py-[9px] border border-[--color-line] rounded-[999px] text-[13px] font-semibold text-navy-800 no-underline transition-colors hover:border-navy-800"
+        >
+          <i class="fa-solid fa-phone text-[12px]"></i>
+          <span class="hidden md:inline">{phoneDisplay}</span>
+        </a>
+
+        <a
+          href={`https://wa.me/${phone}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-[8px] px-[18px] py-[9px] bg-orange-600 text-white rounded-[999px] text-[13px] font-semibold no-underline shadow-[0_10px_20px_-8px_rgba(238,125,15,0.5)] transition-all duration-[0.18s] hover:-translate-y-[1px] hover:shadow-[0_14px_24px_-8px_rgba(238,125,15,0.6)]"
+        >
+          <i class="fa-brands fa-whatsapp text-[14px]"></i>
+          <span class="hidden md:inline">Konsultasi Gratis</span>
+        </a>
+
+        <!-- Burger -->
+        <button class="lg:hidden flex items-center justify-center w-[40px] h-[40px] text-navy-800 text-[20px] bg-transparent border-none cursor-pointer" aria-label="Menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>

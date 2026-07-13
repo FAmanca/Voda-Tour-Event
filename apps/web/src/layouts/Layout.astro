@@ -1,14 +1,20 @@
 ---
 // Voda Tour & Event — Base Layout
-// Import global CSS (Tailwind + theme)
 import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
 
 interface Props {
   title?: string;
   description?: string;
+  active?: 'beranda' | 'paket' | 'gathering' | 'destinasi' | 'tentang' | 'kontak';
 }
 
-const { title = "Voda Tour & Event", description = "Perjalanan Berkesan, Momen Tak Terlupakan" } = Astro.props;
+const {
+  title = "Voda Tour & Event",
+  description = "Perjalanan Berkesan, Momen Tak Terlupakan",
+  active,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -21,7 +27,7 @@ const { title = "Voda Tour & Event", description = "Perjalanan Berkesan, Momen T
     <title>{title}</title>
     <meta name="description" content={description} />
 
-    <!-- Google Fonts: Poppins + Playfair Display + Inter -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -29,14 +35,16 @@ const { title = "Voda Tour & Event", description = "Perjalanan Berkesan, Momen T
       rel="stylesheet"
     />
 
-    <!-- Font Awesome 6 (free) -->
+    <!-- Font Awesome 6 -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
       crossorigin="anonymous"
     />
   </head>
-  <body>
+  <body class="pt-[88px] max-lg:pt-[76px]">
+    <Header {active} />
     <slot />
+    <Footer />
   </body>
 </html>
