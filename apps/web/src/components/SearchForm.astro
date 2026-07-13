@@ -1,6 +1,7 @@
 ---
-// Voda Tour & Event — SearchForm Component
-// Standalone search form untuk halaman /cari (full-width variant dari SearchCard)
+// Voda Tour & Event — SearchForm Component (Synced with Landing SearchCard)
+// Fields: q (autocomplete) + tanggal + kegiatan + pax
+// Semua pencarian dicatat ke tabel searches via logSearch()
 
 import type { Destination } from "../types/directus";
 import type { ActivityType } from "../types/directus";
@@ -9,85 +10,124 @@ interface Props {
   destinations: Destination[];
   activityTypes: ActivityType[];
   initialValues?: {
-    destination?: string;
+    q?: string;
     activityType?: string;
     paxCount?: number;
+    travelDate?: string;
   };
 }
+
+const { destinations, activityTypes, initialValues } = Astro.props;
+const iv = initialValues || {};
 ---
 
-<form
-  class="bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-card)] p-[28px] max-lg:p-[20px]"
-  method="GET"
-  action="/cari"
->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[16px] items-end">
-    <!-- Destination -->
-    <div>
-      <label class="block text-[12px] font-semibold text-navy-600 mb-[6px] uppercase tracking-wider">
-        Destinasi
-      </label>
-      <select
-        name="destinasi"
-        class="w-full h-[44px] px-[14px] text-[14px] rounded-[var(--radius-sm)] border border-navy-200 bg-white text-navy-800 outline-none focus:border-orange-500 transition-colors"
-      >
-        <option value="">Semua Destinasi</option>
-        {Astro.props.destinations.map((d) => (
-          <option
-            value={d.slug}
-            selected={Astro.props.initialValues?.destination === d.slug}
-          >
-            {d.name}
-          </option>
-        ))}
-      </select>
+<div class="relative">
+  <form id="search-form" method="GET" action="/cari">
+    <!-- Text Search with Autocomplete -->
+    <div class="relative mb-[16px]">
+      <label class="block text-[12px] font-semibold text-white/70 mb-[6px] uppercase tracking-[0.08em]">Cari Destinasi atau Paket</label>
+      <div class="relative">
+        <i class="fa-solid fa-search absolute left-[18px] top-1/2 -translate-y-1/2 text-white/30 text-[16px] pointer-events-none"></i>
+        <input
+          id="search-input"
+          type="text"
+          name="q"
+          placeholder="Ketik nama destinasi atau paket..."
+          value={iv.q || ""}
+          autocomplete="off"
+          class="w-full h-[52px] pl-[48px] pr-[100px] text-[15px] rounded-[var(--radius-lg)] bg-white/10 border-2 border-white/15 text-white placeholder:text-white/30 outline-none focus:border-orange-500 transition-all"
+        />
+        <button type="submit" class="absolute right-[6px] top-1/2 -translate-y-1/2 h-[40px] px-[18px] bg-orange-500 hover:bg-orange-600 text-white font-semibold text-[13px] rounded-[var(--radius-sm)] transition-colors flex items-center gap-[6px] max-sm:hidden">
+          Cari <i class="fa-solid fa-arrow-right text-[12px]"></i>
+        </button>
+      </div>
+      <!-- Autocomplete Dropdown -->
+      <div id="search-dropdown" class="hidden absolute left-0 right-0 top-full mt-[4px] bg-white rounded-[var(--radius-lg)] shadow-[0_12px_40px_rgba(0,0,0,0.15)] border border-navy-100 z-[999] overflow-hidden max-h-[320px] overflow-y-auto"></div>
     </div>
 
-    <!-- Activity Type -->
-    <div>
-      <label class="block text-[12px] font-semibold text-navy-600 mb-[6px] uppercase tracking-wider">
-        Jenis Kegiatan
-      </label>
-      <select
-        name="kegiatan"
-        class="w-full h-[44px] px-[14px] text-[14px] rounded-[var(--radius-sm)] border border-navy-200 bg-white text-navy-800 outline-none focus:border-orange-500 transition-colors"
-      >
-        <option value="">Semua Kegiatan</option>
-        {Astro.props.activityTypes.map((a) => (
-          <option
-            value={a.slug}
-            selected={Astro.props.initialValues?.activityType === a.slug}
-          >
-            {a.name}
-          </option>
-        ))}
-      </select>
-    </div>
+    <!-- Filters: tanggal + kegiatan + pax -->
+    <div class="bg-white/5 backdrop-blur-sm rounded-[var(--radius-lg)] p-[20px] border border-white/10">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-[14px] items-end">
+        <!-- Tanggal -->
+        <div>
+          <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[5px]">Tanggal Berangkat</label>
+          <div class="relative">
+            <input type="date" name="tanggal" value={iv.travelDate || ""}
+              class="w-full h-[44px] px-[12px] text-[13px] rounded-[var(--radius-sm)] bg-white/10 border border-white/15 text-white outline-none focus:border-orange-500 transition-colors [color-scheme:dark]" />
+            <i class="fa-regular fa-calendar absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
+          </div>
+        </div>
 
-    <!-- Pax Count -->
-    <div>
-      <label class="block text-[12px] font-semibold text-navy-600 mb-[6px] uppercase tracking-wider">
-        Jumlah Peserta
-      </label>
-      <input
-        type="number"
-        name="pax"
-        min="1"
-        placeholder="Mis: 10"
-        value={Astro.props.initialValues?.paxCount || ""}
-        class="w-full h-[44px] px-[14px] text-[14px] rounded-[var(--radius-sm)] border border-navy-200 bg-white text-navy-800 outline-none focus:border-orange-500 transition-colors placeholder:text-navy-300"
-      />
+        <!-- Kegiatan -->
+        <div>
+          <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[5px]">Kegiatan</label>
+          <div class="relative">
+            <select name="kegiatan" class="w-full h-[44px] px-[12px] text-[13px] rounded-[var(--radius-sm)] bg-white/10 border border-white/15 text-white/80 outline-none focus:border-orange-500 transition-colors appearance-none">
+              <option value="" class="text-navy-800">Semua Kegiatan</option>
+              {activityTypes.map((a) => (
+                <option value={a.slug} selected={iv.activityType === a.slug} class="text-navy-800">{a.name}</option>
+              ))}
+            </select>
+            <i class="fa-solid fa-chevron-down absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[10px] pointer-events-none"></i>
+          </div>
+        </div>
+
+        <!-- Pax -->
+        <div>
+          <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[5px]">Jumlah Peserta</label>
+          <div class="relative">
+            <input type="number" name="pax" min="1" placeholder="Mis: 10" value={iv.paxCount || ""}
+              class="w-full h-[44px] px-[12px] text-[13px] rounded-[var(--radius-sm)] bg-white/10 border border-white/15 text-white placeholder:text-white/30 outline-none focus:border-orange-500 transition-colors" />
+            <i class="fa-solid fa-user absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Submit -->
-    <div>
-      <button
-        type="submit"
-        class="w-full h-[44px] bg-orange-500 hover:bg-orange-600 text-white font-semibold text-[14px] rounded-[var(--radius-sm)] transition-colors flex items-center justify-center gap-[8px]"
-      >
-        <i class="fa-solid fa-search text-[14px]"></i>
-        Cari Paket
-      </button>
-    </div>
-  </div>
-</form>
+    <button type="submit" class="w-full mt-[16px] py-[13px] bg-orange-600 hover:bg-orange-500 text-white font-semibold text-[14px] rounded-[var(--radius-sm)] transition-colors flex items-center justify-center gap-[8px]">
+      <i class="fa-solid fa-search"></i>
+      Cari Paket
+    </button>
+  </form>
+</div>
+
+<script>
+import { initAutocomplete, logSearch } from "../lib/search";
+window.__DIRECTUS_URL__ = window.__DIRECTUS_URL__ || "{import.meta.env.DIRECTUS_URL || 'http://localhost:8055'}";
+document.addEventListener("DOMContentLoaded", function () {
+  initAutocomplete("search-input", "search-dropdown");
+
+  // Auto-fill form dari URL params (karena Astro static, initialValues cuma build-time)
+  var sp = new URLSearchParams(window.location.search);
+  if (sp.get("q")) document.querySelector("input[name='q']").value = sp.get("q");
+  if (sp.get("tanggal")) document.querySelector("input[name='tanggal']").value = sp.get("tanggal");
+  if (sp.get("kegiatan")) document.querySelector("select[name='kegiatan']").value = sp.get("kegiatan");
+  if (sp.get("pax")) document.querySelector("input[name='pax']").value = sp.get("pax");
+
+  var form = document.getElementById("search-form");
+  if (form) {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var fd = new FormData(form);
+      var q = fd.get("q") || "";
+      var keg = fd.get("kegiatan") || "";
+      var tgl = fd.get("tanggal") || "";
+      var pax = fd.get("pax") || "";
+      logSearch({
+        query: q,
+        activity_type_name: keg,
+        travel_date: tgl,
+        pax_count: pax ? parseInt(pax) : null,
+      }).then(function () {
+        var sp = new URLSearchParams();
+        if (q) sp.set("q", q);
+        if (keg) sp.set("kegiatan", keg);
+        if (tgl) sp.set("tanggal", tgl);
+        if (pax) sp.set("pax", pax);
+        window.location.href = "/cari?" + sp.toString();
+      });
+    });
+  }
+});
+</script>

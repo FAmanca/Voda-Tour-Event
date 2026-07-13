@@ -65,7 +65,7 @@ export async function getRegions(): Promise<Region[]> {
 // ---------------------------------------------------------------------------
 
 export async function getDestinations(fields = "*"): Promise<Destination[]> {
-  return fetchApi<Destination>("destinasi", {
+  return fetchApi<Destination>("destinations", {
     fields,
     filter: JSON.stringify({ status: { _eq: "published" } }),
     sort: "name",
@@ -75,7 +75,7 @@ export async function getDestinations(fields = "*"): Promise<Destination[]> {
 export async function getDestinationsByRegion(
   regionSlug: string
 ): Promise<Destination[]> {
-  return fetchApi<Destination>("destinasi", {
+  return fetchApi<Destination>("destinations", {
     fields: "*,region_id.*",
     filter: JSON.stringify({
       status: { _eq: "published" },
@@ -88,7 +88,7 @@ export async function getDestinationsByRegion(
 export async function getDestinationBySlug(
   slug: string
 ): Promise<Destination | null> {
-  const items = await fetchApi<Destination>("destinasi", {
+  const items = await fetchApi<Destination>("destinations", {
     fields: "*,region_id.*",
     filter: JSON.stringify({
       status: { _eq: "published" },
@@ -106,7 +106,7 @@ export async function getPackages(
   limit = 50,
   fields = "*"
 ): Promise<Package[]> {
-  return fetchApi<Package>("paket", {
+  return fetchApi<Package>("packages", {
     fields: `${fields},destination_id.*`,
     filter: JSON.stringify({ status: { _eq: "published" } }),
     limit: String(limit),
@@ -117,7 +117,7 @@ export async function getPackages(
 export async function getPackageBySlug(
   slug: string
 ): Promise<Package | null> {
-  const items = await fetchApi<Package>("paket", {
+  const items = await fetchApi<Package>("packages", {
     fields: "*,destination_id.*",
     filter: JSON.stringify({
       status: { _eq: "published" },
@@ -130,7 +130,7 @@ export async function getPackageBySlug(
 export async function getPackagesByDestination(
   destinationId: string
 ): Promise<Package[]> {
-  return fetchApi<Package>("paket", {
+  return fetchApi<Package>("packages", {
     fields: "*",
     filter: JSON.stringify({
       status: { _eq: "published" },
@@ -155,7 +155,7 @@ export async function getPackagesByActivityType(
   );
   if (junction.length === 0) return [];
   const pkgIds = junction.map((j) => j.package_id);
-  return fetchApi<Package>("paket", {
+  return fetchApi<Package>("packages", {
     fields: "*,destination_id.*",
     filter: JSON.stringify({
       status: { _eq: "published" },
@@ -204,7 +204,7 @@ export function getAssetUrl(uuid: string, opts?: {
 // ---------------------------------------------------------------------------
 
 export interface SearchResult {
-  type: "destinasi" | "paket";
+  type: "destinations" | "packages";
   slug: string;
   name: string;
   description: string | null;
@@ -217,7 +217,7 @@ export async function searchAll(q: string): Promise<SearchResult[]> {
   const results: SearchResult[] = [];
 
   // Search destinations
-  const dests = await fetchApi<Destination>("destinasi", {
+  const dests = await fetchApi<Destination>("destinations", {
     fields: "*,region_id.name",
     filter: JSON.stringify({
       status: { _eq: "published" },
@@ -229,7 +229,7 @@ export async function searchAll(q: string): Promise<SearchResult[]> {
   });
   dests.forEach((d) => {
     results.push({
-      type: "destinasi",
+      type: "destinations",
       slug: d.slug,
       name: d.name,
       description: d.description,
@@ -239,7 +239,7 @@ export async function searchAll(q: string): Promise<SearchResult[]> {
   });
 
   // Search packages
-  const pkgs = await fetchApi<Package>("paket", {
+  const pkgs = await fetchApi<Package>("packages", {
     fields: "*,destination_id.name",
     filter: JSON.stringify({
       status: { _eq: "published" },
@@ -251,7 +251,7 @@ export async function searchAll(q: string): Promise<SearchResult[]> {
   });
   pkgs.forEach((p) => {
     results.push({
-      type: "paket",
+      type: "packages",
       slug: p.slug,
       name: p.name,
       description: p.description,
