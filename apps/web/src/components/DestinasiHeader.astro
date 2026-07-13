@@ -22,13 +22,20 @@ const regionName =
 
 <section class="relative min-h-[420px] flex items-center overflow-hidden">
   <!-- Background Image + Overlay -->
-  {bgImage && (
+  {bgImage ? (
     <img
       src={bgImage}
       alt={d.name}
       class="absolute inset-0 w-full h-full object-cover"
       loading="eager"
     />
+  ) : (
+    <div class="absolute inset-0 bg-navy-200 flex items-center justify-center">
+      <div class="text-center text-navy-400">
+        <i class="fa-regular fa-image text-[56px]"></i>
+        <p class="text-[14px] mt-[8px] font-medium">No Image</p>
+      </div>
+    </div>
   )}
   <div class="absolute inset-0 bg-gradient-to-r from-[rgba(10,59,82,0.95)] via-[rgba(10,59,82,0.7)] to-[rgba(10,59,82,0.15)]"></div>
 

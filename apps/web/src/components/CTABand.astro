@@ -16,7 +16,7 @@ const {
   description = "Kami siap merancang perjalanan dan event yang sesuai kebutuhan Anda.",
   ctaLabel = "Hubungi Kami",
   ctaUrl,
-  bgImage = "/images/cta-band-bg.jpg",
+  bgImage = "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=2070&auto=format&fit=crop",
   features: featureProps,
 } = Astro.props;
 
@@ -42,10 +42,10 @@ const whatsappUrl = ctaUrl || "https://wa.me/6282112345678?text=Halo%20Voda%20To
   <!-- Dark navy → teal overlay for text readability -->
   <div class="absolute inset-0 bg-gradient-to-r from-[#0E2333]/95 via-[#173F4C]/85 to-[#2F6B74]/70"></div>
 
-  <div class="relative z-10 flex items-stretch min-h-[92px] max-lg:flex-col max-lg:min-h-0">
+  <div class="relative z-10 flex items-center justify-between min-h-[92px] max-lg:flex-col max-lg:items-stretch py-[18px]">
 
     <!-- Left: heading + description + features -->
-    <div class="flex-1 flex items-center justify-between gap-[32px] pl-[24px] lg:pl-[48px] pr-[24px] py-[18px] flex-wrap lg:flex-nowrap max-lg:justify-start">
+    <div class="flex-1 flex items-center justify-between gap-[32px] pl-[24px] lg:pl-[48px] pr-[24px] flex-wrap lg:flex-nowrap max-lg:justify-start">
 
       <!-- Heading + description -->
       <div class="max-w-[280px] shrink-0 max-lg:max-w-full">
@@ -57,29 +57,31 @@ const whatsappUrl = ctaUrl || "https://wa.me/6282112345678?text=Halo%20Voda%20To
         </p>
       </div>
 
-      <!-- Feature list: icon stacked above label -->
-      <div class="flex items-center gap-x-[28px] gap-y-[14px] flex-wrap justify-center max-lg:justify-start">
+      <!-- Feature list: icon on the left of the label -->
+      <div class="flex items-center gap-x-[36px] gap-y-[18px] flex-wrap justify-center lg:justify-start">
         {features.map((f) => (
-          <div class="flex flex-col items-center gap-[6px] text-center w-[90px]">
-            <div class="w-[30px] h-[30px] rounded-full border border-white/30 flex items-center justify-center text-white text-[13px] shrink-0">
+          <div class="flex items-center gap-[10px] text-left max-w-[210px]">
+            <div class="w-[36px] h-[36px] rounded-full border border-white/20 bg-white/10 flex items-center justify-center text-orange-400 text-[15px] shrink-0 shadow-sm">
               <i class={f.icon}></i>
             </div>
-            <span class="text-white/85 text-[11.5px] font-medium leading-tight">{f.label}</span>
+            <span class="text-white/90 text-[12.5px] font-medium leading-tight whitespace-normal max-w-[150px]">{f.label}</span>
           </div>
         ))}
       </div>
     </div>
 
-    <!-- Right: CTA button, edge-to-edge, full height -->
-    <a
-      href={whatsappUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="flex items-center justify-center gap-[10px] bg-orange-600 text-white px-[32px] py-[16px] font-semibold text-[14px] no-underline shrink-0 transition-colors duration-[0.18s] hover:bg-orange-500 max-lg:justify-start"
-    >
-      <i class="fa-brands fa-whatsapp text-[17px]"></i>
-      {ctaLabel}
-    </a>
+    <!-- Right: CTA button, centered, not full height -->
+    <div class="flex items-center justify-center px-[24px] lg:px-[48px] lg:border-l lg:border-white/10 shrink-0 max-lg:pt-[18px] max-lg:border-t max-lg:border-white/10 max-lg:justify-start">
+      <a
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center justify-center gap-[8px] bg-orange-600 text-white px-[28px] py-[12px] rounded-[var(--radius-sm)] font-semibold text-[14px] no-underline shrink-0 transition-all duration-[0.2s] hover:bg-orange-500 hover:scale-[1.02] active:scale-[0.98] shadow-[0_4px_14px_rgba(234,88,12,0.3)]"
+      >
+        <i class="fa-brands fa-whatsapp text-[18px]"></i>
+        {ctaLabel}
+      </a>
+    </div>
 
   </div>
 </section>

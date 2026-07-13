@@ -8,8 +8,8 @@ let imgs = [];
 let err = false;
 try {
   const [dr, pr] = await Promise.all([
-    fetch(U + "/items/destinasi?fields=gallery,image&filter[status][_eq]=published"),
-    fetch(U + "/items/paket?fields=gallery&filter[status][_eq]=published"),
+    fetch(U + "/items/destinations?fields=gallery,image&filter[status][_eq]=published"),
+    fetch(U + "/items/packages?fields=gallery&filter[status][_eq]=published"),
   ]);
   if (dr.ok) { const j = await dr.json(); (j.data || []).forEach((d) => { if (d.image) imgs.push(d.image); if (d.gallery) d.gallery.forEach((g) => imgs.push(g)); }); }
   if (pr.ok) { const j = await pr.json(); (j.data || []).forEach((p) => { if (p.gallery) p.gallery.forEach((g) => imgs.push(g)); }); }

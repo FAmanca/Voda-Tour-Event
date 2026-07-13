@@ -8,7 +8,7 @@ const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
 const { destinasi: ds, kegiatan: ks, pax: ps } = Astro.url.searchParams;
 
 const [dr, ar] = await Promise.all([
-  fetch(U + "/items/destinasi?fields=*,region_id.*&filter[status][_eq]=published&sort=name"),
+  fetch(U + "/items/destinations?fields=*,region_id.*&filter[status][_eq]=published&sort=name"),
   fetch(U + "/items/activity_types?filter[status][_eq]=published&sort=name"),
 ]);
 let alld = [], acts = [];
@@ -18,7 +18,7 @@ if (ar.ok) { const j = await ar.json(); acts = j.data || []; }
 let packages = [];
 let err = false;
 try {
-  let url = U + "/items/paket?fields=*,destination_id.*&filter[status][_eq]=published&sort=-id";
+  let url = U + "/items/packages?fields=*,destination_id.*&filter[status][_eq]=published&sort=-id";
   if (ds) url += "&filter[destination_id][slug][_eq]=" + ds;
   if (ks) {
     const jr = await fetch(U + "/items/packages_activity_types?fields=package_id&filter[activity_type_id][slug][_eq]=" + ks);

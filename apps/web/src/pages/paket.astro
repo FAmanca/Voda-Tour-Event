@@ -10,7 +10,7 @@ let fetchError = false;
 
 try {
   const [pkgRes, actRes] = await Promise.all([
-    fetch(DIRECTUS_URL + "/items/paket?fields=*,destination_id.*&limit=50&filter[status][_eq]=published&sort=-id"),
+    fetch(DIRECTUS_URL + "/items/packages?fields=*,destination_id.*&limit=50&filter[status][_eq]=published&sort=-id"),
     fetch(DIRECTUS_URL + "/items/activity_types?filter[status][_eq]=published&sort=name"),
   ]);
   if (pkgRes.ok) { const json = await pkgRes.json(); packages = json.data || []; }

@@ -11,7 +11,7 @@ export async function getStaticPaths() {
   const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
   let destinations = [];
   try {
-    const res = await fetch(DIRECTUS_URL + "/items/destinasi?fields=slug&filter[status][_eq]=published");
+    const res = await fetch(DIRECTUS_URL + "/items/destinations?fields=slug&filter[status][_eq]=published");
     if (res.ok) { const json = await res.json(); destinations = json.data || []; }
   } catch {}
   return destinations.map((d) => ({ params: { slug: d.slug } }));
@@ -25,8 +25,8 @@ let fetchError = false;
 
 try {
   const [destRes, pkgRes] = await Promise.all([
-    fetch(DIRECTUS_URL + "/items/destinasi?fields=*,region_id.*&filter[slug][_eq]=" + slug + "&filter[status][_eq]=published"),
-    fetch(DIRECTUS_URL + "/items/paket?fields=*,destination_id.*&filter[destination_id][slug][_eq]=" + slug + "&filter[status][_eq]=published&sort=id"),
+    fetch(DIRECTUS_URL + "/items/destinations?fields=*,region_id.*&filter[slug][_eq]=" + slug + "&filter[status][_eq]=published"),
+    fetch(DIRECTUS_URL + "/items/packages?fields=*,destination_id.*&filter[destination_id][slug][_eq]=" + slug + "&filter[status][_eq]=published&sort=id"),
   ]);
   if (destRes.ok) { const json = await destRes.json(); destination = json.data?.[0] || null; }
   if (pkgRes.ok) { const json = await pkgRes.json(); packages = json.data || []; }

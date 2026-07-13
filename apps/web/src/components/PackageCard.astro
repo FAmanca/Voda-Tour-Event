@@ -3,24 +3,42 @@
 // Individual package card with photo area, icon badge, price
 
 interface Props {
-  title: string;
-  description: string;
-  slug: string;
+  /** Alternate: pass full package object */
+  package?: any;
+  /** Show destination name */
+  showDestination?: boolean;
+  title?: string;
+  description?: string;
+  slug?: string;
   /** Price tier pertama sebagai harga mulai */
   priceFrom?: number;
+  image?: string;
   icon?: string;
-  /** Kategori untuk gradient warna: 'wisata' | 'gathering' | 'corporate' | 'outbound' */
   category?: string;
 }
 
 const {
-  title,
-  description,
-  slug,
-  priceFrom,
+  title: _title,
+  description: _desc,
+  slug: _slug,
+  priceFrom: _priceFrom,
+  image: _img,
   icon = "fa-solid fa-map-marked-alt",
   category = 'wisata',
+  showDestination,
+  package: pkg,
 } = Astro.props;
+
+// Support both individual props AND full package object
+const BASE_URL = import.meta.env.DIRECTUS_URL || 'http://localhost:8055';
+const title = _title || pkg?.name || '';
+const description = _desc || pkg?.description || '';
+const slug = _slug || pkg?.slug || '';
+const priceFrom = _priceFrom ?? (pkg?.price_tiers ? Math.min(...pkg.price_tiers.map(t => t.price_per_pax)) : undefined);
+const image = _img || (pkg?.image ? BASE_URL + '/assets/' + pkg.image + '?width=400&height=250&fit=cover' : undefined);
+const destName = pkg?.destination_id
+  ? (typeof pkg.destination_id === 'object' ? pkg.destination_id?.name : '')
+  : '';
 
 const gradientMap: Record<string, string> = {
   wisata: 'from-[#0A3B52] to-[#2A7A6E]',
@@ -41,7 +59,15 @@ const displayPrice = priceFrom
   class="group block bg-white rounded-[var(--radius-md)] shadow-[var(--shadow-soft)] overflow-hidden no-underline transition-all duration-[0.25s] hover:-translate-y-[6px] hover:shadow-[var(--shadow-card)]"
 >
   <!-- Photo area -->
-  <div class={`relative h-[150px] bg-gradient-to-br ${gradient}`}>
+  <div class="relative h-[150px] overflow-hidden bg-navy-100">
+    {image ? (
+      <img src={image} alt={title} class="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+    ) : (
+      <div class="absolute inset-0 flex flex-col items-center justify-center text-navy-300">
+        <i class="fa-regular fa-image text-[32px]"></i>
+        <span class="text-[11px] mt-[6px] font-medium">No Image</span>
+      </div>
+    )}
     <!-- Icon badge pinned top-left, overlapping edge -->
     <div class="absolute top-[14px] left-[14px] w-[38px] h-[38px] bg-white rounded-full flex items-center justify-center text-navy-800 text-[16px] shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
       <i class={icon}></i>
@@ -52,6 +78,7 @@ const displayPrice = priceFrom
   <div class="p-[18px]">
     <h3 class="font-[family-name:var(--font-display)] text-navy-800 font-semibold text-[15.5px] leading-tight line-clamp-2">{title}</h3>
     <p class="text-body text-[12.8px] leading-relaxed mt-[6px] line-clamp-2">{description}</p>
+    {showDestination && destName && <p class="text-[11px] text-navy-400 mt-[8px]"><i class="fa-solid fa-location-dot text-[10px] mr-[3px]"></i>{destName}</p>}
 
     <!-- Dashed divider -->
     <div class="border-t border-dashed border-[--color-line] my-[14px]"></div>

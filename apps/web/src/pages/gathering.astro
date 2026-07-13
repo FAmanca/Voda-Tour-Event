@@ -17,7 +17,7 @@ try {
     let ids = [];
     if (jr.ok) { const jj = await jr.json(); ids = (jj.data || []).map((x) => x.package_id); }
     if (ids.length > 0) {
-      const pr = await fetch(U + "/items/paket?fields=*,destination_id.*&filter[id][_in]=" + ids.join(",") + "&filter[status][_eq]=published&sort=-id");
+      const pr = await fetch(U + "/items/packages?fields=*,destination_id.*&filter[id][_in]=" + ids.join(",") + "&filter[status][_eq]=published&sort=-id");
       if (pr.ok) { const pj = await pr.json(); packages = pj.data || []; }
     }
   }

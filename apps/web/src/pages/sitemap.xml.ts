@@ -9,8 +9,8 @@ export const GET: APIRoute = async () => {
 
   try {
     const [destRes, pkgRes] = await Promise.all([
-      fetch(DIRECTUS_URL + "/items/destinasi?fields=slug,updated_at&filter[status][_eq]=published"),
-      fetch(DIRECTUS_URL + "/items/paket?fields=slug,updated_at&filter[status][_eq]=published"),
+      fetch(DIRECTUS_URL + "/items/destinations?fields=slug,updated_at&filter[status][_eq]=published"),
+      fetch(DIRECTUS_URL + "/items/packages?fields=slug,updated_at&filter[status][_eq]=published"),
     ]);
     if (destRes.ok) { const j = await destRes.json(); destinations = j.data || []; }
     if (pkgRes.ok) { const j = await pkgRes.json(); packages = j.data || []; }

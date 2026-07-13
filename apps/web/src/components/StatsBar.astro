@@ -44,26 +44,27 @@ const initials = testimonial.name
   .toUpperCase();
 ---
 
-<div class="relative z-20 -mt-[64px] max-lg:-mt-0 max-lg:pt-[40px]">
+<div class="relative z-20 mt-[30px] max-lg:-mt-0 max-lg:pt-[40px] mb-10">
   <div class="wrap">
     <div class="bg-navy-900 rounded-[var(--radius-lg)] shadow-[var(--shadow-card)] px-[36px] py-[28px] max-lg:px-[24px] max-lg:py-[24px] overflow-hidden">
       <div class="flex items-center justify-between gap-[32px] max-lg:flex-col max-lg:items-stretch">
 
-        <div class="flex flex-1 min-w-0 items-center justify-between gap-x-[16px] divide-x divide-white/10 max-md:grid max-md:grid-cols-2 max-md:gap-[16px] max-md:divide-x-0">
+        <div class="flex flex-1 min-w-0 items-stretch justify-between divide-x divide-white/10">
           {stats.map((s) => (
-            <div class="flex items-center gap-[12px] first:pl-0 pl-[16px] max-md:pl-0">
-              {/* Ukuran Lingkaran Ikon */}
-              <div class="w-[40px] h-[40px] rounded-full border border-white/15 bg-white/5 flex items-center justify-center text-orange-500 text-[16px] shrink-0">
+            <div class="flex-1 flex items-center justify-center gap-[6px] lg:gap-[12px] px-[4px] lg:px-[12px] first:pl-0 last:pr-0">
+              {/* Icon Circle */}
+              <div class="w-[24px] h-[24px] lg:w-[40px] lg:h-[40px] rounded-full border border-white/15 bg-white/5 flex items-center justify-center text-orange-500 text-[11px] lg:text-[16px] shrink-0">
                 <i class={s.icon}></i>
               </div>
-              <div class="min-w-0">
-                {/* Ukuran Angka Stat */}
-                <div class="font-[family-name:var(--font-display)] text-white font-bold text-[18px] leading-none">
+              <div class="min-w-0 flex flex-col justify-center">
+                {/* Stat Value */}
+                <div class="font-[family-name:var(--font-display)] text-white font-bold text-[18px] lg:text-[28px] leading-none shrink-0">
                   {s.value}
                 </div>
-                {/* Ukuran Label */}
-                <div class="text-white/70 text-[12px] leading-tight mt-[4px] whitespace-nowrap">
-                  {s.label}{s.sublabel ? ` ${s.sublabel}` : ""}
+                {/* Stat Label */}
+                <div class="text-white/70 text-[9px] lg:text-[12px] leading-tight mt-[2px] lg:mt-[4px] font-medium whitespace-normal">
+                  <span class="block text-white/80">{s.label}</span>
+                  {s.sublabel && <span class="block text-white/50 text-[8px] lg:text-[11px] mt-[1px]">{s.sublabel}</span>}
                 </div>
               </div>
             </div>

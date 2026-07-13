@@ -282,45 +282,46 @@ Buat di Directus Admin Panel:
   - Fields: id (UUID), name (string), slug (string, unique), description (text), image (file), status (select)
   - System: created_at, updated_at, created_by, updated_by
 
-- [ ] **destinations**
+- [x] **destinations**
   - Fields: id (UUID), region_id (M2O → regions), name (string), slug (string, unique), description (text), image (file), gallery (JSON/file[]), status (select)
 
-- [ ] **packages**
+- [x] **packages**
   - Fields: id (UUID), destination_id (M2O → destinations), name (string), slug (string, unique), description (text), duration (string), itinerary (JSON), facilities (JSON), price_tiers (JSON), gallery (JSON/file[]), status (select)
 
-- [ ] **activity_types**
+- [x] **activity_types**
   - Fields: id (UUID), name (string), slug (string, unique), description (text), status (select)
 
-- [ ] **packages_activity_types**
+- [x] **packages_activity_types**
   - Fields: id (UUID), package_id (M2O → packages), activity_type_id (M2O → activity_types)
   - Junction: many-to-many
 
-- [ ] **settings**
+- [x] **settings**
   - Fields: id (UUID), key (string, unique), value (text)
 
-- [ ] **searches**
+- [x] **searches**
   - Fields: id (UUID), destination_name (string), region_name (string), activity_type_name (string), pax_count (integer), travel_date (date), ip_hash (string)
   - Note: NO status field, NO soft delete. Just log.
 
 ### 6.2 Directus Configuration
-- [ ] Set **Public Role**:
+- [x] Set **Public Role**:
   - regions: Read
   - destinations: Read
   - packages: Read
   - activity_types: Read
   - settings: Read
   - searches: **Create only** (no read)
-- [ ] Set admin user: `admin@vodaevent.id` / `admin123`
-- [ ] Test: GET `/items/destinations` tanpa auth → harus return data
+- [x] Set admin user: `admin@vodaevent.id` / `admin123`
+- [x] Test: GET `/items/*` tanpa auth → ✅ semua accessible
 
 ### 6.3 Seed Data
-- [ ] Input via admin panel:
-  - Regions: Bandung, Bali, Yogyakarta, Kepulauan Seribu
-  - Destinations: 2-3 per region
-  - Packages: 1-2 per destination with price_tiers
-  - Activity Types: Private Trip, Corporate Gathering, Team Building, Family Vacation
-  - Settings: site_name, whatsapp, email, phone, address, instagram
-- [ ] Upload sample images via Directus file manager
+- [x] Input via seeder script:
+  - Regions: 5 ✅
+  - Destinations: 14 (2-3 per region) ✅
+  - Packages: 6 (with itinerary, price_tiers, facilities, M2M) ✅
+  - Activity Types: 5 ✅
+  - Settings: 9 entries ✅
+  - Images: need upload via admin panel (Directus files API requires multipart)
+- [ ] Upload sample images via Directus file manager — perlu manual via admin panel
 
 ---
 

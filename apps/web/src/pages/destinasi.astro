@@ -11,7 +11,7 @@ let destinations = [];
 let fetchError = false;
 
 try {
-  const res = await fetch(DIRECTUS_URL + "/items/destinasi?fields=*,region_id.*&filter[status][_eq]=published&sort=name");
+  const res = await fetch(DIRECTUS_URL + "/items/destinations?fields=*,region_id.*&filter[status][_eq]=published&sort=name");
   if (res.ok) {
     const json = await res.json();
     destinations = json.data || [];

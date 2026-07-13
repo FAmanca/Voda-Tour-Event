@@ -13,7 +13,7 @@ import { getStartingPrice, formatPrice } from "../../lib/utils";
 export async function getStaticPaths() {
   const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
   let pkgs = [];
-  try { const r = await fetch(U + "/items/paket?fields=slug&filter[status][_eq]=published"); if (r.ok) { const j = await r.json(); pkgs = j.data || []; } } catch {}
+  try { const r = await fetch(U + "/items/packages?fields=slug&filter[status][_eq]=published"); if (r.ok) { const j = await r.json(); pkgs = j.data || []; } } catch {}
   return pkgs.map((p) => ({ params: { slug: p.slug } }));
 }
 
@@ -24,12 +24,12 @@ let similar = [];
 let err = false;
 
 try {
-  const r = await fetch(U + "/items/paket?fields=*,destination_id.*&filter[slug][_eq]=" + slug + "&filter[status][_eq]=published");
+  const r = await fetch(U + "/items/packages?fields=*,destination_id.*&filter[slug][_eq]=" + slug + "&filter[status][_eq]=published");
   if (r.ok) { const j = await r.json(); pkg = j.data?.[0] || null; }
   if (pkg) {
     const did = typeof pkg.destination_id === "object" ? pkg.destination_id?.id : pkg.destination_id;
     if (did) {
-      const s = await fetch(U + "/items/paket?fields=*,destination_id.*&limit=3&filter[id][_neq]=" + pkg.id + "&filter[destination_id][_eq]=" + did + "&filter[status][_eq]=published&sort=-id");
+      const s = await fetch(U + "/items/packages?fields=*,destination_id.*&limit=3&filter[id][_neq]=" + pkg.id + "&filter[destination_id][_eq]=" + did + "&filter[status][_eq]=published&sort=-id");
       if (s.ok) { const j = await s.json(); similar = j.data || []; }
     }
   }
@@ -46,7 +46,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
     {!err && !pkg && <section class="bg-navy-900"><div class="wrap py-[120px] text-center"><i class="fa-regular fa-face-frown text-[56px] text-white/30 block mb-[20px]"></i><h1 class="font-[family-name:var(--font-display)] text-white text-[28px] font-bold">Paket Tidak Ditemukan</h1><p class="text-white/60 mt-[10px]">Halaman tidak tersedia.</p><a href="/paket" class="inline-flex items-center gap-[8px] mt-[20px] text-orange-500 font-semibold text-[14px] hover:underline"><i class="fa-solid fa-arrow-left"></i> Kembali</a></div></section>}
     {pkg && <>
       <section class="relative min-h-[380px] flex items-center overflow-hidden bg-navy-900">
-        {pkg.gallery?.[0] && <img src={getAssetUrl(pkg.gallery[0], { width: 1440, height: 600, format: "webp", quality: 85 })} alt={pkg.name} class="absolute inset-0 w-full h-full object-cover" loading="eager" />}
+        {pkg.gallery?.[0] ? <img src={getAssetUrl(pkg.gallery[0], { width: 1440, height: 600, format: "webp", quality: 85 })} alt={pkg.name} class="absolute inset-0 w-full h-full object-cover" loading="eager" /> : <div class="absolute inset-0 bg-navy-200 flex items-center justify-center"><div class="text-center text-navy-400"><i class="fa-regular fa-image text-[48px]"></i><p class="text-[13px] mt-[6px] font-medium">No Image</p></div></div>}
         <div class="absolute inset-0 bg-gradient-to-r from-[rgba(10,59,82,0.95)] via-[rgba(10,59,82,0.7)] to-[rgba(10,59,82,0.15)]"></div>
         <div class="wrap relative z-10 py-[80px] max-lg:py-[50px]">
           {dname && <a href={"/destinasi/" + dslug} class="inline-flex items-center gap-[6px] text-white/60 text-[13px] hover:text-orange-500 transition-colors mb-[12px]"><i class="fa-solid fa-arrow-left text-[11px]"></i>{dname}</a>}
@@ -63,7 +63,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
       {pkg.price_tiers && pkg.price_tiers.length > 0 && <section class="bg-navy-50"><div class="wrap py-[60px] max-lg:py-[40px]"><SectionHeader title="Harga Paket" subtitle="Harga per orang berdasarkan jumlah peserta" layout="default" /><div class="max-w-[600px] mt-[34px]"><PriceTable tiers={pkg.price_tiers} /><p class="text-navy-400 text-[12px] mt-[12px]"><i class="fa-solid fa-info-circle mr-[4px]"></i>Harga dapat berubah sesuai musim dan ketersediaan.</p></div></div></section>}
       {pkg.gallery && pkg.gallery.length > 1 && <section><div class="wrap py-[60px] max-lg:py-[40px]"><SectionHeader title="Galeri" subtitle={pkg.gallery.length + " foto"} layout="default" /><div class="mt-[34px]"><GallerySection images={pkg.gallery} columns={3} /></div></div></section>}
       <section class="bg-gradient-to-r from-navy-800 to-navy-900"><div class="wrap py-[50px] flex flex-col items-center text-center"><h2 class="font-[family-name:var(--font-display)] text-white text-[26px] max-lg:text-[22px] font-bold">Tertarik dengan Paket Ini?</h2><p class="text-white/60 text-[14px] mt-[10px] max-w-[400px]">Hubungi kami via WhatsApp.</p><div class="mt-[24px]"><WaButton variant="primary" message={"Halo Voda! Saya tertarik dengan paket " + pkg.name + " (" + pkg.duration + ") di " + dname + "."}>Pesan via WhatsApp</WaButton></div></div></section>
-      {similar.length > 0 && <section><div class="wrap py-[60px] max-lg:py-[40px]"><SectionHeader title="Paket Lainnya" subtitle={"Destinasi " + dname} layout="split" /><div class="grid grid-cols-1 md:grid-cols-3 gap-[24px] mt-[34px]">{similar.map((sp) => <a href={"/paket/" + sp.slug} class="group block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden hover:shadow-[var(--shadow-card)] transition-all hover:-translate-y-[4px]">{sp.gallery?.[0] && <div class="aspect-[16/9] overflow-hidden"><img src={getAssetUrl(sp.gallery[0], { width: 600, height: 338, format: "webp", quality: 85 })} alt={sp.name} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" /></div>}<div class="p-[16px]"><h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[15px] font-semibold group-hover:text-orange-500 transition-colors">{sp.name}</h3><div class="flex items-center gap-[10px] mt-[8px] text-[12px] text-navy-400"><span><i class="fa-regular fa-clock mr-[4px]"></i>{sp.duration}</span></div></div></a>)}</div></div></section>}
+      {similar.length > 0 && <section><div class="wrap py-[60px] max-lg:py-[40px]"><SectionHeader title="Paket Lainnya" subtitle={"Destinasi " + dname} layout="split" /><div class="grid grid-cols-1 md:grid-cols-3 gap-[24px] mt-[34px]">{similar.map((sp) => <a href={"/paket/" + sp.slug} class="group block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden hover:shadow-[var(--shadow-card)] transition-all hover:-translate-y-[4px]">{sp.gallery?.[0] ? <div class="aspect-[16/9] overflow-hidden"><img src={getAssetUrl(sp.gallery[0], { width: 600, height: 338, format: "webp", quality: 85 })} alt={sp.name} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" /></div> : <div class="aspect-[16/9] bg-navy-100 flex items-center justify-center"><i class="fa-regular fa-image text-[28px] text-navy-300"></i></div>}<div class="p-[16px]"><h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[15px] font-semibold group-hover:text-orange-500 transition-colors">{sp.name}</h3><div class="flex items-center gap-[10px] mt-[8px] text-[12px] text-navy-400"><span><i class="fa-regular fa-clock mr-[4px]"></i>{sp.duration}</span></div></div></a>)}</div></div></section>}
       <CTABand />
     </>}
   </main>

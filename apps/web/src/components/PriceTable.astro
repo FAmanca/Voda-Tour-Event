@@ -45,10 +45,10 @@ const activeIdx = getActiveTierIndex();
                 {tier.min_pax}{tier.max_pax ? ` - ${tier.max_pax} orang` : "+ orang"}
               </td>
               <td class="px-[18px] py-[12px]">
-                <span class="font-bold text-orange-600">{formatPrice(tier.price)}</span>
+                <span class="font-bold text-orange-600">{formatPrice(tier.price_per_pax)}</span>
               </td>
               <td class="px-[18px] py-[12px] text-navy-500 text-[13px]">
-                {tier.note || "—"}
+                {tier.description || "—"}
               </td>
             </tr>
           );
