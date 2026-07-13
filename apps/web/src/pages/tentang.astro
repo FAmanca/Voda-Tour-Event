@@ -1,0 +1,22 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Eyebrow from "../components/Eyebrow.astro";
+
+const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+let settings = {};
+try {
+  const r = await fetch(U + "/items/settings");
+  if (r.ok) { const j = await r.json(); if (j.data) j.data.forEach((s) => { settings[s.key] = s.value; }); }
+} catch {}
+---
+
+<Layout title="Tentang Kami | Voda Tour & Event" description="Kenali Voda Tour & Event — mitra perjalanan dan gathering terpercaya." active="tentang">
+  <main>
+    <section class="bg-gradient-to-r from-[rgba(10,59,82,0.95)] to-[rgba(10,59,82,0.85)] py-[80px] max-lg:py-[50px]"><div class="wrap text-center"><Eyebrow text="Tentang Kami" /><h1 class="font-[family-name:var(--font-display)] text-white text-[38px] max-lg:text-[28px] font-bold mt-[12px]">Voda Tour & Event</h1><p class="text-white/70 text-[16px] max-lg:text-[14px] mt-[10px] max-w-[600px] mx-auto">Perjalanan Berkesan, Momen Tak Terlupakan</p></div></section>
+    <section><div class="wrap py-[70px] max-lg:py-[50px]"><div class="grid grid-cols-1 lg:grid-cols-2 gap-[50px] items-center">
+      <div><h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[28px] font-bold">Mitra Perjalanan & Event Terpercaya</h2><p class="text-navy-600 text-[15px] leading-relaxed mt-[16px]">Voda Tour & Event adalah penyedia jasa perjalanan wisata, gathering, dan event organizer yang berkomitmen memberikan pengalaman terbaik bagi setiap pelanggan. Kami melayani berbagai kebutuhan — mulai dari private trip, corporate gathering, outbound, team building, hingga perusahaan event.</p><p class="text-navy-600 text-[15px] leading-relaxed mt-[12px]">Dengan jaringan luas di berbagai destinasi, tim profesional yang berpengalaman, serta perhatian pada setiap detail, kami pastikan setiap momen bersama Voda menjadi kenangan yang tak terlupakan.</p></div>
+      <div class="bg-navy-50 rounded-[var(--radius-lg)] p-[34px] max-lg:p-[24px]"><h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[20px] font-semibold">Mengapa Memilih Voda?</h3><ul class="mt-[16px] space-y-[14px]"><li class="flex items-start gap-[12px]"><i class="fa-solid fa-check-circle text-orange-500 text-[18px] mt-[2px]"></i><div><strong class="text-navy-800">Paket Fleksibel</strong><p class="text-navy-500 text-[13px]">Customizable sesuai kebutuhan</p></div></li><li class="flex items-start gap-[12px]"><i class="fa-solid fa-check-circle text-orange-500 text-[18px] mt-[2px]"></i><div><strong class="text-navy-800">Destinasi Beragam</strong><p class="text-navy-500 text-[13px]">Bandung hingga Kepulauan Seribu</p></div></li><li class="flex items-start gap-[12px]"><i class="fa-solid fa-check-circle text-orange-500 text-[18px] mt-[2px]"></i><div><strong class="text-navy-800">Tim Profesional</strong><p class="text-navy-500 text-[13px]">Berpengalaman dalam event</p></div></li><li class="flex items-start gap-[12px]"><i class="fa-solid fa-check-circle text-orange-500 text-[18px] mt-[2px]"></i><div><strong class="text-navy-800">Harga Transparan</strong><p class="text-navy-500 text-[13px]">Tanpa biaya tersembunyi</p></div></li></ul></div>
+    </div></div></section>
+    <section class="bg-navy-50"><div class="wrap py-[60px] max-lg:py-[40px] text-center"><h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] font-bold">Siap Merencanakan Perjalanan Anda?</h2><p class="text-navy-500 text-[15px] mt-[10px]">Hubungi kami dan dapatkan penawaran terbaik.</p><a href="/kontak" class="inline-flex items-center gap-[8px] mt-[20px] bg-orange-500 hover:bg-orange-600 text-white font-semibold text-[14px] px-[28px] py-[12px] rounded-[var(--radius-sm)] transition-colors">Hubungi Kami <i class="fa-solid fa-arrow-right text-[12px]"></i></a></div></section>
+  </main>
+</Layout>

@@ -1,0 +1,74 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Eyebrow from "../components/Eyebrow.astro";
+import WaButton from "../components/WaButton.astro";
+
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+const WA_NUMBER = import.meta.env.WA_NUMBER || "6281234567890";
+
+let settings = {};
+try {
+  const res = await fetch(DIRECTUS_URL + "/items/settings");
+  if (res.ok) { const json = await res.json(); if (json.data) { json.data.forEach((s) => { settings[s.key] = s.value; }); } }
+} catch {}
+
+const waNum = settings.wa_number || WA_NUMBER;
+const email = settings.email || "info@vodaevent.id";
+const address = settings.address || "";
+const ig = settings.instagram || "";
+const fb = settings.facebook || "";
+const yt = settings.youtube || "";
+---
+
+<Layout title="Kontak | Voda Tour & Event" description="Hubungi Voda Tour & Event untuk konsultasi dan pemesanan." active="kontak">
+  <main>
+    <section class="bg-gradient-to-r from-[rgba(10,59,82,0.95)] to-[rgba(10,59,82,0.85)] py-[80px] max-lg:py-[50px]">
+      <div class="wrap text-center">
+        <Eyebrow text="Kontak" />
+        <h1 class="font-[family-name:var(--font-display)] text-white text-[38px] max-lg:text-[28px] font-bold mt-[12px]">Hubungi Kami</h1>
+        <p class="text-white/70 text-[16px] max-lg:text-[14px] mt-[10px] max-w-[500px] mx-auto">Kami siap membantu Anda merencanakan perjalanan dan event terbaik.</p>
+      </div>
+    </section>
+
+    <section><div class="wrap py-[70px] max-lg:py-[50px]">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-[50px]">
+        <!-- Contact Info -->
+        <div>
+          <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[24px] font-bold">Informasi Kontak</h2>
+          <p class="text-navy-500 text-[14px] mt-[8px]">Jangan ragu untuk menghubungi kami.</p>
+          <div class="space-y-[20px] mt-[28px]">
+            {waNum && (
+              <div class="flex items-start gap-[14px]"><div class="w-[44px] h-[44px] rounded-full bg-green-50 flex items-center justify-center text-green-600 text-[18px] shrink-0"><i class="fa-brands fa-whatsapp"></i></div><div><p class="text-navy-800 font-semibold text-[14px]">WhatsApp</p><a href={"https://wa.me/" + waNum} target="_blank" class="text-orange-500 text-[14px] hover:underline">{waNum}</a></div></div>
+            )}
+            {email && (
+              <div class="flex items-start gap-[14px]"><div class="w-[44px] h-[44px] rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-[18px] shrink-0"><i class="fa-solid fa-envelope"></i></div><div><p class="text-navy-800 font-semibold text-[14px]">Email</p><a href={"mailto:" + email} class="text-orange-500 text-[14px] hover:underline">{email}</a></div></div>
+            )}
+            {address && (
+              <div class="flex items-start gap-[14px]"><div class="w-[44px] h-[44px] rounded-full bg-navy-50 flex items-center justify-center text-navy-600 text-[18px] shrink-0"><i class="fa-solid fa-location-dot"></i></div><div><p class="text-navy-800 font-semibold text-[14px]">Alamat</p><p class="text-navy-500 text-[14px]">{address}</p></div></div>
+            )}
+          </div>
+
+          <!-- Social Media -->
+          {(ig || fb || yt) && (
+            <div class="mt-[34px]">
+              <p class="text-navy-700 font-semibold text-[14px] mb-[12px]">Ikuti Kami</p>
+              <div class="flex gap-[10px]">
+                {ig && <a href={ig} target="_blank" class="w-[40px] h-[40px] rounded-full bg-navy-800 flex items-center justify-center text-white text-[16px] hover:bg-orange-500 transition-colors"><i class="fa-brands fa-instagram"></i></a>}
+                {fb && <a href={fb} target="_blank" class="w-[40px] h-[40px] rounded-full bg-navy-800 flex items-center justify-center text-white text-[16px] hover:bg-orange-500 transition-colors"><i class="fa-brands fa-facebook-f"></i></a>}
+                {yt && <a href={yt} target="_blank" class="w-[40px] h-[40px] rounded-full bg-navy-800 flex items-center justify-center text-white text-[16px] hover:bg-orange-500 transition-colors"><i class="fa-brands fa-youtube"></i></a>}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <!-- CTA Card -->
+        <div class="bg-navy-900 rounded-[var(--radius-lg)] p-[34px] max-lg:p-[24px] text-center flex flex-col items-center justify-center">
+          <i class="fa-brands fa-whatsapp text-green-400 text-[56px]"></i>
+          <h3 class="font-[family-name:var(--font-display)] text-white text-[22px] font-bold mt-[16px]">Respons Cepat via WA</h3>
+          <p class="text-white/60 text-[14px] mt-[8px] max-w-[300px]">Tim kami siap merespon pesan Anda dalam hitungan menit.</p>
+          <div class="mt-[20px]"><WaButton variant="primary" message="Halo Voda Tour & Event! Saya ingin konsultasi.">Hubungi WhatsApp</WaButton></div>
+        </div>
+      </div>
+    </div></section>
+  </main>
+</Layout>

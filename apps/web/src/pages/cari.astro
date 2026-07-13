@@ -1,0 +1,51 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SearchForm from "../components/SearchForm.astro";
+import SearchResult from "../components/SearchResult.astro";
+import Eyebrow from "../components/Eyebrow.astro";
+
+const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+const { destinasi: ds, kegiatan: ks, pax: ps } = Astro.url.searchParams;
+
+const [dr, ar] = await Promise.all([
+  fetch(U + "/items/destinasi?fields=*,region_id.*&filter[status][_eq]=published&sort=name"),
+  fetch(U + "/items/activity_types?filter[status][_eq]=published&sort=name"),
+]);
+let alld = [], acts = [];
+if (dr.ok) { const j = await dr.json(); alld = j.data || []; }
+if (ar.ok) { const j = await ar.json(); acts = j.data || []; }
+
+let packages = [];
+let err = false;
+try {
+  let url = U + "/items/paket?fields=*,destination_id.*&filter[status][_eq]=published&sort=-id";
+  if (ds) url += "&filter[destination_id][slug][_eq]=" + ds;
+  if (ks) {
+    const jr = await fetch(U + "/items/packages_activity_types?fields=package_id&filter[activity_type_id][slug][_eq]=" + ks);
+    let ids = [];
+    if (jr.ok) { const jj = await jr.json(); ids = (jj.data || []).map((x) => x.package_id); }
+    if (ids.length > 0) url += "&filter[id][_in]=" + ids.join(",");
+    else packages = []; // no results
+  }
+  if (!ks || (ks && packages.length === 0 && false)) {  // skip re-assign
+    const r = await fetch(url);
+    if (r.ok) { const j = await r.json(); packages = j.data || []; }
+    else err = true;
+  }
+} catch { err = true; }
+
+const hasSearch = !!(ds || ks || ps);
+---
+
+<Layout title={hasSearch ? "Hasil Pencarian | Voda Tour & Event" : "Cari Paket Wisata | Voda Tour & Event"} description="Cari paket wisata dan destinasi." active="paket">
+  <main>
+    <section class="bg-navy-900 py-[70px] max-lg:py-[50px]">
+      <div class="wrap">
+        <Eyebrow text="Pencarian" />
+        <h1 class="font-[family-name:var(--font-display)] text-white text-[32px] max-lg:text-[24px] font-bold mt-[8px]">{hasSearch ? "Hasil Pencarian" : "Cari Paket Wisata"}</h1>
+        <div class="mt-[28px]"><SearchForm destinations={alld} activityTypes={acts} initialValues={{ destination: ds, activityType: ks, paxCount: ps ? parseInt(ps) : undefined }} /></div>
+      </div>
+    </section>
+    <section><div class="wrap py-[50px] max-lg:py-[30px]">{!hasSearch ? <div class="text-center py-[60px]"><i class="fa-solid fa-search text-[48px] text-navy-200 block mb-[16px]"></i><p class="text-navy-400 text-[15px]">Gunakan form di atas untuk mencari paket.</p></div> : <><p class="text-navy-500 text-[14px] mb-[24px]"><strong>{packages.length}</strong> paket ditemukan</p><SearchResult packages={packages} error={err ? "Gagal memuat hasil." : null} /></>}</div></section>
+  </main>
+</Layout>

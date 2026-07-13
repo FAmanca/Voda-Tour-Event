@@ -1,0 +1,65 @@
+---
+// Voda Tour & Event — Destination Detail Page
+import Layout from "../../layouts/Layout.astro";
+import DestinasiHeader from "../../components/DestinasiHeader.astro";
+import SectionHeader from "../../components/SectionHeader.astro";
+import PackageCard from "../../components/PackageCard.astro";
+import CTABand from "../../components/CTABand.astro";
+import GallerySection from "../../components/GallerySection.astro";
+
+export async function getStaticPaths() {
+  const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+  let destinations = [];
+  try {
+    const res = await fetch(DIRECTUS_URL + "/items/destinasi?fields=slug&filter[status][_eq]=published");
+    if (res.ok) { const json = await res.json(); destinations = json.data || []; }
+  } catch {}
+  return destinations.map((d) => ({ params: { slug: d.slug } }));
+}
+
+const { slug } = Astro.params;
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+let destination = null;
+let packages = [];
+let fetchError = false;
+
+try {
+  const [destRes, pkgRes] = await Promise.all([
+    fetch(DIRECTUS_URL + "/items/destinasi?fields=*,region_id.*&filter[slug][_eq]=" + slug + "&filter[status][_eq]=published"),
+    fetch(DIRECTUS_URL + "/items/paket?fields=*,destination_id.*&filter[destination_id][slug][_eq]=" + slug + "&filter[status][_eq]=published&sort=id"),
+  ]);
+  if (destRes.ok) { const json = await destRes.json(); destination = json.data?.[0] || null; }
+  if (pkgRes.ok) { const json = await pkgRes.json(); packages = json.data || []; }
+} catch { fetchError = true; }
+---
+
+<Layout title={destination ? destination.name + " | Destinasi Voda Tour & Event" : "Destinasi Tidak Ditemukan"} description={destination?.description || ""} active="destinasi">
+  <main>
+    {fetchError && (
+      <section class="bg-navy-900"><div class="wrap py-[120px] text-center text-white/80"><i class="fa-solid fa-triangle-exclamation text-[40px] text-orange-500 block mb-[16px]"></i><p>Gagal memuat halaman.</p></div></section>
+    )}
+    {!fetchError && !destination && (
+      <section class="bg-navy-900"><div class="wrap py-[120px] text-center"><i class="fa-regular fa-face-frown text-[56px] text-white/30 block mb-[20px]"></i><h1 class="font-[family-name:var(--font-display)] text-white text-[28px] font-bold">Destinasi Tidak Ditemukan</h1><p class="text-white/60 mt-[10px]">Halaman tidak tersedia.</p><a href="/destinasi" class="inline-flex items-center gap-[8px] mt-[20px] text-orange-500 font-semibold text-[14px] hover:underline"><i class="fa-solid fa-arrow-left"></i> Kembali</a></div></section>
+    )}
+    {destination && (
+      <>
+        <DestinasiHeader destination={destination} packageCount={packages.length} />
+        <section><div class="wrap py-[70px] max-lg:py-[50px]">
+          <SectionHeader title="Paket Tersedia" subtitle={packages.length + " paket wisata di " + destination.name} layout="split" />
+          {packages.length > 0 ? (
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px] mt-[34px]">{packages.map((pkg) => <PackageCard package={pkg} />)}</div>
+          ) : (
+            <div class="text-center py-[40px] text-navy-400 text-[14px]"><i class="fa-regular fa-box-open text-[36px] block mb-[12px]"></i>Belum ada paket tersedia.</div>
+          )}
+        </div></section>
+        {destination.gallery && destination.gallery.length > 0 && (
+          <section class="bg-navy-50"><div class="wrap py-[70px] max-lg:py-[50px]">
+            <SectionHeader title="Galeri Foto" subtitle={destination.gallery.length + " foto " + destination.name} layout="default" />
+            <div class="mt-[34px]"><GallerySection images={destination.gallery} columns={3} /></div>
+          </div></section>
+        )}
+        <CTABand />
+      </>
+    )}
+  </main>
+</Layout>

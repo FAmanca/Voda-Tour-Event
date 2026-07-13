@@ -1,0 +1,52 @@
+---
+// Voda Tour & Event — SearchResult Component
+// List hasil pencarian dengan PackageCard variant horizontal
+
+import PackageCard from "./PackageCard.astro";
+import SkeletonCard from "./SkeletonCard.astro";
+
+interface Props {
+  packages: any[];
+  loading?: boolean;
+  error?: string | null;
+}
+---
+
+<div>
+  {Astro.props.error && (
+    <div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[16px] text-red-700 text-[14px] flex items-center gap-[10px]">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span>{Astro.props.error}</span>
+    </div>
+  )}
+
+  {Astro.props.loading && (
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <SkeletonCard key={i} type="package" />
+      ))}
+    </div>
+  )}
+
+  {!Astro.props.loading && !Astro.props.error && (
+    <>
+      {Astro.props.packages.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">
+          {Astro.props.packages.map((pkg) => (
+            <PackageCard package={pkg} showDestination />
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-[60px]">
+          <i class="fa-regular fa-face-frown text-[48px] text-navy-300 block mb-[16px]"></i>
+          <h3 class="font-[family-name:var(--font-display)] text-navy-600 text-[20px] font-semibold">
+            Paket Tidak Ditemukan
+          </h3>
+          <p class="text-navy-400 text-[14px] mt-[8px] max-w-[400px] mx-auto">
+            Coba ubah kata kunci atau filter pencarian kamu.
+          </p>
+        </div>
+      )}
+    </>
+  )}
+</div>

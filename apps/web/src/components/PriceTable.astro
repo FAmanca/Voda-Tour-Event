@@ -1,0 +1,59 @@
+---
+// Voda Tour & Event — PriceTable Component
+// Tabel harga per tier (pax range)
+
+import type { PriceTier } from "../types/directus";
+import { formatPrice } from "../lib/utils";
+
+interface Props {
+  tiers: PriceTier[];
+  activePax?: number | null;
+}
+
+const { tiers, activePax } = Astro.props;
+
+function getActiveTierIndex(): number | null {
+  if (!activePax || !tiers) return null;
+  for (let i = 0; i < tiers.length; i++) {
+    const t = tiers[i];
+    if (activePax >= t.min_pax && activePax <= t.max_pax) return i;
+  }
+  return null;
+}
+
+const activeIdx = getActiveTierIndex();
+---
+
+{tiers && tiers.length > 0 && (
+  <div class="overflow-hidden rounded-[var(--radius-md)] border border-navy-100">
+    <table class="w-full text-left">
+      <thead>
+        <tr class="bg-navy-800 text-white text-[13px] font-semibold">
+          <th class="px-[18px] py-[12px]">Jumlah Peserta</th>
+          <th class="px-[18px] py-[12px]">Harga / Orang</th>
+          <th class="px-[18px] py-[12px]">Keterangan</th>
+        </tr>
+      </thead>
+      <tbody>
+        {tiers.map((tier, i) => {
+          const isActive = activeIdx !== null && i === activeIdx;
+          return (
+            <tr
+              class={[                "border-t border-navy-100 text-[14px] transition-colors",                isActive ? "bg-orange-50 border-orange-200" : "bg-white hover:bg-navy-50",              ].join(" ")}
+            >
+              <td class="px-[18px] py-[12px] font-semibold text-navy-800">
+                {tier.min_pax}{tier.max_pax ? ` - ${tier.max_pax} orang` : "+ orang"}
+              </td>
+              <td class="px-[18px] py-[12px]">
+                <span class="font-bold text-orange-600">{formatPrice(tier.price)}</span>
+              </td>
+              <td class="px-[18px] py-[12px] text-navy-500 text-[13px]">
+                {tier.note || "—"}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+)}

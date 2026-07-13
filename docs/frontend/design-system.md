@@ -77,8 +77,8 @@ White rounded card (radius-lg, shadow-card) sitting on the overlap, 4-column ico
 ### Package / offer cards
 Photo top (gradient block + circular icon badge pinned top-left, half-overlapping the photo edge), body with title, 2-line description, dashed divider, then a price row (`Mulai dari` micro-label + bold orange price) paired with a circular navy arrow button that turns orange on hover.
 
-### Stats + testimonial bar
-Full-width navy-900 band. Left: 3–4 stat clusters (outlined circular icon + bold number + 2-line label) separated by hairline vertical rules. Right: a single testimonial with quote-mark glyph, 5-star orange rating, name/company, and a circular avatar with an orange ring.
+### Stats bar
+White floating card (`radius-lg`, `shadow-card`) dengan negative margin `-64px` overlap section sebelumnya — identik dengan FeatureStrip. 4-column horizontal grid: tiap item berisi 52px navy-800 solid circle icon (orange glyph) + bold navy number (28px/700) + label (14px/600) + optional sublabel muted. Testimonial tidak ada di komponen ini.
 
 ### CTA band
 Deep navy/teal gradient "photo" section, top border rule, heading + supporting line, a row of small feature chips (rounded-square icon tile + 2-line label), ending in the primary orange CTA button. This is the mirror of the hero — same DNA (gradient photo, orange CTA, icon+label chips) used to close the page.

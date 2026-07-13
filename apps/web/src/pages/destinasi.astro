@@ -1,0 +1,70 @@
+---
+// Voda Tour & Event — Destinasi Page
+// List semua destinasi
+
+import Layout from "../layouts/Layout.astro";
+import Eyebrow from "../components/Eyebrow.astro";
+
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+
+let destinations = [];
+let fetchError = false;
+
+try {
+  const res = await fetch(DIRECTUS_URL + "/items/destinasi?fields=*,region_id.*&filter[status][_eq]=published&sort=name");
+  if (res.ok) {
+    const json = await res.json();
+    destinations = json.data || [];
+  } else { fetchError = true; }
+} catch { fetchError = true; }
+---
+
+<Layout title="Destinasi Wisata | Voda Tour & Event" description="Jelajahi destinasi wisata terbaik untuk liburan, gathering, dan event perusahaan." active="destinasi">
+  <main>
+    <section class="bg-gradient-to-r from-[rgba(10,59,82,0.95)] to-[rgba(10,59,82,0.85)] py-[80px] max-lg:py-[50px]">
+      <div class="wrap text-center">
+        <Eyebrow text="Destinasi" />
+        <h1 class="font-[family-name:var(--font-display)] text-white text-[38px] max-lg:text-[28px] font-bold mt-[12px]">Jelajahi Destinasi</h1>
+        <p class="text-white/70 text-[16px] max-lg:text-[14px] mt-[10px] max-w-[500px] mx-auto">Temukan pengalaman tak terlupakan di berbagai destinasi pilihan kami.</p>
+      </div>
+    </section>
+
+    {fetchError && (
+      <section><div class="wrap py-[60px]"><div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[20px] text-red-700 text-[14px] text-center"><i class="fa-solid fa-circle-exclamation mr-[8px]"></i>Gagal memuat destinasi.</div></div></section>
+    )}
+
+    {!fetchError && (
+      <section><div class="wrap py-[70px] max-lg:py-[50px]">
+        {destinations.length > 0 ? (
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">
+            {destinations.map((d) => {
+              const regionName = d.region_id?.name || "";
+              const imgUrl = d.image ? DIRECTUS_URL + "/assets/" + d.image + "?width=600&height=400&format=webp&quality=85" : null;
+              return (
+                <a href={"/destinasi/" + d.slug} class="group block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden hover:shadow-[var(--shadow-card)] transition-all duration-300 hover:-translate-y-[4px]">
+                  <div class="relative aspect-[4/3] overflow-hidden">
+                    {imgUrl ? (
+                      <img src={imgUrl} alt={d.name} class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />
+                    ) : (
+                      <div class="absolute inset-0 bg-navy-100 flex items-center justify-center text-navy-300 text-[40px]"><i class="fa-regular fa-image"></i></div>
+                    )}
+                    {regionName && (
+                      <span class="absolute top-[12px] left-[12px] bg-white/90 backdrop-blur-sm text-navy-700 text-[11px] font-semibold px-[10px] py-[3px] rounded-full">{regionName}</span>
+                    )}
+                  </div>
+                  <div class="p-[20px]">
+                    <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[18px] font-semibold group-hover:text-orange-500 transition-colors">{d.name}</h3>
+                    {d.description && <p class="text-navy-500 text-[13px] mt-[6px] line-clamp-2 leading-relaxed">{d.description}</p>}
+                    <span class="inline-flex items-center gap-[6px] text-orange-500 text-[13px] font-semibold mt-[12px] group-hover:gap-[10px] transition-all">Lihat Paket <i class="fa-solid fa-arrow-right text-[11px]"></i></span>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        ) : (
+          <div class="text-center py-[60px]"><i class="fa-regular fa-map text-[48px] text-navy-300 block mb-[16px]"></i><p class="text-navy-500 text-[16px]">Belum ada destinasi tersedia.</p></div>
+        )}
+      </div></section>
+    )}
+  </main>
+</Layout>

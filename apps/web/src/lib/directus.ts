@@ -1,0 +1,285 @@
+// ============================================================================
+// Voda Tour & Event — Directus API Helper
+// SSR-safe fetch functions. Jangan dipake di client-side.
+// ============================================================================
+
+import type {
+  Region,
+  Destination,
+  Package,
+  ActivityType,
+  Setting,
+  Status,
+} from "../types/directus";
+
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+const BASE = `${DIRECTUS_URL}/items`;
+
+// ---------------------------------------------------------------------------
+// Generic fetch wrapper
+// ---------------------------------------------------------------------------
+
+async function fetchApi<T>(path: string, params?: Record<string, string>): Promise<T[]> {
+  const url = new URL(`${BASE}/${path}`);
+  if (params) {
+    Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+  }
+  const res = await fetch(url.toString());
+  if (!res.ok) throw new Error(`Directus ${res.status}: ${res.statusText}`);
+  const json = await res.json();
+  return (json.data || []) as T[];
+}
+
+async function fetchSingle<T>(path: string): Promise<T | null> {
+  const url = new URL(`${BASE}/${path}`);
+  const res = await fetch(url.toString());
+  if (!res.ok) return null;
+  const json = await res.json();
+  return (json.data || null) as T | null;
+}
+
+// ---------------------------------------------------------------------------
+// Settings
+// ---------------------------------------------------------------------------
+
+export async function getSettings(): Promise<Record<string, string>> {
+  const items = await fetchApi<Setting>("settings");
+  const map: Record<string, string> = {};
+  items.forEach((s) => { map[s.key] = s.value; });
+  return map;
+}
+
+// ---------------------------------------------------------------------------
+// Regions
+// ---------------------------------------------------------------------------
+
+export async function getRegions(): Promise<Region[]> {
+  return fetchApi<Region>("regions", {
+    filter: JSON.stringify({ status: { _eq: "published" } }),
+    sort: "name",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Destinations
+// ---------------------------------------------------------------------------
+
+export async function getDestinations(fields = "*"): Promise<Destination[]> {
+  return fetchApi<Destination>("destinasi", {
+    fields,
+    filter: JSON.stringify({ status: { _eq: "published" } }),
+    sort: "name",
+  });
+}
+
+export async function getDestinationsByRegion(
+  regionSlug: string
+): Promise<Destination[]> {
+  return fetchApi<Destination>("destinasi", {
+    fields: "*,region_id.*",
+    filter: JSON.stringify({
+      status: { _eq: "published" },
+      region_id: { slug: { _eq: regionSlug } },
+    }),
+    sort: "name",
+  });
+}
+
+export async function getDestinationBySlug(
+  slug: string
+): Promise<Destination | null> {
+  const items = await fetchApi<Destination>("destinasi", {
+    fields: "*,region_id.*",
+    filter: JSON.stringify({
+      status: { _eq: "published" },
+      slug: { _eq: slug },
+    }),
+  });
+  return items.length > 0 ? items[0] : null;
+}
+
+// ---------------------------------------------------------------------------
+// Packages
+// ---------------------------------------------------------------------------
+
+export async function getPackages(
+  limit = 50,
+  fields = "*"
+): Promise<Package[]> {
+  return fetchApi<Package>("paket", {
+    fields: `${fields},destination_id.*`,
+    filter: JSON.stringify({ status: { _eq: "published" } }),
+    limit: String(limit),
+    sort: "-id",
+  });
+}
+
+export async function getPackageBySlug(
+  slug: string
+): Promise<Package | null> {
+  const items = await fetchApi<Package>("paket", {
+    fields: "*,destination_id.*",
+    filter: JSON.stringify({
+      status: { _eq: "published" },
+      slug: { _eq: slug },
+    }),
+  });
+  return items.length > 0 ? items[0] : null;
+}
+
+export async function getPackagesByDestination(
+  destinationId: string
+): Promise<Package[]> {
+  return fetchApi<Package>("paket", {
+    fields: "*",
+    filter: JSON.stringify({
+      status: { _eq: "published" },
+      destination_id: { _eq: destinationId },
+    }),
+    sort: "id",
+  });
+}
+
+export async function getPackagesByActivityType(
+  activitySlug: string
+): Promise<Package[]> {
+  // Filter via M2M junction: get package IDs from packages_activity_types
+  const junction = await fetchApi<{ package_id: string }>(
+    "packages_activity_types",
+    {
+      fields: "package_id",
+      filter: JSON.stringify({
+        activity_type_id: { slug: { _eq: activitySlug } },
+      }),
+    }
+  );
+  if (junction.length === 0) return [];
+  const pkgIds = junction.map((j) => j.package_id);
+  return fetchApi<Package>("paket", {
+    fields: "*,destination_id.*",
+    filter: JSON.stringify({
+      status: { _eq: "published" },
+      id: { _in: pkgIds },
+    }),
+    sort: "-id",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Activity Types
+// ---------------------------------------------------------------------------
+
+export async function getActivityTypes(): Promise<ActivityType[]> {
+  return fetchApi<ActivityType>("activity_types", {
+    filter: JSON.stringify({ status: { _eq: "published" } }),
+    sort: "name",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Gallery / Files
+// ---------------------------------------------------------------------------
+
+export function getAssetUrl(uuid: string, opts?: {
+  width?: number;
+  height?: number;
+  format?: "webp" | "avif" | "jpeg";
+  quality?: number;
+}): string {
+  let url = `${DIRECTUS_URL}/assets/${uuid}`;
+  if (opts) {
+    const qs = new URLSearchParams();
+    if (opts.width) qs.set("width", String(opts.width));
+    if (opts.height) qs.set("height", String(opts.height));
+    if (opts.format) qs.set("format", opts.format);
+    if (opts.quality) qs.set("quality", String(opts.quality));
+    const qstr = qs.toString();
+    if (qstr) url += `?${qstr}`;
+  }
+  return url;
+}
+
+// ---------------------------------------------------------------------------
+// Search
+// ---------------------------------------------------------------------------
+
+export interface SearchResult {
+  type: "destinasi" | "paket";
+  slug: string;
+  name: string;
+  description: string | null;
+  image: string | null;
+  regionName?: string;
+  destinationName?: string;
+}
+
+export async function searchAll(q: string): Promise<SearchResult[]> {
+  const results: SearchResult[] = [];
+
+  // Search destinations
+  const dests = await fetchApi<Destination>("destinasi", {
+    fields: "*,region_id.name",
+    filter: JSON.stringify({
+      status: { _eq: "published" },
+      _or: [
+        { name: { _icontains: q } },
+        { description: { _icontains: q } },
+      ],
+    }),
+  });
+  dests.forEach((d) => {
+    results.push({
+      type: "destinasi",
+      slug: d.slug,
+      name: d.name,
+      description: d.description,
+      image: d.image,
+      regionName: typeof d.region_id === "object" ? (d.region_id as any)?.name : undefined,
+    });
+  });
+
+  // Search packages
+  const pkgs = await fetchApi<Package>("paket", {
+    fields: "*,destination_id.name",
+    filter: JSON.stringify({
+      status: { _eq: "published" },
+      _or: [
+        { name: { _icontains: q } },
+        { description: { _icontains: q } },
+      ],
+    }),
+  });
+  pkgs.forEach((p) => {
+    results.push({
+      type: "paket",
+      slug: p.slug,
+      name: p.name,
+      description: p.description,
+      image: p.gallery?.[0] || null,
+      destinationName: typeof p.destination_id === "object" ? (p.destination_id as any)?.name : undefined,
+    });
+  });
+
+  return results;
+}
+
+// ---------------------------------------------------------------------------
+// Log Search
+// ---------------------------------------------------------------------------
+
+export async function logSearch(params: {
+  destination?: string;
+  activity_type?: string;
+  pax_count?: number;
+  travel_date?: string;
+}): Promise<void> {
+  try {
+    await fetch(`${DIRECTUS_URL}/items/searches`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(params),
+    });
+  } catch {
+    // Silently fail — logging is non-critical
+  }
+}
