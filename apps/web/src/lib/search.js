@@ -263,43 +263,45 @@ function renderResults(container, packages, loading, error) {
         var displayPrice = priceFrom ? Number(priceFrom).toLocaleString('id-ID') : null;
 
         var imgHtml = image
-          ? '<img src="' + image + '" alt="' + esc(title) + '" class="absolute inset-0 w-full h-full object-cover" loading="lazy" />'
-          : '<div class="absolute inset-0 flex flex-col items-center justify-center text-navy-300">'
-            + '<i class="fa-regular fa-image text-[32px]"></i>'
-            + '<span class="text-[11px] mt-[6px] font-medium">No Image</span>'
+          ? '<img src="' + image + '" alt="' + esc(title) + '" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />'
+          : '<div class="w-full h-full flex flex-col items-center justify-center text-white/20">'
+            + '<i class="fa-regular fa-image text-[48px]"></i>'
+            + '<span class="text-[12px] mt-[8px] font-medium">No Image</span>'
             + '</div>';
 
         var destHtml = destName
-          ? '<p class="text-[11px] text-navy-400 mt-[8px]"><i class="fa-solid fa-location-dot text-[10px] mr-[3px]"></i>' + esc(destName) + '</p>'
+          ? '<p class="text-[11px] text-white/50 mt-[8px]"><i class="fa-solid fa-location-dot text-orange-400 text-[10px] mr-[3px]"></i>' + esc(destName) + '</p>'
           : '';
 
         var priceHtml = displayPrice
-          ? '<span class="text-[11px] text-body-light font-medium block leading-none">Mulai dari</span>'
-            + '<span class="font-[family-name:var(--font-display)] text-orange-600 font-bold text-[16px] leading-tight">Rp ' + displayPrice + '</span>'
-          : '<span class="text-[12px] text-body-light italic">Hubungi kami</span>';
+          ? '<span class="text-[11px] text-white/50 font-medium block leading-none">Mulai dari</span>'
+            + '<span class="font-[family-name:var(--font-display)] text-orange-400 font-bold text-[16px] leading-tight">Rp ' + displayPrice + '</span>'
+          : '<span class="text-[12px] text-white/60 italic">Hubungi kami</span>';
 
-        return '<a href="/paket/' + slug + '" class="group block bg-white rounded-[var(--radius-md)] shadow-[var(--shadow-soft)] overflow-hidden no-underline transition-all duration-[0.25s] hover:-translate-y-[6px] hover:shadow-[var(--shadow-card)]">'
-          + '<!-- Photo area -->'
-          + '<div class="relative h-[150px] overflow-hidden bg-navy-100">'
+        return '<a href="/paket/' + slug + '" class="group relative block w-full min-h-[340px] flex flex-col justify-end rounded-[var(--radius-md)] shadow-[var(--shadow-soft)] overflow-hidden no-underline transition-all duration-[0.25s] hover:-translate-y-[6px] hover:shadow-[var(--shadow-card)]">'
+          + '<!-- Background Image & Overlay -->'
+          + '<div class="absolute inset-0 bg-navy-950 z-0">'
           + imgHtml
-          + '<!-- Icon badge pinned top-left, overlapping edge -->'
-          + '<div class="absolute top-[14px] left-[14px] w-[38px] h-[38px] bg-white rounded-full flex items-center justify-center text-navy-800 text-[16px] shadow-[0_4px_12px_rgba(0,0,0,0.15)]">'
+          + '<!-- Dark Navy Gradient overlay from bottom to top -->'
+          + '<div class="absolute inset-0 bg-gradient-to-t from-[#06121E] via-[#06121E]/85 to-[#06121E]/20"></div>'
+          + '</div>'
+          + '<!-- Icon badge pinned top-left -->'
+          + '<div class="absolute top-[16px] left-[16px] z-10 w-[38px] h-[38px] bg-white rounded-full flex items-center justify-center text-navy-800 text-[16px] shadow-[0_4px_12px_rgba(0,0,0,0.15)]">'
           + '<i class="' + icon + '"></i>'
           + '</div>'
-          + '</div>'
-          + '<!-- Body -->'
-          + '<div class="p-[18px]">'
-          + '<h3 class="font-[family-name:var(--font-display)] text-navy-800 font-semibold text-[15.5px] leading-tight line-clamp-2">' + esc(title) + '</h3>'
-          + '<p class="text-body text-[12.8px] leading-relaxed mt-[6px] line-clamp-2">' + esc(description) + '</p>'
+          + '<!-- Body Content -->'
+          + '<div class="relative z-10 p-[18px]">'
+          + '<h3 class="font-[family-name:var(--font-display)] text-white font-semibold text-[15.5px] leading-tight line-clamp-2">' + esc(title) + '</h3>'
+          + '<p class="text-white/70 text-[12.8px] leading-relaxed mt-[6px] line-clamp-2">' + esc(description) + '</p>'
           + destHtml
           + '<!-- Dashed divider -->'
-          + '<div class="border-t border-dashed border-[--color-line] my-[14px]"></div>'
+          + '<div class="border-t border-dashed border-white/15 my-[14px]"></div>'
           + '<!-- Price row -->'
           + '<div class="flex items-center justify-between">'
           + '<div>'
           + priceHtml
           + '</div>'
-          + '<div class="w-[38px] h-[38px] bg-navy-800 rounded-full flex items-center justify-center text-white text-[14px] transition-transform duration-[0.2s] group-hover:bg-orange-600 group-hover:scale-110">'
+          + '<div class="w-[38px] h-[38px] bg-white rounded-full flex items-center justify-center text-[#06121E] text-[14px] transition-all duration-[0.2s] group-hover:bg-orange-500 group-hover:text-white group-hover:scale-110">'
           + '<i class="fa-solid fa-arrow-right"></i>'
           + '</div>'
           + '</div>'
