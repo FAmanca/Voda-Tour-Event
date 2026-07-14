@@ -31,8 +31,8 @@ try {
 
   const [settingsRes, destRes, pkgRes, actRes] = await Promise.all([
     fetch(`${base}/settings`).then((r) => (r.ok ? r.json() : { data: [] })),
-    fetch(`${base}/destinasi?limit=10&sort=name`).then((r) => (r.ok ? r.json() : { data: [] })),
-    fetch(`${base}/paket?limit=4&sort=-id`).then((r) => (r.ok ? r.json() : { data: [] })),
+    fetch(`${base}/destinations?limit=10&sort=name`).then((r) => (r.ok ? r.json() : { data: [] })),
+    fetch(`${base}/packages?limit=4&sort=-id`).then((r) => (r.ok ? r.json() : { data: [] })),
     fetch(`${base}/activity_types?limit=20&sort=name`).then((r) => (r.ok ? r.json() : { data: [] })),
   ]);
 
@@ -69,22 +69,26 @@ try {
     <FeatureStrip />
 
     <!-- 3.3 + 3.4 PackageGrid -->
-    <section id="paket" class="wrap py-[90px] max-lg:py-[60px]">
-      <SectionHeader
-        eyebrow="PAKET PILIHAN"
-        title="Destinasi & Paket Favorit"
-        description="Temukan paket perjalanan dan event terbaik untuk momen spesial Anda."
-        layout="default"
-      />
-      <div class="mt-[28px]">
-        {fetchError ? (
-          <div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[16px] text-red-700 text-[14px]">
-            <i class="fa-solid fa-circle-exclamation mr-[8px]"></i>
-            Gagal memuat data. Pastikan Directus sudah berjalan.
-          </div>
-        ) : (
-          <PackageGrid packages={packages} />
-        )}
+    <section id="paket" class="wrap py-[90px] max-lg:py-[60px] my-[500px]">
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-[30px] lg:gap-[40px] items-start">
+        <div>
+          <SectionHeader
+            eyebrow="PAKET PILIHAN"
+            title="Destinasi & Paket Favorit"
+            description="Temukan paket perjalanan dan event terbaik untuk momen spesial Anda."
+            layout="default"
+          />
+        </div>
+        <div class="lg:col-span-4">
+          {fetchError ? (
+            <div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[16px] text-red-700 text-[14px]">
+              <i class="fa-solid fa-circle-exclamation mr-[8px]"></i>
+              Gagal memuat data. Pastikan Directus sudah berjalan.
+            </div>
+          ) : (
+            <PackageGrid packages={packages} />
+          )}
+        </div>
       </div>
     </section>
 

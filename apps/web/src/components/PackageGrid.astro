@@ -19,7 +19,7 @@ let loadError = false;
 if (!packages) {
   try {
     const directusUrl = process.env.DIRECTUS_URL || 'http://localhost:8055';
-    const res = await fetch(`${directusUrl}/items/paket?limit=4&sort[]=id&filter[status][_eq]=published`);
+    const res = await fetch(`${directusUrl}/items/packages?limit=4&sort[]=id&filter[status][_eq]=published`);
     if (res.ok) {
       const json = await res.json();
       packages = json.data || [];
@@ -52,12 +52,13 @@ if (!packages) {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
       {packages.map((pkg) => (
         <PackageCard
-          title={pkg.nama_paket}
-          description={pkg.deskripsi_singkat}
+          title={pkg.name}
+          description={pkg.description}
           slug={pkg.slug}
-          priceFrom={pkg.harga_mulai}
-          icon={pkg.icon || 'fa-solid fa-map-marked-alt'}
-          category={pkg.kategori || 'wisata'}
+          priceFrom={pkg.price_tiers ? Math.min(...pkg.price_tiers.map(t => t.price_per_pax).filter(p => p !== null && p > 0)) : undefined}
+          icon={'fa-solid fa-map-marked-alt'}
+          category={'wisata'}
+          image={pkg.image ? `${import.meta.env.DIRECTUS_URL || 'http://localhost:8055'}/assets/${pkg.image}?width=400&height=250&fit=cover` : undefined}
         />
       ))}
     </div>

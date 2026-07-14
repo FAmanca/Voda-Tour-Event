@@ -1,63 +1,87 @@
 ---
 // Voda Tour & Event — CTABand Component
-// Call-to-action band with heading, CTA button, and feature chips
+// Single-row CTA band on a photo background: heading+desc | feature list | WhatsApp CTA
 
 interface Props {
   heading?: string;
   description?: string;
   ctaLabel?: string;
   ctaUrl?: string;
+  bgImage?: string;
   features?: { icon: string; label: string }[];
 }
 
 const {
-  heading = "Butuh Paket Custom untuk Perushaan Anda?",
+  heading = "Butuh Paket Custom untuk Perusahaan Anda?",
   description = "Kami siap merancang perjalanan dan event yang sesuai kebutuhan Anda.",
   ctaLabel = "Hubungi Kami",
   ctaUrl,
+  bgImage = "https://images.unsplash.com/photo-1549558549-415fe4c37b60?q=80&w=1419&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   features: featureProps,
 } = Astro.props;
 
 const defaultFeatures = [
-  { icon: "fa-solid fa-map-marked-alt", label: "Destinasi Terkurasi" },
-  { icon: "fa-solid fa-tag", label: "Harga Transparan" },
-  { icon: "fa-solid fa-users", label: "Tim Profesional" },
-  { icon: "fa-solid fa-headset", label: "24/7 Support" },
+  { icon: "fa-solid fa-map-marked-alt", label: "Rancang Paket Sesuai Kebutuhan" },
+  { icon: "fa-solid fa-users", label: "Tim Event Berpengalaman" },
+  { icon: "fa-solid fa-medal", label: "Pelayanan Terbaik" },
+  { icon: "fa-solid fa-circle-check", label: "Hasil Memuaskan" },
 ];
 
 const features = featureProps || defaultFeatures;
 const whatsappUrl = ctaUrl || "https://wa.me/6282112345678?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20tertarik%20dengan%20penawaran%20Anda.";
 ---
 
-<section class="bg-gradient-to-r from-[#122A3D] to-[#356E78]">
-  <div class="wrap py-[70px] max-lg:py-[50px]">
-    <!-- Top: heading + description + CTA -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-[24px] pb-[34px] border-b border-white/10">
-      <div class="max-w-[600px] my-5">
-        <h2 class="font-[family-name:var(--font-display)] text-white font-bold text-[34px] max-lg:text-[28px] leading-[1.15]">{heading}</h2>
-        <p class="text-white/65 text-[15px] leading-relaxed mt-[8px]">{description}</p>
+<section class="relative overflow-hidden">
+  <!-- Background photo -->
+  <img
+    src={bgImage}
+    alt=""
+    class="absolute inset-0 w-full h-full object-cover"
+    loading="lazy"
+  />
+  <!-- Dark navy → teal overlay for text readability -->
+  <div class="absolute inset-0 bg-gradient-to-r from-[#0E2333]/95 via-[#173F4C]/85 to-[#2F6B74]/70"></div>
+
+  <div class="relative z-10 flex items-center justify-between min-h-[92px] max-lg:flex-col max-lg:items-stretch py-[18px]">
+
+    <!-- Left: heading + description + features -->
+    <div class="flex-1 flex items-center justify-between gap-[32px] pl-[24px] lg:pl-[48px] pr-[24px] flex-wrap lg:flex-nowrap max-lg:justify-start">
+
+      <!-- Heading + description -->
+      <div class="max-w-[280px] shrink-0 max-lg:max-w-full">
+        <h2 class="font-[family-name:var(--font-display)] text-white font-bold text-[19px] leading-[1.25]">
+          {heading}
+        </h2>
+        <p class="text-white/65 text-[12.5px] leading-relaxed mt-[4px]">
+          {description}
+        </p>
       </div>
+
+      <!-- Feature list: icon on the left of the label -->
+      <div class="flex items-center gap-x-[36px] gap-y-[18px] flex-wrap justify-center lg:justify-start">
+        {features.map((f) => (
+          <div class="flex items-center gap-[10px] text-left max-w-[210px]">
+            <div class="w-[36px] h-[36px] rounded-full border border-white/20 bg-white/10 flex items-center justify-center text-orange-400 text-[15px] shrink-0 shadow-sm">
+              <i class={f.icon}></i>
+            </div>
+            <span class="text-white/90 text-[12.5px] font-medium leading-tight whitespace-normal max-w-[150px]">{f.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Right: CTA button, centered, not full height -->
+    <div class="flex items-center justify-center px-[24px] lg:px-[48px] lg:border-l lg:border-white/10 shrink-0 max-lg:pt-[18px] max-lg:border-t max-lg:border-white/10 max-lg:justify-start">
       <a
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-flex items-center gap-[10px] bg-orange-600 text-white rounded-[999px] px-[28px] py-[14px] font-semibold text-[14.5px] no-underline shadow-[0_14px_28px_-10px_rgba(238,125,15,0.55)] transition-all duration-[0.18s] hover:-translate-y-[2px] hover:shadow-[0_18px_34px_-10px_rgba(238,125,15,0.65)] shrink-0"
+        class="flex items-center justify-center gap-[8px] bg-orange-600 text-white px-[28px] py-[12px] rounded-[var(--radius-sm)] font-semibold text-[14px] no-underline shrink-0 transition-all duration-[0.2s] hover:bg-orange-500 hover:scale-[1.02] active:scale-[0.98] shadow-[0_4px_14px_rgba(234,88,12,0.3)]"
       >
         <i class="fa-brands fa-whatsapp text-[18px]"></i>
         {ctaLabel}
       </a>
     </div>
 
-    <!-- Bottom: feature chips -->
-    <div class="flex flex-wrap gap-[20px] mt-[30px] ">
-      {features.map((f) => (
-        <div class="flex items-center gap-[10px] bg-white/10 rounded-[999px] px-[14px] py-[8px]">
-          <div class="w-[32px] h-[32px] bg-white/15 rounded-[8px] flex items-center justify-center text-orange-400 text-[14px]">
-            <i class={f.icon}></i>
-          </div>
-          <span class="text-white/85 text-[13px] font-medium">{f.label}</span>
-        </div>
-      ))}
-    </div>
   </div>
 </section>

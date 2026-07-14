@@ -1,0 +1,43 @@
+---
+// Voda Tour & Event — ItineraryTimeline Component
+// Timeline vertikal dengan day marker + title + list activities
+
+import type { DayActivity } from "../types/directus";
+
+interface Props {
+  itinerary: DayActivity[];
+}
+---
+
+<div class="relative">
+  <!-- Vertical line -->
+  <div class="absolute left-[19px] top-[12px] bottom-[12px] w-[2px] bg-navy-200"></div>
+
+  <div class="space-y-[32px]">
+    {Astro.props.itinerary.map((day) => (
+      <div class="relative pl-[56px]">
+        <!-- Day marker (circle) -->
+        <div class="absolute left-0 top-0 w-[40px] h-[40px] rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-[13px] z-10 shadow-[var(--shadow-soft)]">
+          {String(day.day).padStart(2, "0")}
+        </div>
+
+        <!-- Content -->
+        <div>
+          <h4 class="font-[family-name:var(--font-display)] text-navy-800 text-[18px] font-semibold">
+            {day.title}
+          </h4>
+          {day.activities && day.activities.length > 0 && (
+            <ul class="mt-[10px] space-y-[6px]">
+              {day.activities.map((activity) => (
+                <li class="flex items-start gap-[10px] text-navy-600 text-[14px] leading-relaxed">
+                  <i class="fa-solid fa-check-circle text-orange-500 text-[13px] mt-[3px] shrink-0"></i>
+                  <span>{activity}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+</div>

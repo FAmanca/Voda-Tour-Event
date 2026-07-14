@@ -1,0 +1,52 @@
+---
+// Voda Tour & Event — 404 Page
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Halaman Tidak Ditemukan | Voda Tour & Event"
+  description="Maaf, halaman yang Anda cari tidak ditemukan."
+  active="beranda"
+>
+  <main class="min-h-[80vh] flex items-center justify-center px-[24px]">
+    <div class="text-center max-w-[480px]">
+
+      <!-- Illustration -->
+      <div class="w-[120px] h-[120px] mx-auto mb-[32px] rounded-full bg-navy-50 flex items-center justify-center">
+        <i class="fa-regular fa-compass text-[56px] text-navy-300"></i>
+      </div>
+
+      <!-- Code -->
+      <p class="text-[72px] font-[family-name:var(--font-display)] font-bold text-orange-500 leading-[1]">404</p>
+
+      <!-- Title -->
+      <h1 class="text-[24px] font-bold text-navy-800 mt-[12px]">Halaman Tidak Ditemukan</h1>
+
+      <!-- Description -->
+      <p class="text-navy-500 text-[15px] mt-[12px] leading-relaxed">
+        Sepertinya halaman yang Anda cari telah dipindah, dihapus, atau tidak pernah ada.
+        Tenang, kami siap membantu Anda menemukan yang lain.
+      </p>
+
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-[12px] mt-[32px]">
+        <a href="/" class="inline-flex items-center gap-[8px] px-[24px] py-[12px] bg-orange-600 text-white rounded-[999px] text-[14px] font-semibold no-underline transition-all hover:-translate-y-[1px] shadow-[0_8px_20px_-6px_rgba(238,125,15,0.4)]">
+          <i class="fa-solid fa-house"></i>
+          Kembali ke Beranda
+        </a>
+        <a href="/paket" class="inline-flex items-center gap-[8px] px-[24px] py-[12px] border border-[--color-line] text-navy-700 rounded-[999px] text-[14px] font-semibold no-underline transition-colors hover:border-navy-300">
+          Lihat Paket Wisata
+        </a>
+      </div>
+
+      <!-- Search suggestion -->
+      <div class="mt-[40px] pt-[24px] border-t border-[--color-line]">
+        <p class="text-[13px] text-navy-400">Atau coba cari paket wisata yang Anda inginkan</p>
+        <a href="/cari" class="inline-flex items-center gap-[6px] text-orange-600 text-[14px] font-semibold mt-[8px] hover:underline">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          Cari Paket
+        </a>
+      </div>
+
+    </div>
+  </main>
+</Layout>

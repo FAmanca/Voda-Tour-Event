@@ -1,0 +1,105 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PackageCard from "../components/PackageCard.astro";
+import Eyebrow from "../components/Eyebrow.astro";
+
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+let packages = [];
+let activityTypes = [];
+let destCount = 0;
+let fetchError = false;
+
+try {
+  const [pkgRes, actRes, dstRes] = await Promise.all([
+    fetch(DIRECTUS_URL + "/items/packages?fields=*,destination_id.*&limit=50&filter[status][_eq]=published&sort=-id"),
+    fetch(DIRECTUS_URL + "/items/activity_types?filter[status][_eq]=published&sort=name"),
+    fetch(DIRECTUS_URL + "/items/destinations?fields=id&filter[status][_eq]=published&limit=1&meta=total_count"),
+  ]);
+  if (pkgRes.ok) { const json = await pkgRes.json(); packages = json.data || []; }
+  if (actRes.ok) { const json = await actRes.json(); activityTypes = json.data || []; }
+  if (dstRes.ok) { const json = await dstRes.json(); destCount = json.meta?.total_count || 0; }
+} catch { fetchError = true; }
+---
+
+<Layout title="Paket Wisata | Voda Tour & Event" description="Jelajahi semua paket wisata, gathering, dan outbound." active="paket">
+  <main>
+    <section class="relative overflow-hidden bg-gradient-to-br from-navy-900 via-navy-800 to-[#0F2C4C] py-[100px] max-lg:py-[60px]">
+      <div class="absolute top-[-120px] right-[-60px] w-[300px] h-[300px] rounded-full bg-white/[0.03]" aria-hidden="true"></div>
+      <div class="absolute bottom-[-80px] left-[-40px] w-[200px] h-[200px] rounded-full bg-white/[0.02]" aria-hidden="true"></div>
+      <div class="wrap relative z-10 text-center">
+        <Eyebrow text="Paket Wisata" />
+        <h1 class="font-[family-name:var(--font-display)] text-white text-[42px] max-lg:text-[30px] font-bold mt-[14px] leading-tight">
+          Temukan Paket <span class="text-orange-400">Impian</span> Anda
+        </h1>
+        <p class="text-white/65 text-[16px] max-lg:text-[14px] mt-[10px] max-w-[520px] mx-auto leading-relaxed">
+          Dari private trip santai sampai corporate gathering seru &mdash; pilih pengalaman yang cocok buat Anda.
+        </p>
+        {!fetchError && (packages.length > 0 || destCount > 0) && (
+          <div class="flex flex-wrap justify-center gap-[32px] mt-[36px]">
+            <div class="text-center"><span class="block text-white text-[28px] font-bold font-[family-name:var(--font-display)]">{packages.length}</span><span class="text-white/50 text-[12px] uppercase tracking-wider">Paket</span></div>
+            <div class="w-[1px] bg-white/15 self-stretch max-sm:hidden"></div>
+            <div class="text-center"><span class="block text-white text-[28px] font-bold font-[family-name:var(--font-display)]">{destCount}</span><span class="text-white/50 text-[12px] uppercase tracking-wider">Destinasi</span></div>
+            <div class="w-[1px] bg-white/15 self-stretch max-sm:hidden"></div>
+            <div class="text-center"><span class="block text-white text-[28px] font-bold font-[family-name:var(--font-display)]">{activityTypes.length}</span><span class="text-white/50 text-[12px] uppercase tracking-wider">Kategori</span></div>
+          </div>
+        )}
+      </div>
+    </section>
+
+    {!fetchError && activityTypes.length > 0 && (
+      <section class="sticky top-[88px] z-30 bg-white/90 backdrop-blur-md border-b border-[--color-line]">
+        <div class="wrap py-[14px]">
+          <div class="flex items-center gap-[8px] overflow-x-auto scrollbar-none">
+            <span class="text-[11px] font-semibold text-navy-400 uppercase tracking-wider mr-[4px] shrink-0">Filter</span>
+            <a href="/paket" class="shrink-0 px-[16px] py-[7px] text-[12.5px] font-semibold rounded-full bg-orange-500 text-white shadow-[0_4px_12px_rgba(238,125,15,0.3)] no-underline transition-all">Semua</a>
+            {activityTypes.map((a) => (
+              <a href={"/cari?kegiatan=" + a.slug} class="shrink-0 px-[16px] py-[7px] text-[12.5px] font-medium rounded-full border border-navy-200 text-navy-600 no-underline transition-all hover:border-orange-400 hover:text-orange-600 hover:bg-orange-50 whitespace-nowrap">
+                <i class="fa-regular fa-tag text-[10px] mr-[5px]"></i>{a.name}
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {fetchError && (
+      <section class="py-[80px]"><div class="wrap">
+        <div class="max-w-[400px] mx-auto text-center bg-red-50 border border-red-200 rounded-[var(--radius-lg)] p-[30px]">
+          <i class="fa-solid fa-circle-exclamation text-[36px] text-red-400 block mb-[12px]"></i>
+          <p class="text-red-700 text-[14px] font-medium">Gagal memuat paket.</p>
+        </div>
+      </div></section>
+    )}
+
+    {!fetchError && (
+      <section class="py-[60px] max-lg:py-[40px]"><div class="wrap">
+        {packages.length > 0 ? (
+          <>
+            <div class="flex items-center justify-between mb-[28px]">
+              <p class="text-navy-500 text-[13px]"><strong class="text-navy-800">{packages.length}</strong> paket ditemukan</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">
+              {packages.map((pkg) => <PackageCard package={pkg} showDestination />)}
+            </div>
+          </>
+        ) : (
+          <div class="text-center py-[80px]">
+            <i class="fa-regular fa-face-smile text-[56px] text-navy-200 block mb-[16px]"></i>
+            <h3 class="font-[family-name:var(--font-display)] text-navy-600 text-[20px] font-semibold">Belum Ada Paket</h3>
+            <p class="text-navy-400 text-[14px] mt-[6px]">Paket akan segera hadir.</p>
+          </div>
+        )}
+      </div></section>
+    )}
+
+    {!fetchError && packages.length > 0 && (
+      <section class="bg-gradient-to-r from-navy-900 via-navy-800 to-[#0F2C4C] py-[60px]"><div class="wrap text-center">
+        <h2 class="font-[family-name:var(--font-display)] text-white text-[24px] font-bold">Tidak menemukan yang cocok?</h2>
+        <p class="text-white/60 text-[14px] mt-[8px] max-w-[400px] mx-auto">Kami bisa bikin paket custom sesuai kebutuhan Anda.</p>
+        <a href="/kontak" class="inline-flex items-center gap-[8px] mt-[20px] bg-orange-500 text-white rounded-[999px] px-[28px] py-[12px] font-semibold text-[14px] no-underline shadow-[0_10px_20px_-8px_rgba(238,125,15,0.4)] transition-all hover:-translate-y-[2px]">
+          <i class="fa-solid fa-comment-dots"></i>Hubungi Kami
+        </a>
+      </div></section>
+    )}
+  </main>
+</Layout>

@@ -1,0 +1,52 @@
+---
+// Voda Tour & Event — GallerySection Component
+// Masonry-style grid untuk galeri foto
+
+import { getAssetUrl } from "../lib/directus";
+
+interface Props {
+  images: string[];           // Array of Directus UUIDs
+  columns?: 2 | 3 | 4;
+}
+
+const { images, columns = 3 } = Astro.props;
+
+const colClasses: Record<number, string> = {
+  2: "grid-cols-2",
+  3: "grid-cols-3 max-lg:grid-cols-2 max-md:grid-cols-1",
+  4: "grid-cols-4 max-lg:grid-cols-2 max-md:grid-cols-1",
+};
+
+// Generate aspect ratios variasi untuk masonry effect
+const aspects = ["aspect-[4/3]", "aspect-[1/1]", "aspect-[3/4]", "aspect-[16/9]"];
+---
+
+<div>
+  {images && images.length > 0 ? (
+    <div class={`grid gap-[12px] ${colClasses[columns]}`}>
+      {images.map((uuid, i) => {
+        const aspect = aspects[i % aspects.length];
+        return (
+          <a
+            href={getAssetUrl(uuid, { width: 1200 })}
+            target="_blank"
+            class={`relative overflow-hidden rounded-[var(--radius-md)] ${aspect} group cursor-pointer`}
+          >
+            <img
+              src={getAssetUrl(uuid, { width: 600, height: 400, format: "webp", quality: 85 })}
+              alt={`Gallery image ${i + 1}`}
+              class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              loading="lazy"
+            />
+            <div class="absolute inset-0 bg-navy-900/0 group-hover:bg-navy-900/20 transition-colors duration-300"></div>
+          </a>
+        );
+      })}
+    </div>
+  ) : (
+    <div class="text-center text-navy-400 text-[14px] py-[40px]">
+      <i class="fa-regular fa-image text-[36px] block mb-[12px]"></i>
+      Belum ada galeri tersedia.
+    </div>
+  )}
+</div>
