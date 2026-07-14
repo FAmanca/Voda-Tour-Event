@@ -53,7 +53,7 @@ interface Props {
             const dname = typeof pkg.destination_id === "object" ? pkg.destination_id?.name : "";
             const dslug = typeof pkg.destination_id === "object" ? pkg.destination_id?.slug : "";
             const sprice = pkg.price_tiers && pkg.price_tiers.length > 0
-              ? Math.min(...pkg.price_tiers.map((t) => t.price_per_pax))
+              ? Math.min(...pkg.price_tiers.map(t => t.price_per_pax).filter(p => p !== null && p > 0))
               : null;
             const hasImg = pkg.gallery && pkg.gallery.length > 0;
             const destUrl = "/destinasi/" + dslug;

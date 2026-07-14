@@ -34,19 +34,22 @@ export function formatPriceDisplay(
 
 /** Dapatkan harga termurah dari price_tiers */
 export function getStartingPrice(
-  tiers: { min_pax: number; price: number }[]
+  tiers: { min_pax: number; price_per_pax: number | null }[]
 ): number | null {
   if (!tiers || tiers.length === 0) return null;
-  // Harga termurah (biasanya pax paling banyak)
-  return Math.min(...tiers.map((t) => t.price_per_pax));
+  // Harga termurah -- filter null (kaya "Hubungi CS")
+  const prices = tiers.map(t => t.price_per_pax).filter((p): p is number => p !== null && p > 0);
+  if (prices.length === 0) return null;
+  return Math.min(...prices);
 }
 
 /** Dapatkan range harga (termurah — termahal) */
 export function getPriceRange(
-  tiers: { min_pax: number; price: number }[]
+  tiers: { min_pax: number; price_per_pax: number | null }[]
 ): { min: number; max: number } | null {
   if (!tiers || tiers.length === 0) return null;
-  const prices = tiers.map((t) => t.price_per_pax);
+  const prices = tiers.map(t => t.price_per_pax).filter((p): p is number => p !== null && p > 0);
+  if (prices.length === 0) return null;
   return { min: Math.min(...prices), max: Math.max(...prices) };
 }
 

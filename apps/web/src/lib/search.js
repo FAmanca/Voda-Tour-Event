@@ -210,7 +210,7 @@ function renderResults(container, packages, loading, error) {
     + packages.map(function (pkg) {
         var dname = pkg.destination_id && typeof pkg.destination_id === 'object' ? pkg.destination_id.name : '';
         var sprice = pkg.price_tiers && pkg.price_tiers.length
-          ? Math.min.apply(Math, pkg.price_tiers.map(function (t) { return t.price_per_pax; })) : null;
+          ? Math.min.apply(Math, pkg.price_tiers.map(function (t) { return t.price_per_pax; }).filter(function (p) { return p !== null && p > 0; })) : null;
         var imgHtml = (!pkg.gallery || !pkg.gallery[0])
           ? '<div class="w-full h-full flex items-center justify-center bg-navy-100 text-navy-300"><i class="fa-regular fa-image text-3xl"></i></div>'
           : '<img src="' + DIRECTUS_URL + '/assets/' + pkg.gallery[0] + '?width=600&height=400&fit=cover&format=webp&quality=85" alt="' + esc(pkg.name) + '" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />';
