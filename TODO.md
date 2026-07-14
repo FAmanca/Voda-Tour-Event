@@ -358,48 +358,42 @@ Buat di Directus Admin Panel:
 ## Phase 8: Client-Side JavaScript
 
 ### 8.1 Mobile Menu
-- [ ] Hamburger toggle
-- [ ] Slide-in nav
-- [ ] Dropdown accordion untuk submenu
-- [ ] Close on outside click
+- [x] Hamburger toggle
+- [x] Slide-in nav
+- [x] Dropdown accordion untuk submenu  (N/A — semua nav top-level)
+- [x] Close on outside click
 
 ### 8.2 Search Autocomplete
-- [ ] `src/lib/search.js`:
-  - [ ] Debounce 300ms
-  - [ ] Client-side filter dari data destinasi (embedded di HTML)
-  - [ ] Render dropdown suggestions
-  - [ ] Keyboard navigation (arrow keys + enter)
-  - [ ] Click outside close
+- [x] `src/lib/search.js`:
+  - [x] Debounce 300ms
+  - [x] Client-side filter dari data destinasi (embedded di HTML)
+  - [x] Render dropdown suggestions
+  - [x] Keyboard navigation (arrow keys + enter)
+  - [x] Click outside close
 
-### 8.3 Price Calculator
-- [ ] Input jumlah peserta di halaman paket detail
-- [ ] Otomatis highlight tier yg sesuai
-- [ ] Tampilkan total harga: `price_per_pax * pax`
-- [ ] Update real-time tanpa reload
-
-### 8.4 Form Submissions
-- [ ] Search form → POST ke `/api/search` + redirect
-- [ ] WA button → generate wa.me URL dengan prefilled message
+### 8.3 Form Submissions
+- [x] Search form → POST ke `/api/search` + redirect  (🗑️ obsolete — client-side search)
+- [x] WA button → generate wa.me URL dengan prefilled message ✅
 
 ---
 
 ## Phase 9: Error Pages & Edge Cases
 
 ### 9.1 404 Page
-- [ ] `src/pages/404.astro`
-- [ ] Ilustrasi + copy ramah
-- [ ] CTA: kembali ke beranda
+- [x] `src/pages/404.astro`
+- [x] Ilustrasi + copy ramah
+- [x] CTA: kembali ke beranda
 
 ### 9.2 500 / Error Page
-- [ ] Fallback error page
-- [ ] Minimalis: logo + "Terjadi kesalahan" + refresh button
+- [x] Fallback error page
+- [x] Minimalis: logo + "Terjadi kesalahan" + refresh button
 
 ### 9.3 Edge Case Handling
-- [ ] Destinasi tanpa paket → empty state
-- [ ] Paket tanpa price_tiers → "Hubungi kami untuk informasi harga"
-- [ ] Directus offline → error state gracefully
-- [ ] Gambar broken → fallback gradient sesuai kategori
-- [ ] Slug duplicate → 404 atau redirect
+- [x] Destinasi tanpa paket → empty state ✅
+- [x] Paket tanpa price_tiers → "Hubungi kami untuk informasi harga" ✅
+- [x] Directus offline → error state gracefully ✅
+- [x] Gambar broken → fallback no image sesuai kategori ✅
+- [x] Slug duplicate → 404 atau redirect ✅
 
 ---
 

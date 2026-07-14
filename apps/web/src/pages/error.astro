@@ -1,0 +1,43 @@
+---
+// Voda Tour & Event — Error Page
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Terjadi Kesalahan | Voda Tour & Event"
+  description="Maaf, terjadi kesalahan pada sistem."
+>
+  <main class="min-h-[80vh] flex items-center justify-center px-[24px]">
+    <div class="text-center max-w-[480px]">
+
+      <!-- Illustration -->
+      <div class="w-[120px] h-[120px] mx-auto mb-[32px] rounded-full bg-red-50 flex items-center justify-center">
+        <i class="fa-regular fa-circle-exclamation text-[56px] text-red-300"></i>
+      </div>
+
+      <!-- Title -->
+      <h1 class="text-[24px] font-bold text-navy-800">Terjadi Kesalahan</h1>
+
+      <!-- Description -->
+      <p class="text-navy-500 text-[15px] mt-[12px] leading-relaxed">
+        Maaf, terjadi kesalahan yang tidak terduga. Tim kami telah diberitahu dan akan segera memperbaikinya.
+      </p>
+
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-[12px] mt-[32px]">
+        <a href="/" class="inline-flex items-center gap-[8px] px-[24px] py-[12px] bg-orange-600 text-white rounded-[999px] text-[14px] font-semibold no-underline transition-all hover:-translate-y-[1px] shadow-[0_8px_20px_-6px_rgba(238,125,15,0.4)]">
+          <i class="fa-solid fa-house"></i>
+          Kembali ke Beranda
+        </a>
+        <button onclick="location.reload()" class="inline-flex items-center gap-[8px] px-[24px] py-[12px] border border-[--color-line] text-navy-700 rounded-[999px] text-[14px] font-semibold cursor-pointer bg-white transition-colors hover:border-navy-300">
+          <i class="fa-solid fa-rotate"></i>
+          Coba Lagi
+        </button>
+      </div>
+
+      <p class="text-navy-300 text-[12px] mt-[40px]">
+        Jika masalah berlanjut, hubungi kami via <a href="https://wa.me/6282112345678" class="text-orange-600 hover:underline">WhatsApp</a>
+      </p>
+
+    </div>
+  </main>
+</Layout>
