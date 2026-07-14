@@ -87,10 +87,53 @@ document.addEventListener("DOMContentLoaded", function () {
   // Init autocomplete
   initAutocomplete("search-card-input", "search-card-dropdown");
 
+  // Validation helper
+  function showFieldError(inputEl, msg) {
+    var key = (inputEl.id || inputEl.name || 'field') + '-error';
+    var err = document.getElementById(key);
+    if (!err) {
+      err = document.createElement('p');
+      err.id = key;
+      err.className = 'text-[11px] text-red-400 mt-[4px]';
+      inputEl.parentNode.appendChild(err);
+    }
+    err.textContent = msg;
+    inputEl.style.borderColor = 'rgba(248,113,113,0.5)';
+  }
+
+  function clearFieldError(inputEl) {
+    var key = (inputEl.id || inputEl.name || 'field') + '-error';
+    var err = document.getElementById(key);
+    if (err) err.remove();
+    inputEl.style.borderColor = '';
+  }
+
   // Log search on form submit
   var form = document.getElementById("search-card-form");
   if (form) {
     form.addEventListener("submit", function (e) {
+      // === VALIDATION ===
+      var valid = true;
+      var qInput = document.querySelector("#search-card-form input[name='q']");
+      var kegSelect = document.querySelector("#search-card-form select[name='kegiatan']");
+
+      if (qInput && qInput.dataset.searchValid !== 'true') {
+        showFieldError(qInput, 'Harap pilih destinasi atau paket dari daftar yang muncul');
+        valid = false;
+      } else if (qInput) {
+        clearFieldError(qInput);
+      }
+
+      if (kegSelect && !kegSelect.value) {
+        showFieldError(kegSelect, 'Harap pilih jenis kegiatan');
+        valid = false;
+      } else if (kegSelect) {
+        clearFieldError(kegSelect);
+      }
+
+      if (!valid) { e.preventDefault(); return; }
+
+      // === PROCEED ===
       e.preventDefault();
       var fd = new FormData(form);
       var q = fd.get("q") || "";
@@ -103,11 +146,9 @@ document.addEventListener("DOMContentLoaded", function () {
         travel_date: tgl,
         pax_count: pax ? parseInt(pax) : null,
       }).then(function () {
-        // Navigate after log completes
         var sp = new URLSearchParams();
         if (q) sp.set("q", q);
         if (keg) sp.set("kegiatan", keg);
-        // tanggal tidak dikirim ke URL (hanya untuk log)
         if (pax) sp.set("pax", pax);
         window.location.href = "/cari?" + sp.toString();
       });

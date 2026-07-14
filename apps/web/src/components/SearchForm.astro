@@ -100,14 +100,59 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Auto-fill form dari URL params (karena Astro static, initialValues cuma build-time)
   var sp = new URLSearchParams(window.location.search);
-  if (sp.get("q")) document.querySelector("input[name='q']").value = sp.get("q");
+  var qInput = document.querySelector("input[name='q']");
+  if (sp.get("q")) { qInput.value = sp.get("q"); qInput.dataset.searchValid = 'true'; qInput.dataset.searchLabel = sp.get("q"); }
   if (sp.get("tanggal")) document.querySelector("input[name='tanggal']").value = sp.get("tanggal");
   if (sp.get("kegiatan")) document.querySelector("select[name='kegiatan']").value = sp.get("kegiatan");
   if (sp.get("pax")) document.querySelector("input[name='pax']").value = sp.get("pax");
 
+  // Validation helper
+  function showFieldError(inputEl, msg) {
+    var key = (inputEl.id || inputEl.name || 'field') + '-error';
+    var err = document.getElementById(key);
+    if (!err) {
+      err = document.createElement('p');
+      err.id = key;
+      err.className = 'text-[11px] text-red-400 mt-[4px]';
+      inputEl.parentNode.appendChild(err);
+    }
+    err.textContent = msg;
+    inputEl.style.borderColor = 'rgba(248,113,113,0.5)';
+  }
+
+  function clearFieldError(inputEl) {
+    var key = (inputEl.id || inputEl.name || 'field') + '-error';
+    var err = document.getElementById(key);
+    if (err) err.remove();
+    inputEl.style.borderColor = '';
+  }
+
   var form = document.getElementById("search-form");
   if (form) {
     form.addEventListener("submit", function (e) {
+      // === VALIDATION ===
+      var valid = true;
+
+      // 1. Search input — must be selected from dropdown
+      if (qInput.dataset.searchValid !== 'true') {
+        showFieldError(qInput, 'Harap pilih destinasi atau paket dari daftar yang muncul');
+        valid = false;
+      } else {
+        clearFieldError(qInput);
+      }
+
+      // 2. Kegiatan — must be selected
+      var kegSelect = document.querySelector("select[name='kegiatan']");
+      if (!kegSelect.value) {
+        showFieldError(kegSelect, 'Harap pilih jenis kegiatan');
+        valid = false;
+      } else {
+        clearFieldError(kegSelect);
+      }
+
+      if (!valid) { e.preventDefault(); return; }
+
+      // === PROCEED ===
       e.preventDefault();
       var fd = new FormData(form);
       var q = fd.get("q") || "";
