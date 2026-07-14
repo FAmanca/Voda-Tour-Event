@@ -202,15 +202,30 @@ function rp(num) {
 function renderResults(container, packages, loading, error) {
   if (!container) return;
   if (loading) {
-    container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">'
-      + Array(6).fill(0).map(function () { return '<div class="rounded-xl bg-navy-50 animate-pulse h-[280px]"></div>'; }).join('') + '</div>';
+    container.className = 'text-left py-0';
+    container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">'
+      + Array(6).fill(0).map(function () {
+          return '<div class="rounded-[var(--radius-md)] bg-navy-50 animate-pulse overflow-hidden">'
+            + '<div class="h-[150px] bg-navy-100"></div>'
+            + '<div class="p-[18px] space-y-[10px]">'
+            + '<div class="h-[16px] bg-navy-100 rounded w-[70%]"></div>'
+            + '<div class="h-[12px] bg-navy-50 rounded w-[50%]"></div>'
+            + '<div class="flex justify-between pt-[10px] border-t border-navy-100">'
+            + '<div class="h-[12px] bg-navy-50 rounded w-[60px]"></div>'
+            + '<div class="h-[12px] bg-navy-50 rounded w-[80px]"></div>'
+            + '</div>'
+            + '</div>'
+            + '</div>';
+        }).join('') + '</div>';
     return;
   }
   if (error) {
-    container.innerHTML = '<div class="rounded-lg bg-red-50 border border-red-200 p-5 text-red-700 text-sm flex items-center gap-3"><i class="fa-solid fa-circle-exclamation"></i><span>' + error + '</span></div>';
+    container.className = 'text-center py-[80px]';
+    container.innerHTML = '<div class="rounded-lg bg-red-50 border border-red-200 p-5 text-red-700 text-sm flex items-start gap-3"><i class="fa-solid fa-circle-exclamation mt-[2px] shrink-0"></i><span>' + error + '</span></div>';
     return;
   }
   if (!packages || packages.length === 0) {
+    container.className = 'text-center py-[80px]';
     container.innerHTML = ''
       + '<div class="text-center py-16 max-w-md mx-auto">'
       + '<div class="w-20 h-20 rounded-full bg-navy-50 flex items-center justify-center mx-auto mb-5">'
@@ -224,23 +239,72 @@ function renderResults(container, packages, loading, error) {
       + '</div></div>';
     return;
   }
-  container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">'
+  container.className = 'text-left py-0';
+  container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">'
     + packages.map(function (pkg) {
-        var dname = pkg.destination_id && typeof pkg.destination_id === 'object' ? pkg.destination_id.name : '';
-        var sprice = pkg.price_tiers && pkg.price_tiers.length
-          ? Math.min.apply(Math, pkg.price_tiers.map(function (t) { return t.price_per_pax; }).filter(function (p) { return p !== null && p > 0; })) : null;
-        var imgHtml = (!pkg.gallery || !pkg.gallery[0])
-          ? '<div class="w-full h-full flex items-center justify-center bg-navy-100 text-navy-300"><i class="fa-regular fa-image text-3xl"></i></div>'
-          : '<img src="' + DIRECTUS_URL + '/assets/' + pkg.gallery[0] + '?width=600&height=400&fit=cover&format=webp&quality=85" alt="' + esc(pkg.name) + '" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />';
-        return '<a href="/paket/' + pkg.slug + '" class="group block bg-white rounded-xl shadow-sm overflow-hidden no-underline hover:shadow-md transition-all duration-300 hover:-translate-y-1">'
-          + '<div class="aspect-[16/10] overflow-hidden bg-navy-100">' + imgHtml + '</div>'
-          + '<div class="p-4">'
-          + '<h3 class="font-[family-name:var(--font-display)] text-navy-800 text-sm font-semibold group-hover:text-orange-500 transition-colors line-clamp-2">' + esc(pkg.name) + '</h3>'
-          + (dname ? '<p class="text-navy-400 text-xs mt-1"><i class="fa-solid fa-location-dot text-orange-400 text-[10px] mr-1"></i>' + esc(dname) + '</p>' : '')
-          + '<div class="flex items-center justify-between mt-2.5 pt-2.5 border-t border-navy-100">'
-          + '<span class="text-navy-400 text-xs"><i class="fa-regular fa-clock mr-1"></i>' + esc(pkg.duration || '') + '</span>'
-          + (sprice ? '<span class="text-orange-600 text-xs font-bold">' + rp(sprice) + '</span>' : '<span class="text-orange-500 text-xs font-semibold group-hover:translate-x-0.5 transition-transform">Detail <i class="fa-solid fa-arrow-right text-[10px]"></i></span>')
-          + '</div></div></a>';
+        var title = pkg.name || '';
+        var description = pkg.description || '';
+        var slug = pkg.slug || '';
+        var priceFrom = pkg.price_tiers && pkg.price_tiers.length
+          ? Math.min.apply(Math, pkg.price_tiers.map(function (t) { return t.price_per_pax; }).filter(function (p) { return p !== null && p > 0; }))
+          : null;
+        
+        var image = pkg.image
+          ? DIRECTUS_URL + '/assets/' + pkg.image + '?width=400&height=250&fit=cover'
+          : (pkg.gallery && pkg.gallery[0]
+            ? DIRECTUS_URL + '/assets/' + pkg.gallery[0] + '?width=400&height=250&fit=cover'
+            : null);
+          
+        var destName = pkg.destination_id && typeof pkg.destination_id === 'object'
+          ? pkg.destination_id.name
+          : '';
+
+        var icon = 'fa-solid fa-map-marked-alt';
+        var displayPrice = priceFrom ? Number(priceFrom).toLocaleString('id-ID') : null;
+
+        var imgHtml = image
+          ? '<img src="' + image + '" alt="' + esc(title) + '" class="absolute inset-0 w-full h-full object-cover" loading="lazy" />'
+          : '<div class="absolute inset-0 flex flex-col items-center justify-center text-navy-300">'
+            + '<i class="fa-regular fa-image text-[32px]"></i>'
+            + '<span class="text-[11px] mt-[6px] font-medium">No Image</span>'
+            + '</div>';
+
+        var destHtml = destName
+          ? '<p class="text-[11px] text-navy-400 mt-[8px]"><i class="fa-solid fa-location-dot text-[10px] mr-[3px]"></i>' + esc(destName) + '</p>'
+          : '';
+
+        var priceHtml = displayPrice
+          ? '<span class="text-[11px] text-body-light font-medium block leading-none">Mulai dari</span>'
+            + '<span class="font-[family-name:var(--font-display)] text-orange-600 font-bold text-[16px] leading-tight">Rp ' + displayPrice + '</span>'
+          : '<span class="text-[12px] text-body-light italic">Hubungi kami</span>';
+
+        return '<a href="/paket/' + slug + '" class="group block bg-white rounded-[var(--radius-md)] shadow-[var(--shadow-soft)] overflow-hidden no-underline transition-all duration-[0.25s] hover:-translate-y-[6px] hover:shadow-[var(--shadow-card)]">'
+          + '<!-- Photo area -->'
+          + '<div class="relative h-[150px] overflow-hidden bg-navy-100">'
+          + imgHtml
+          + '<!-- Icon badge pinned top-left, overlapping edge -->'
+          + '<div class="absolute top-[14px] left-[14px] w-[38px] h-[38px] bg-white rounded-full flex items-center justify-center text-navy-800 text-[16px] shadow-[0_4px_12px_rgba(0,0,0,0.15)]">'
+          + '<i class="' + icon + '"></i>'
+          + '</div>'
+          + '</div>'
+          + '<!-- Body -->'
+          + '<div class="p-[18px]">'
+          + '<h3 class="font-[family-name:var(--font-display)] text-navy-800 font-semibold text-[15.5px] leading-tight line-clamp-2">' + esc(title) + '</h3>'
+          + '<p class="text-body text-[12.8px] leading-relaxed mt-[6px] line-clamp-2">' + esc(description) + '</p>'
+          + destHtml
+          + '<!-- Dashed divider -->'
+          + '<div class="border-t border-dashed border-[--color-line] my-[14px]"></div>'
+          + '<!-- Price row -->'
+          + '<div class="flex items-center justify-between">'
+          + '<div>'
+          + priceHtml
+          + '</div>'
+          + '<div class="w-[38px] h-[38px] bg-navy-800 rounded-full flex items-center justify-center text-white text-[14px] transition-transform duration-[0.2s] group-hover:bg-orange-600 group-hover:scale-110">'
+          + '<i class="fa-solid fa-arrow-right"></i>'
+          + '</div>'
+          + '</div>'
+          + '</div>'
+          + '</a>';
       }).join('') + '</div>';
 }
 
