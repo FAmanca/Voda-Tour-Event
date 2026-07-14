@@ -26,14 +26,32 @@ var __pkgCache = null;
 
 async function fetchAllPackages() {
   if (__pkgCache) return __pkgCache;
+  // Fetch packages + destination
   var url = DIRECTUS_URL + '/items/packages'
-    + '?fields=*,destination_id.*,activity_types.activity_type_id.slug,activity_types.activity_type_id.name'
+    + '?fields=*,destination_id.*'
     + '&filter[status][_eq]=published&limit=50&sort=-id';
   try {
     var r = await fetch(url);
     if (!r.ok) return [];
     var j = await r.json();
-    __pkgCache = j.data || [];
+    var pkgs = j.data || [];
+
+    // Fetch activity types separately (Directus O2M bug workaround)
+    var aurl = DIRECTUS_URL + '/items/packages_activity_types'
+      + '?fields=package_id,activity_type_id.slug,activity_type_id.name&limit=200';
+    var ar = await fetch(aurl);
+    if (ar.ok) {
+      var aj = await ar.json();
+      var allActs = aj.data || [];
+      // Attach activity types to packages
+      pkgs.forEach(function (p) {
+        p.activity_types = allActs.filter(function (a) {
+          return a.package_id === p.id;
+        });
+      });
+    }
+
+    __pkgCache = pkgs;
     return __pkgCache;
   } catch (e) { return []; }
 }
