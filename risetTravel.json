@@ -1,0 +1,515 @@
+{
+  "judul": "Riset Harga Paket Trip Wisata Indonesia per Daerah",
+  "catatan_umum": [
+    "Harga bersifat estimasi/indikatif berdasarkan riset operator tur (open trip & private trip) per Juli 2026, dan BISA BERUBAH sewaktu-waktu (naik saat high season: libur Lebaran, Natal-Tahun Baru, long weekend).",
+    "Skema harga umumnya: semakin banyak jumlah peserta per mobil/bus, semakin murah harga per orang, karena biaya kendaraan & driver dibagi rata.",
+    "Private trip = rombongan sendiri, itinerary bisa custom. Open trip = digabung dengan peserta lain (biasanya per weekend, harga lebih murah tapi jadwal fixed).",
+    "Satu paket wisata bisa cocok untuk lebih dari satu jenis aktivitas/segmen pasar (lihat field 'kategori_aktivitas' di tiap paket), tergantung siapa yang memesan dan tujuan trip-nya.",
+    "Selalu konfirmasi ulang harga terbaru langsung ke operator tur sebelum booking, karena harga di lapangan sering nego/berubah."
+  ],
+  "daftar_kategori_aktivitas": [
+    {"kategori": "Private Trip", "deskripsi": "Rombongan sendiri (keluarga/teman/kolega), jadwal & itinerary bisa custom, tidak digabung peserta lain."},
+    {"kategori": "Open Trip", "deskripsi": "Digabung dengan peserta lain yang tidak saling kenal, jadwal fixed (biasanya weekend), harga per orang lebih murah."},
+    {"kategori": "Family Trip", "deskripsi": "Trip untuk liburan keluarga, ramah anak dan orang tua, ritme santai, destinasi kid-friendly."},
+    {"kategori": "Corporate Gathering", "deskripsi": "Acara kantor/perusahaan untuk mempererat kebersamaan tim, biasanya termasuk makan bersama & venue acara."},
+    {"kategori": "Team Building", "deskripsi": "Fokus pada aktivitas kerja sama tim, biasanya dikombinasikan dengan games/outbound terstruktur dan fasilitator."},
+    {"kategori": "Outbound", "deskripsi": "Aktivitas fisik luar ruangan berbasis games/tantangan kelompok (flying fox, war game, dsb), biasa untuk sekolah atau kantor."},
+    {"kategori": "Honeymoon / Pasangan", "deskripsi": "Trip romantis untuk pasangan/bulan madu, biasanya private dan destinasi lebih personal/santai."},
+    {"kategori": "Study Tour / Wisata Edukasi", "deskripsi": "Kunjungan wisata untuk pelajar/mahasiswa dengan muatan edukasi sejarah/budaya/sains."},
+    {"kategori": "Backpacker / Solo Traveler", "deskripsi": "Trip hemat untuk traveler individu yang ingin gabung open trip, budget minim, cocok untuk kenalan baru."},
+    {"kategori": "Reuni / Komunitas", "deskripsi": "Trip untuk kelompok alumni, komunitas hobi, atau kumpulan teman lama."},
+    {"kategori": "Religi / Ziarah", "deskripsi": "Kunjungan ke situs bersejarah/keagamaan seperti candi, pura, atau tempat ziarah."}
+  ],
+  "daerah": [
+
+    {
+      "nama_daerah": "Bandung & Sekitarnya (Lembang, Ciwidey)",
+      "destinasi_utama": ["Tangkuban Perahu", "Kawah Putih", "Farmhouse Lembang", "The Lodge Maribaya", "Dusun Bambu", "Situ Patenggang", "Jalan Braga", "Trans Studio Bandung"],
+      "paket_wisata": [
+        {
+          "nama_paket": "Paket Wisata Bandung 1 Hari (Lembang City Tour)",
+          "tipe": "Private Trip",
+          "kategori_aktivitas": ["Private Trip", "Family Trip", "Honeymoon / Pasangan", "Reuni / Komunitas"],
+          "durasi": "1 Hari (± 10-12 jam)",
+          "itinerary": [
+            "Penjemputan di Stasiun Bandung / Bandara Husein Sastranegara / hotel area Bandung",
+            "Menuju kawasan Lembang: Farmhouse Lembang",
+            "The Lodge Maribaya / Orchid Forest",
+            "Makan siang di resto area Lembang",
+            "Tangkuban Perahu (opsional)",
+            "Wisata belanja oleh-oleh khas Bandung",
+            "Pengantaran kembali ke stasiun/bandara"
+          ],
+          "termasuk": [
+            "Mobil ber-AC (Avanza/Innova, tergantung jumlah peserta)",
+            "Driver + BBM + parkir + tol",
+            "Tiket masuk lokasi wisata (kecuali disebutkan tidak termasuk)",
+            "Air mineral selama perjalanan"
+          ],
+          "tidak_termasuk": [
+            "Makan siang/malam (jika tidak disebutkan include)",
+            "Tiket masuk wahana tambahan (contoh: wahana di Farmhouse)",
+            "Pengeluaran pribadi & tip driver"
+          ],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Berdasarkan jumlah peserta per kendaraan",
+            "tabel": [
+              {"jumlah_peserta": "2-5 orang (mobil Avanza/APV)", "harga_per_orang": "Rp 300.000 - Rp 450.000"},
+              {"jumlah_peserta": "6-9 orang (mobil Elf/Pregio)", "harga_per_orang": "Rp 250.000 - Rp 350.000"},
+              {"jumlah_peserta": "10-20 orang (Elf Long/Bus kecil)", "harga_per_orang": "Rp 200.000 - Rp 280.000"},
+              {"jumlah_peserta": ">20 orang (Bus/rombongan)", "harga_per_orang": "Hubungi CS untuk penawaran grup"}
+            ]
+          },
+          "sumber": ["mawaholiday.net", "javawisata.com", "nuarthatours.com"]
+        },
+        {
+          "nama_paket": "Paket Wisata Bandung 2 Hari 1 Malam",
+          "tipe": "Private Trip",
+          "kategori_aktivitas": ["Private Trip", "Family Trip", "Honeymoon / Pasangan", "Reuni / Komunitas"],
+          "durasi": "2 Hari 1 Malam",
+          "itinerary": [
+            "Hari 1: Penjemputan - Lembang (Farmhouse, The Lodge Maribaya, Dusun Bambu) - Check in hotel - makan malam",
+            "Hari 2: Ciwidey (Kawah Putih, Situ Patenggang, kebun teh Rancabali) - kota Bandung (Braga, Alun-Alun) - pengantaran pulang"
+          ],
+          "termasuk": [
+            "Mobil ber-AC + driver + BBM + parkir + tol",
+            "Hotel 1 malam (kamar sesuai jumlah peserta)",
+            "Tiket masuk objek wisata utama",
+            "Sarapan di hotel"
+          ],
+          "tidak_termasuk": ["Makan siang & malam", "Tiket wahana tambahan", "Keperluan pribadi"],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Berdasarkan jumlah peserta",
+            "tabel": [
+              {"jumlah_peserta": "2 orang", "harga_per_orang": "Rp 900.000 - Rp 1.100.000"},
+              {"jumlah_peserta": "4-6 orang", "harga_per_orang": "Rp 720.000 - Rp 850.000"},
+              {"jumlah_peserta": "7-10 orang", "harga_per_orang": "Rp 600.000 - Rp 750.000"},
+              {"jumlah_peserta": "11-20 orang", "harga_per_orang": "Rp 500.000 - Rp 650.000"}
+            ]
+          },
+          "sumber": ["mawaholiday.net"]
+        },
+        {
+          "nama_paket": "Paket Wisata Bandung 3 Hari 2 Malam",
+          "tipe": "Private Trip",
+          "kategori_aktivitas": ["Private Trip", "Family Trip", "Honeymoon / Pasangan", "Study Tour / Wisata Edukasi", "Reuni / Komunitas"],
+          "durasi": "3 Hari 2 Malam",
+          "itinerary": [
+            "Hari 1: Penjemputan - City tour Bandung (Gedung Sate, Jalan Braga) - Check in hotel",
+            "Hari 2: Lembang full day (Tangkuban Perahu, Farmhouse, The Lodge Maribaya, Dusun Bambu)",
+            "Hari 3: Ciwidey (Kawah Putih, Situ Patenggang) - belanja oleh-oleh - pengantaran ke stasiun/bandara"
+          ],
+          "termasuk": [
+            "Mobil ber-AC + driver + BBM + parkir + tol",
+            "Hotel 2 malam",
+            "Tiket masuk objek wisata sesuai itinerary",
+            "Sarapan 2x di hotel"
+          ],
+          "tidak_termasuk": ["Makan siang & malam", "Wahana tambahan", "Pengeluaran pribadi"],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Berdasarkan jumlah peserta",
+            "tabel": [
+              {"jumlah_peserta": "2 orang", "harga_per_orang": "Rp 1.800.000 - Rp 2.250.000"},
+              {"jumlah_peserta": "4-6 orang", "harga_per_orang": "Rp 1.530.000 - Rp 1.700.000"},
+              {"jumlah_peserta": "7-10 orang", "harga_per_orang": "Rp 1.230.000 - Rp 1.450.000"},
+              {"jumlah_peserta": "11-20 orang", "harga_per_orang": "Rp 1.000.000 - Rp 1.200.000"}
+            ]
+          },
+          "sumber": ["dodolan.jogjakota.go.id (Jogja75)", "mawaholiday.net", "javawisata.com"]
+        },
+        {
+          "nama_paket": "Paket Outing/Gathering Perusahaan Bandung (Group Besar)",
+          "tipe": "Group/Corporate Tour",
+          "kategori_aktivitas": ["Corporate Gathering", "Team Building", "Outbound", "Reuni / Komunitas"],
+          "durasi": "1-2 Hari (fleksibel)",
+          "itinerary": [
+            "Custom sesuai kebutuhan acara (family gathering, outbound, meeting)",
+            "Bisa dikombinasikan dengan outbound, rafting, offroad"
+          ],
+          "termasuk": [
+            "Bus pariwisata + driver + co-driver",
+            "Fasilitas outbound/games (opsional)",
+            "Makan sesuai paket",
+            "Venue/tempat acara (jika disewa)"
+          ],
+          "tidak_termasuk": ["Sewa alat outbound tambahan di luar paket", "Dokumentasi profesional (opsional tambahan biaya)"],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Semakin banyak peserta semakin murah, minimal umumnya 50 orang untuk harga promo",
+            "tabel": [
+              {"jumlah_peserta": "20-49 orang", "harga_per_orang": "Hubungi CS (nego sesuai fasilitas)"},
+              {"jumlah_peserta": "50 orang ke atas", "harga_per_orang": "Promo fantastis, hubungi CS untuk penawaran khusus"}
+            ]
+          },
+          "sumber": ["mawaholiday.net"]
+        }
+      ]
+    },
+
+    {
+      "nama_daerah": "Kepulauan Seribu (Pulau Tidung, Pulau Pari, Pulau Payung)",
+      "destinasi_utama": ["Pulau Tidung (Jembatan Cinta)", "Pulau Pari (Pantai Pasir Perawan)", "Pulau Payung", "Pulau Harapan"],
+      "paket_wisata": [
+        {
+          "nama_paket": "Open Trip Pulau Tidung 2 Hari 1 Malam",
+          "tipe": "Open Trip",
+          "kategori_aktivitas": ["Open Trip", "Backpacker / Solo Traveler", "Reuni / Komunitas"],
+          "durasi": "2 Hari 1 Malam, berangkat Sabtu-Minggu",
+          "itinerary": [
+            "Hari 1: Kumpul di Pelabuhan Kali Adem Muara Angke / Marina Ancol (pagi) - Penyeberangan kapal ferry/kapal cepat (2,5-3 jam) - Check in homestay - Keliling pulau naik sepeda - Snorkeling - Makan siang & malam - BBQ malam (opsional)",
+            "Hari 2: Sunrise di Jembatan Cinta - Sarapan - Island hopping (opsional) - Berkemas - Kembali ke pelabuhan asal"
+          ],
+          "termasuk": [
+            "Transportasi kapal PP (ferry/kapal cepat)",
+            "Homestay/penginapan AC (kamar isi 4-7 orang)",
+            "Makan 3x (sesuai program)",
+            "Alat snorkeling + perahu + foto underwater",
+            "Local guide",
+            "Sepeda keliling pulau"
+          ],
+          "tidak_termasuk": [
+            "Transport menuju titik kumpul (pelabuhan)",
+            "Tiket masuk wahana tambahan (banana boat, dll)",
+            "Alat snorkeling tambahan/GoPro rental",
+            "Pengeluaran pribadi & tip guide"
+          ],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Open trip harga flat per orang, bisa lebih murah untuk rombongan besar",
+            "tabel": [
+              {"jumlah_peserta": "1 (gabung open trip)", "harga_per_orang": "Rp 325.000 - Rp 495.000"},
+              {"jumlah_peserta": "2-10 orang (gabung open trip / grup kecil)", "harga_per_orang": "Rp 350.000 - Rp 420.000"},
+              {"jumlah_peserta": "11-20 orang (booking grup)", "harga_per_orang": "Rp 300.000 - Rp 380.000"},
+              {"jumlah_peserta": "25 orang ke atas (Group Package)", "harga_per_orang": "Rp 760.000 - Rp 820.000 (paket lengkap plus EO)"}
+            ]
+          },
+          "sumber": ["dinowisata.com", "pulautidung.co.id", "tidung.id", "jelajah-nusantara.com"]
+        },
+        {
+          "nama_paket": "Private Trip Pulau Tidung 2 Hari 1 Malam",
+          "tipe": "Private Trip",
+          "kategori_aktivitas": ["Private Trip", "Family Trip", "Honeymoon / Pasangan", "Reuni / Komunitas"],
+          "durasi": "2 Hari 1 Malam, jadwal fleksibel (bisa hari kerja)",
+          "itinerary": [
+            "Hari 1: Penjemputan/kumpul di pelabuhan - Penyeberangan - Check in homestay - Snorkeling - Keliling pulau - Sunset di Jembatan Cinta - BBQ malam",
+            "Hari 2: Sunrise - Island hopping ke pulau lain (opsional) - Sarapan - Check out - Kembali ke pelabuhan"
+          ],
+          "termasuk": [
+            "Transportasi kapal PP",
+            "Homestay eksklusif untuk rombongan sendiri",
+            "Makan sesuai program",
+            "Snorkeling set + perahu",
+            "Tour leader/local guide"
+          ],
+          "tidak_termasuk": ["Transport ke pelabuhan keberangkatan", "Aktivitas water sport tambahan", "Pengeluaran pribadi"],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Minimal 2 orang, harga makin murah untuk rombongan lebih besar",
+            "tabel": [
+              {"jumlah_peserta": "2-10 orang", "harga_per_orang": "Rp 550.000 - Rp 760.000"},
+              {"jumlah_peserta": "11-20 orang", "harga_per_orang": "Rp 450.000 - Rp 600.000"},
+              {"jumlah_peserta": "21 orang ke atas", "harga_per_orang": "Hubungi CS untuk nego grup"}
+            ]
+          },
+          "sumber": ["jelajah-nusantara.com", "tidung.id"]
+        },
+        {
+          "nama_paket": "One Day Trip Pulau Tidung / Pulau Pari (Tanpa Menginap)",
+          "tipe": "Private/Open Trip",
+          "kategori_aktivitas": ["Private Trip", "Open Trip", "Family Trip", "Study Tour / Wisata Edukasi", "Backpacker / Solo Traveler"],
+          "durasi": "1 Hari (berangkat pagi, pulang sore)",
+          "itinerary": [
+            "Kumpul pagi di pelabuhan - Penyeberangan - Snorkeling - Keliling pulau - Makan siang - Foto di Jembatan Cinta / Pantai Pasir Perawan - Sore kembali ke pelabuhan"
+          ],
+          "termasuk": ["Transportasi kapal PP", "Makan siang 1x", "Alat snorkeling + perahu", "Tur keliling pulau"],
+          "tidak_termasuk": ["Penginapan (karena tanpa menginap)", "Wahana tambahan", "Pengeluaran pribadi"],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Minimal 2 orang untuk private, lebih murah jika gabung open trip",
+            "tabel": [
+              {"jumlah_peserta": "2-10 orang", "harga_per_orang": "Rp 360.000 - Rp 620.000"},
+              {"jumlah_peserta": "11-20 orang", "harga_per_orang": "Rp 300.000 - Rp 450.000"}
+            ]
+          },
+          "sumber": ["pulauseributravel.com", "Grand Lagoon Resort (tidung.id)"]
+        },
+        {
+          "nama_paket": "Paket Outing Perusahaan Pulau Tidung (Rombongan Besar)",
+          "tipe": "Group/Corporate",
+          "kategori_aktivitas": ["Corporate Gathering", "Team Building", "Outbound"],
+          "durasi": "2 Hari 1 Malam",
+          "itinerary": ["Custom, biasanya termasuk games/outbound, makan bersama, dan snorkeling"],
+          "termasuk": ["Jasa Event Organizer", "Transportasi kapal", "Penginapan", "Makan bersama", "Games/outbound kelompok"],
+          "tidak_termasuk": ["Dekorasi tambahan", "Dokumentasi profesional (opsional)"],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Harga per orang menurun seiring jumlah peserta",
+            "tabel": [
+              {"jumlah_peserta": "25 orang ke atas", "harga_per_orang": "Rp 250.000 - Rp 400.000 (tergantung fasilitas)"}
+            ]
+          },
+          "sumber": ["tidung.id (Grand Lagoon Resort)"]
+        }
+      ]
+    },
+
+    {
+      "nama_daerah": "Yogyakarta - Candi Borobudur & Prambanan",
+      "destinasi_utama": ["Candi Borobudur", "Candi Prambanan", "Ratu Boko", "Malioboro", "Keraton Yogyakarta", "Tebing Breksi", "Gereja Ayam"],
+      "paket_wisata": [
+        {
+          "nama_paket": "Paket Wisata Jogja 1 Hari - Candi Borobudur, Prambanan & Ratu Boko",
+          "tipe": "Private Trip",
+          "kategori_aktivitas": ["Private Trip", "Family Trip", "Study Tour / Wisata Edukasi", "Religi / Ziarah", "Reuni / Komunitas"],
+          "durasi": "1 Hari (± 10-12 jam)",
+          "itinerary": [
+            "Penjemputan di hotel/bandara/stasiun area Yogyakarta",
+            "Menuju Candi Borobudur - eksplorasi candi Buddha terbesar di dunia",
+            "Makan siang",
+            "Menuju Candi Prambanan - eksplorasi candi Hindu terbesar",
+            "Ratu Boko (opsional, terutama untuk sunset)",
+            "Pengantaran kembali ke hotel/bandara/stasiun"
+          ],
+          "termasuk": [
+            "Mobil ber-AC + driver",
+            "BBM + parkir + tol",
+            "Penjemputan & pengantaran gratis dalam radius kota Yogyakarta",
+            "Air mineral botol"
+          ],
+          "tidak_termasuk": [
+            "Tiket masuk candi (Borobudur Rp 50.000/orang domestik, Prambanan terpisah)",
+            "Makan siang/malam",
+            "Pemandu wisata (kecuali paket premium)",
+            "Tip driver (sukarela)"
+          ],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Berdasarkan jumlah peserta per kendaraan",
+            "tabel": [
+              {"jumlah_peserta": "2-6 orang", "harga_per_orang": "Rp 290.000 - Rp 490.000"},
+              {"jumlah_peserta": "7-10 orang", "harga_per_orang": "Rp 250.000 - Rp 350.000"},
+              {"jumlah_peserta": "11-20 orang (Elf/Hiace)", "harga_per_orang": "Rp 200.000 - Rp 300.000"},
+              {"jumlah_peserta": ">20 orang (Bus)", "harga_per_orang": "Hubungi CS untuk penawaran grup"}
+            ]
+          },
+          "sumber": ["visit-jogja.com", "wisatajogjatrip.com", "traveloka.com"]
+        },
+        {
+          "nama_paket": "Paket Sunrise Borobudur + Prambanan",
+          "tipe": "Private Trip",
+          "kategori_aktivitas": ["Private Trip", "Honeymoon / Pasangan", "Religi / Ziarah"],
+          "durasi": "1 Hari (mulai dini hari)",
+          "itinerary": [
+            "Penjemputan dini hari (± jam 03.30-04.00)",
+            "Sunrise di kawasan Candi Borobudur (via Punthuk Setumbu atau tiket sunrise resmi)",
+            "Tur mobil VW klasik keliling area Borobudur (opsional tambahan)",
+            "Sarapan pagi",
+            "Menuju Yogyakarta - kunjungan Candi Prambanan",
+            "Pengantaran kembali ke hotel"
+          ],
+          "termasuk": ["Mobil ber-AC + driver", "BBM + parkir + tol", "Air mineral"],
+          "tidak_termasuk": ["Tiket sunrise Borobudur (terpisah, harga lebih tinggi dari tiket reguler)", "Tiket Prambanan", "Makan (kecuali disebutkan include)", "Tur VW (biaya tambahan jika diambil)"],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Harga tergantung titik keberangkatan (Yogyakarta/Solo) dan jumlah peserta",
+            "tabel": [
+              {"jumlah_peserta": "Reguler (gabung open trip, dari Yogyakarta)", "harga_per_orang": "Rp 250.000 - Rp 350.000"},
+              {"jumlah_peserta": "Reguler (dari Solo)", "harga_per_orang": "Sekitar Rp 1.140.000"},
+              {"jumlah_peserta": "Private 2-10 orang", "harga_per_orang": "Rp 1.350.000 - Rp 1.500.000 per kendaraan (dibagi jumlah peserta)"}
+            ]
+          },
+          "sumber": ["campatour.com"]
+        },
+        {
+          "nama_paket": "Paket Wisata Jogja 2 Hari 1 Malam",
+          "tipe": "Private Trip",
+          "kategori_aktivitas": ["Private Trip", "Family Trip", "Honeymoon / Pasangan", "Reuni / Komunitas"],
+          "durasi": "2 Hari 1 Malam",
+          "itinerary": [
+            "Hari 1: Penjemputan - Candi Borobudur - Punthuk Setumbu/Gereja Ayam - Check in hotel - Malioboro malam hari",
+            "Hari 2: Candi Prambanan - Tebing Breksi - Keraton Yogyakarta/Taman Sari - Pengantaran pulang"
+          ],
+          "termasuk": ["Mobil ber-AC + driver + BBM + tol + parkir", "Hotel 1 malam", "Sarapan di hotel"],
+          "tidak_termasuk": ["Tiket masuk objek wisata", "Makan siang & malam", "Pengeluaran pribadi"],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Berdasarkan jumlah peserta",
+            "tabel": [
+              {"jumlah_peserta": "2-6 orang", "harga_per_orang": "Rp 750.000 - Rp 1.000.000"},
+              {"jumlah_peserta": "7-10 orang", "harga_per_orang": "Rp 600.000 - Rp 800.000"},
+              {"jumlah_peserta": "11-20 orang", "harga_per_orang": "Rp 500.000 - Rp 650.000"}
+            ]
+          },
+          "sumber": ["nusantaratrip.com", "ronapersadatour.com"]
+        },
+        {
+          "nama_paket": "Paket Wisata Jogja 3 Hari 2 Malam",
+          "tipe": "Private Trip",
+          "kategori_aktivitas": ["Private Trip", "Family Trip", "Study Tour / Wisata Edukasi", "Reuni / Komunitas"],
+          "durasi": "3 Hari 2 Malam",
+          "itinerary": [
+            "Hari 1: Penjemputan - Candi Borobudur - Candi Mendut - Check in hotel",
+            "Hari 2: Ketep Pass - Jeep Volcano Tour Merapi - Candi Prambanan",
+            "Hari 3: Keraton Yogyakarta - Taman Sari - Malioboro & pusat oleh-oleh - Pengantaran pulang"
+          ],
+          "termasuk": ["Mobil ber-AC + driver + BBM + tol + parkir", "Hotel 2 malam", "Sarapan 2x di hotel"],
+          "tidak_termasuk": ["Tiket masuk semua objek wisata & Jeep Merapi", "Makan siang & malam", "Pengeluaran pribadi"],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Berdasarkan jumlah peserta",
+            "tabel": [
+              {"jumlah_peserta": "2 orang", "harga_per_orang": "Rp 1.800.000 - Rp 2.190.000"},
+              {"jumlah_peserta": "4-6 orang", "harga_per_orang": "Rp 1.200.000 - Rp 1.500.000"},
+              {"jumlah_peserta": "7-10 orang", "harga_per_orang": "Rp 950.000 - Rp 1.200.000"},
+              {"jumlah_peserta": "11-20 orang", "harga_per_orang": "Rp 750.000 - Rp 950.000"}
+            ]
+          },
+          "sumber": ["nagantour.com", "visit-jogja.com"]
+        }
+      ]
+    },
+
+    {
+      "nama_daerah": "Bali",
+      "destinasi_utama": ["Tanah Lot", "Kintamani", "Ubud", "Tanjung Benoa", "GWK", "Nusa Penida (opsional tambahan)", "Bedugul", "Uluwatu"],
+      "paket_wisata": [
+        {
+          "nama_paket": "Open Trip Bali 4 Hari 3 Malam",
+          "tipe": "Open Trip",
+          "kategori_aktivitas": ["Open Trip", "Backpacker / Solo Traveler", "Reuni / Komunitas"],
+          "durasi": "4 Hari 3 Malam",
+          "itinerary": [
+            "Hari 1: Penjemputan di Bandara Bali - Transfer & check in hotel - Free program",
+            "Hari 2: Kuta - Tour Bali Utara/Tengah - Celuk (kerajinan perak) - Kintamani (pemandangan Gunung & Danau Batur) - Pura Tirta Empul",
+            "Hari 3: Tour Bali Selatan - Tanjung Benoa (water sport/banana boat) - GWK / Tanah Lot (sunset)",
+            "Hari 4: Free program pagi - Check out - Transfer ke bandara"
+          ],
+          "termasuk": [
+            "Hotel sesuai pilihan (3 malam)",
+            "Transportasi bus/mobil ber-AC selama di Bali",
+            "Makan 7 kali (sesuai program)",
+            "Air mineral",
+            "Tour guide",
+            "Dokumentasi",
+            "Penjemputan & pengantaran bandara"
+          ],
+          "tidak_termasuk": [
+            "Tiket pesawat menuju Bali",
+            "Makan di luar program",
+            "Pengeluaran pribadi",
+            "Tip guide (sukarela)",
+            "Tiket masuk objek wisata premium (tergantung paket)"
+          ],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Open trip harga flat, tergantung kelas hotel & musim",
+            "tabel": [
+              {"jumlah_peserta": "1 (gabung open trip, quad/twin share)", "harga_per_orang": "Rp 2.100.000 - Rp 2.999.000"},
+              {"jumlah_peserta": "Minimal pendaftaran 2 orang (private trip alternatif)", "harga_per_orang": "Custom, hubungi CS"}
+            ]
+          },
+          "sumber": ["haraduta.com"]
+        },
+        {
+          "nama_paket": "Paket Tour Bali 3 Hari 2 Malam + Tiket Pesawat",
+          "tipe": "Private Trip",
+          "kategori_aktivitas": ["Private Trip", "Family Trip", "Honeymoon / Pasangan"],
+          "durasi": "3 Hari 2 Malam",
+          "itinerary": [
+            "Hari 1: Penjemputan Bandara Ngurah Rai - City tour singkat - Check in hotel",
+            "Hari 2: Tour Bali (Kintamani/Ubud/Tanah Lot sesuai paket) - Water sport Tanjung Benoa / GWK",
+            "Hari 3: Free program pagi - Check out - Antar ke bandara"
+          ],
+          "termasuk": [
+            "Tiket pesawat PP",
+            "Hotel bintang 3 (2/3 malam sesuai paket)",
+            "Mobil ber-AC + BBM + driver as guide",
+            "Antar jemput bandara",
+            "Tiket parkir & tiket masuk objek wisata",
+            "Makan pagi 3x, makan siang 2x, makan malam 2x",
+            "Air mineral selama perjalanan",
+            "Free Banana Boat / Tiket GWK"
+          ],
+          "tidak_termasuk": [
+            "Uang tipping",
+            "Keperluan pribadi",
+            "Trip tambahan ke Nusa Penida (+Rp 325.000/orang jika diambil)"
+          ],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Harga khusus untuk peserta lebih dari 2 orang, tidak berlaku saat high/peak season",
+            "tabel": [
+              {"jumlah_peserta": "2 orang", "harga_per_orang": "Hubungi CS (harga dasar, sebelum diskon grup)"},
+              {"jumlah_peserta": "Lebih dari 2 orang", "harga_per_orang": "Dapat harga spesial/diskon (nego by CS)"}
+            ]
+          },
+          "sumber": ["baliagatour.co.id", "wisatabali.co.id"]
+        },
+        {
+          "nama_paket": "Paket Tour Bali Group 3 Hari 2 Malam (Silver)",
+          "tipe": "Group Tour",
+          "kategori_aktivitas": ["Corporate Gathering", "Team Building", "Reuni / Komunitas", "Study Tour / Wisata Edukasi"],
+          "durasi": "3 Hari 2 Malam",
+          "itinerary": [
+            "Hari 1: Penjemputan - Pilihan Kintamani Tour ATAU Bedugul Tour",
+            "Hari 2: Melasti Tour (Pura Tanah Lot, makan malam seafood di Jimbaran)",
+            "Hari 3: Check out - Antar ke bandara"
+          ],
+          "termasuk": [
+            "Hotel (Euphoria Legian / Siesta Legian bintang 3, atau setara)",
+            "Transportasi bus ber-AC + driver",
+            "Tiket masuk objek wisata sesuai itinerary",
+            "Makan malam seafood di Jimbaran"
+          ],
+          "tidak_termasuk": ["Tiket pesawat", "Makan siang (tergantung paket)", "Pengeluaran pribadi"],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Harga per orang menurun sesuai jumlah rombongan (twin share)",
+            "tabel": [
+              {"jumlah_peserta": "10-15 orang", "harga_per_orang": "Rp 1.550.000"},
+              {"jumlah_peserta": "16-25 orang", "harga_per_orang": "Rp 1.450.000"},
+              {"jumlah_peserta": "26-35 orang", "harga_per_orang": "Rp 1.370.000"},
+              {"jumlah_peserta": "36-45 orang", "harga_per_orang": "Rp 1.285.000"},
+              {"jumlah_peserta": ">45 orang", "harga_per_orang": "Konsultasi dengan admin"}
+            ]
+          },
+          "sumber": ["sahabatbalitour.com"]
+        },
+        {
+          "nama_paket": "Paket Tour Bali Group 5 Hari 4 Malam (Company Gathering)",
+          "tipe": "Group/Corporate Tour",
+          "kategori_aktivitas": ["Corporate Gathering", "Team Building", "Outbound", "Family Trip", "Reuni / Komunitas"],
+          "durasi": "5 Hari 4 Malam",
+          "itinerary": [
+            "Itinerary lengkap mencakup wisata alam, budaya, dan destinasi ikonik Bali (Kintamani, Ubud, Tanah Lot, GWK, Uluwatu, dll - dapat disesuaikan)"
+          ],
+          "termasuk": ["Hotel 4 malam", "Transportasi bus/mobil ber-AC + driver", "Tiket masuk objek wisata utama", "Makan sesuai program"],
+          "tidak_termasuk": ["Tiket pesawat", "Pengeluaran pribadi", "Tip driver/guide"],
+          "harga_per_orang": {
+            "mata_uang": "IDR",
+            "skema": "Harga per couple (2 orang) atau per orang untuk grup minimal 10 orang",
+            "tabel": [
+              {"jumlah_peserta": "2 orang (per couple)", "harga_per_orang": "Mulai Rp 2.121.000"},
+              {"jumlah_peserta": "Minimal 10 orang", "harga_per_orang": "Mulai Rp 2.121.000 (harga grup, cenderung lebih murah untuk peserta lebih banyak)"}
+            ]
+          },
+          "sumber": ["kutabalitour.com"]
+        }
+      ]
+    }
+  ],
+
+  "daerah_tambahan_bisa_diriset": [
+    "Bromo - Tengger (Jawa Timur)",
+    "Labuan Bajo - Pulau Komodo (NTT)",
+    "Lombok - Gili Trawangan (NTB)",
+    "Bandung Selatan - Rancabali/Pangalengan",
+    "Karimunjawa (Jawa Tengah)",
+    "Belitung",
+    "Danau Toba (Sumatera Utara)",
+    "Raja Ampat (Papua Barat)"
+  ]
+}

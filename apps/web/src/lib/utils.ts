@@ -2,8 +2,9 @@
 // Voda Tour & Event — Formatting Utilities
 // ============================================================================
 
-/** Format jumlah ke format Rupiah penuh (Rp 850.000) */
+/** Format jumlah ke format Rupiah penuh (Rp 850.000). Kembalikan hubungi kami jika 0 */
 export function formatPrice(amount: number): string {
+  if (!amount || amount === 0) return "Hubungi Kami";
   return `Rp ${amount.toLocaleString("id-ID")}`;
 }
 
