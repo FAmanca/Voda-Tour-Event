@@ -291,8 +291,17 @@ function initAutocomplete(inputId, dropdownId, opts) {
         clearInputError();
         if (opts.onSelect) opts.onSelect(sel.dataset.name);
       } else {
-        e.preventDefault();
-        showInputError('Harap pilih destinasi atau paket dari daftar yang muncul');
+        // Auto-pilih item pertama dari dropdown
+        var first = dropdown.querySelector('[data-index]');
+        if (first) {
+          e.preventDefault();
+          input.value = first.dataset.name;
+          markValid(first.dataset.name);
+          dropdown.classList.add('hidden');
+          clearInputError();
+          if (opts.onSelect) opts.onSelect(first.dataset.name);
+        }
+        // Kalo dropdown kosong (ga ada saran) — biarkan bebas, tanpa error
       }
     }
   });
