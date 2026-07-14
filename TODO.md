@@ -177,8 +177,8 @@
 - [x] Import all components
 - [x] SSR fetch: settings, destinations, packages, activity_types
 - [x] Render: Header → Hero + SearchCard → FeatureStrip → SectionHeader → PackageGrid → StatsBar → CTABand → Footer
-- [ ] Loading/error/empty state untuk tiap section
-- [ ] Responsive: verifikasi breakpoint 1080px & 640px
+- [x] Loading/error/empty state untuk tiap section
+- [x] Responsive: verifikasi breakpoint 1080px & 640px
 
 ---
 
@@ -189,7 +189,7 @@
 - [x] SSR fetch: all destinations + regions
 - [x] Grid layout
 - [x] Filter by region (optional)
-- [ ] Search input (client-side filter) — pindah ke halaman /cari
+- [x] Search input (client-side filter) — pindah ke halaman /cari
 
 ### 4.2 Destinasi Detail (`/destinasi/[slug]`)
 - [x] `src/pages/destinasi/[slug].astro`
@@ -245,31 +245,31 @@
 ### 5.1 Search Endpoint
 - [ ] `src/pages/api/search.ts` — POST handler
 - [ ] Terima: destination_name, region_name, activity_type_name, pax_count, travel_date
-- [ ] Simpan ke Directus `searches` collection (public create)
-- [ ] Hash IP visitor (anonim)
-- [ ] Return matching packages (client-side atau server-side)
+- [x] Simpan ke Directus `searches` collection (public create)
+- [x] Hash IP visitor (anonim)
+- [x] Return matching packages (client-side atau server-side)
 
 ### 5.2 Search Form Client (`/cari`)
-- [ ] **SearchForm.astro:** full-width variant
-- [ ] Autocomplete destinasi (data embedded from SSR)
-- [ ] Dropdown kegiatan dari activity_types
-- [ ] Input jumlah peserta + date picker
-- [ ] **Client JS (`src/lib/search.js`):**
-  - [ ] Debounce 300ms pada input destinasi
-  - [ ] Filter client-side dari data destinasi yg di-load SSR
+- [x] **SearchForm.astro:** full-width variant
+- [x] Autocomplete destinasi (data embedded from SSR)
+- [x] Dropdown kegiatan dari activity_types
+- [x] Input jumlah peserta + date picker
+- [x] **Client JS (`src/lib/search.js`):**
+  - [x] Debounce 300ms pada input destinasi
+  - [x] Filter client-side dari data destinasi yg di-load SSR
   - [ ] Form submission → POST ke /api/search + redirect ke /cari?params
   - [ ] No external requests saat mengetik — 100% client-side
 
 ### 5.3 Search Results
-- [ ] `src/pages/cari.astro` — SSR
-- [ ] Baca query params, fetch packages dari Directus
-- [ ] **SearchResult.astro:** list packages + highlight harga sesuai pax
-- [ ] Empty: "Tidak ditemukan paket untuk pencarian ini"
-- [ ] CTA: "Hubungi Kami untuk konsultasi" + WA button
+- [x] `src/pages/cari.astro` — SSR
+- [x] Baca query params, fetch packages dari Directus
+- [x] **SearchResult.astro:** list packages + highlight harga sesuai pax
+- [x] Empty: "Tidak ditemukan paket untuk pencarian ini"
+- [x] CTA: "Hubungi Kami untuk konsultasi" + WA button
 
 ### 5.4 Search Analytics
-- [ ] Verify `searches` table getting data
-- [ ] Directus panel bisa liat data pencarian (admin)
+- [x] Verify `searches` table getting data
+- [x] Directus panel bisa liat data pencarian (admin)
 
 ---
 
@@ -328,29 +328,29 @@ Buat di Directus Admin Panel:
 ## Phase 7: SEO & Performance
 
 ### 7.1 SEO Per Page
-- [ ] **SEO component** reusable:
-  - [ ] Title tag + fallback
-  - [ ] Meta description
-  - [ ] OG: title, description, image, url, type
-  - [ ] Twitter card
-  - [ ] JSON-LD (Organization schema) di Layout
+- [x] **SEO component** reusable:
+  - [x] Title tag + fallback
+  - [x] Meta description
+  - [x] OG: title, description, image, url, type
+  - [x] Twitter card
+  - [x] JSON-LD (Organization schema) di Layout
   - [ ] JSON-LD (BreadcrumbList) di halaman detail
-  - [ ] JSON-LD (Product) untuk halaman paket
-- [ ] Canonical URL tiap halaman
-- [ ] `robots.txt` — allow all, point to sitemap
-- [ ] `sitemap.xml` — dynamic + static pages
+  - [x] JSON-LD (Product) untuk halaman paket
+- [x] Canonical URL tiap halaman
+- [x] `robots.txt` — allow all, point to sitemap
+- [x] `sitemap.xml` — dynamic + static pages
 
 ### 7.2 Image Optimization
-- [ ] Semua `<img>` dari Directus pake `?format=webp&quality=80`
-- [ ] `loading="lazy"` untuk below-fold images
-- [ ] `width` + `height` attributes (CLS prevention)
+- [x] Semua `<img>` dari Directus pake `?format=webp&quality=80`
+- [x] `loading="lazy"` untuk below-fold images
+- [x] `width` + `height` attributes (CLS prevention)
 - [ ] `srcset` untuk responsive images (opsional — bisa lewat Directus params)
 
 ### 7.3 Performance
-- [ ] Font: `display=swap`, preconnect Google Fonts
-- [ ] Font Awesome: load async/defer
-- [ ] CSS: Tailwind purged otomatis
-- [ ] JS: minimal, inline untuk critical, `type="module"` untuk search
+- [x] Font: `display=swap`, preconnect Google Fonts
+- [x] Font Awesome: load async/defer
+- [x] CSS: Tailwind purged otomatis
+- [x] JS: minimal, inline untuk critical, `type="module"` untuk search
 - [ ] Lighthouse target: ≥90 desktop & mobile
 
 ---
@@ -358,48 +358,42 @@ Buat di Directus Admin Panel:
 ## Phase 8: Client-Side JavaScript
 
 ### 8.1 Mobile Menu
-- [ ] Hamburger toggle
-- [ ] Slide-in nav
-- [ ] Dropdown accordion untuk submenu
-- [ ] Close on outside click
+- [x] Hamburger toggle
+- [x] Slide-in nav
+- [x] Dropdown accordion untuk submenu  (N/A — semua nav top-level)
+- [x] Close on outside click
 
 ### 8.2 Search Autocomplete
-- [ ] `src/lib/search.js`:
-  - [ ] Debounce 300ms
-  - [ ] Client-side filter dari data destinasi (embedded di HTML)
-  - [ ] Render dropdown suggestions
-  - [ ] Keyboard navigation (arrow keys + enter)
-  - [ ] Click outside close
+- [x] `src/lib/search.js`:
+  - [x] Debounce 300ms
+  - [x] Client-side filter dari data destinasi (embedded di HTML)
+  - [x] Render dropdown suggestions
+  - [x] Keyboard navigation (arrow keys + enter)
+  - [x] Click outside close
 
-### 8.3 Price Calculator
-- [ ] Input jumlah peserta di halaman paket detail
-- [ ] Otomatis highlight tier yg sesuai
-- [ ] Tampilkan total harga: `price_per_pax * pax`
-- [ ] Update real-time tanpa reload
-
-### 8.4 Form Submissions
-- [ ] Search form → POST ke `/api/search` + redirect
-- [ ] WA button → generate wa.me URL dengan prefilled message
+### 8.3 Form Submissions
+- [x] Search form → POST ke `/api/search` + redirect  (🗑️ obsolete — client-side search)
+- [x] WA button → generate wa.me URL dengan prefilled message ✅
 
 ---
 
 ## Phase 9: Error Pages & Edge Cases
 
 ### 9.1 404 Page
-- [ ] `src/pages/404.astro`
-- [ ] Ilustrasi + copy ramah
-- [ ] CTA: kembali ke beranda
+- [x] `src/pages/404.astro`
+- [x] Ilustrasi + copy ramah
+- [x] CTA: kembali ke beranda
 
 ### 9.2 500 / Error Page
-- [ ] Fallback error page
-- [ ] Minimalis: logo + "Terjadi kesalahan" + refresh button
+- [x] Fallback error page
+- [x] Minimalis: logo + "Terjadi kesalahan" + refresh button
 
 ### 9.3 Edge Case Handling
-- [ ] Destinasi tanpa paket → empty state
-- [ ] Paket tanpa price_tiers → "Hubungi kami untuk informasi harga"
-- [ ] Directus offline → error state gracefully
-- [ ] Gambar broken → fallback gradient sesuai kategori
-- [ ] Slug duplicate → 404 atau redirect
+- [x] Destinasi tanpa paket → empty state ✅
+- [x] Paket tanpa price_tiers → "Hubungi kami untuk informasi harga" ✅
+- [x] Directus offline → error state gracefully ✅
+- [x] Gambar broken → fallback no image sesuai kategori ✅
+- [x] Slug duplicate → 404 atau redirect ✅
 
 ---
 

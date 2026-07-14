@@ -56,7 +56,28 @@ if (pkg) {
 const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
 ---
 
-<Layout title={pkg ? pkg.name + " | Paket Voda Tour & Event" : "Paket Tidak Ditemukan"} description={pkg?.description || ""} active="paket">
+<Layout title={pkg ? pkg.name + " | Paket Voda Tour & Event" : "Paket Tidak Ditemukan"}
+  description={pkg?.description || ""}
+  image={pkg?.gallery?.[0] ? U + "/assets/" + pkg.gallery[0] + "?width=1200&height=630&format=webp" : ""}
+  canonical={pkg ? "https://vodatour.event.id/paket/" + pkg.slug : ""}
+  jsonld={pkg ? JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": pkg.name,
+    "description": pkg.description,
+    "image": pkg.gallery?.length ? pkg.gallery.map(g => U + "/assets/" + g + "?width=800&format=webp") : [],
+    "url": "https://vodatour.event.id/paket/" + pkg.slug,
+    "brand": { "@type": "Brand", "name": "Voda Tour & Event" },
+    "offers": {
+      "@type": "AggregateOffer",
+      "priceCurrency": "IDR",
+      "lowPrice": Math.min(...pkg.price_tiers.map(t => t.price_per_pax)),
+      "highPrice": Math.max(...pkg.price_tiers.map(t => t.price_per_pax)),
+      "offerCount": pkg.price_tiers.length,
+      "availability": "https://schema.org/InStock"
+    }
+  }) : ""}
+  active="paket">
   <main>
     {err && (
       <section class="bg-navy-900"><div class="wrap py-[120px] text-center text-white/80">
