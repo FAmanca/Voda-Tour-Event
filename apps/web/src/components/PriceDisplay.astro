@@ -17,16 +17,19 @@ interface Props {
 
 const { amount, prefix, format = 'full', perPax = false, size = 'md' } = Astro.props;
 
-const fmt = new Intl.NumberFormat('id-ID');
-const formatted = amount >= 1000000
-  ? `Rp ${fmt.format(amount)}`
-  : `Rp ${fmt.format(amount)}`;
+const showContact = amount === 0 || !amount;
 
-const shortForm = amount >= 1000000
+const fmt = new Intl.NumberFormat('id-ID');
+
+const formatted = !showContact && amount >= 1000000
+  ? `Rp ${fmt.format(amount)}`
+  : !showContact ? `Rp ${fmt.format(amount)}` : '';
+
+const shortForm = !showContact && amount >= 1000000
   ? `${(amount / 1000000).toFixed(1).replace('.0', '')}jt`
-  : amount >= 1000
+  : !showContact && amount >= 1000
     ? `${Math.round(amount / 1000)}rb`
-    : String(amount);
+    : '';
 
 const sizeClass: Record<string, string> = {
   sm: 'text-sm',
@@ -35,9 +38,15 @@ const sizeClass: Record<string, string> = {
 };
 ---
 
-<span class:list={["font-[family-name:var(--font-display)] font-bold text-orange-600", sizeClass[size]]}>
-  {prefix && <span class="text-[0.75em] font-medium text-body-light">{prefix} </span>}
-  {format === 'full' || format === 'auto' ? formatted : shortForm}
-  {format === 'auto' && <span class="text-[0.75em] text-body-light"> ({shortForm})</span>}
-  {perPax && <span class="text-[0.7em] font-medium text-body-light"> /pax</span>}
-</span>
+{#if showContact}
+  <span class:list={["font-[family-name:var(--font-display)] font-bold text-navy-500 text-[14px]", sizeClass[size]]}>
+    Hubungi Kami
+  </span>
+{:else}
+  <span class:list={["font-[family-name:var(--font-display)] font-bold text-orange-600", sizeClass[size]]}>
+    {prefix && <span class="text-[0.75em] font-medium text-body-light">{prefix} </span>}
+    {format === 'full' || format === 'auto' ? formatted : shortForm}
+    {format === 'auto' && <span class="text-[0.75em] text-body-light"> ({shortForm})</span>}
+    {perPax && <span class="text-[0.7em] font-medium text-body-light"> /pax</span>}
+  </span>
+{/if}

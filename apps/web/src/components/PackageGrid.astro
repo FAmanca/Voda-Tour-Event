@@ -55,7 +55,7 @@ if (!packages) {
           title={pkg.name}
           description={pkg.description}
           slug={pkg.slug}
-          priceFrom={pkg.price_tiers ? Math.min(...pkg.price_tiers.map(t => t.price_per_pax)) : undefined}
+          priceFrom={pkg.price_tiers ? Math.min(...pkg.price_tiers.map(t => t.price_per_pax).filter(p => p !== null && p > 0)) : undefined}
           icon={'fa-solid fa-map-marked-alt'}
           category={'wisata'}
           image={pkg.image ? `${import.meta.env.DIRECTUS_URL || 'http://localhost:8055'}/assets/${pkg.image}?width=400&height=250&fit=cover` : undefined}

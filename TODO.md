@@ -321,7 +321,7 @@ Buat di Directus Admin Panel:
   - Activity Types: 5 ✅
   - Settings: 9 entries ✅
   - Images: need upload via admin panel (Directus files API requires multipart)
-- [ ] Upload sample images via Directus file manager — perlu manual via admin panel
+- [ ] Upload sample images via Directus file manager — masih perlu manual via admin panel
 
 ---
 
