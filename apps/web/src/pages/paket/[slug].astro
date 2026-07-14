@@ -71,8 +71,8 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
     "offers": {
       "@type": "AggregateOffer",
       "priceCurrency": "IDR",
-      "lowPrice": Math.min(...pkg.price_tiers.map(t => t.price_per_pax)),
-      "highPrice": Math.max(...pkg.price_tiers.map(t => t.price_per_pax)),
+      "lowPrice": Math.min(...pkg.price_tiers.map(t => t.price_per_pax).filter((p): p is number => p !== null && p > 0)),
+      "highPrice": Math.max(...pkg.price_tiers.map(t => t.price_per_pax).filter((p): p is number => p !== null && p > 0)),
       "offerCount": pkg.price_tiers.length,
       "availability": "https://schema.org/InStock"
     }

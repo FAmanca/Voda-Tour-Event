@@ -210,7 +210,7 @@ function renderResults(container, packages, loading, error) {
     + packages.map(function (pkg) {
         var dname = pkg.destination_id && typeof pkg.destination_id === 'object' ? pkg.destination_id.name : '';
         var sprice = pkg.price_tiers && pkg.price_tiers.length
-          ? Math.min.apply(Math, pkg.price_tiers.map(function (t) { return t.price_per_pax; })) : null;
+          ? Math.min.apply(Math, pkg.price_tiers.map(function (t) { return t.price_per_pax; }).filter(function (p) { return p !== null && p > 0; })) : null;
         var imgHtml = (!pkg.gallery || !pkg.gallery[0])
           ? '<div class="w-full h-full flex items-center justify-center bg-navy-100 text-navy-300"><i class="fa-regular fa-image text-3xl"></i></div>'
           : '<img src="' + DIRECTUS_URL + '/assets/' + pkg.gallery[0] + '?width=600&height=400&fit=cover&format=webp&quality=85" alt="' + esc(pkg.name) + '" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />';
@@ -236,26 +236,78 @@ function initAutocomplete(inputId, dropdownId, opts) {
   if (!input || !dropdown) return;
 
   var minChars = opts.minChars || 2;
+
+  // Track whether user selected from dropdown
+  input.dataset.searchValid = 'false';
+  input.dataset.searchLabel = '';
+
+  function markValid(name) {
+    input.dataset.searchValid = 'true';
+    input.dataset.searchLabel = name;
+  }
+
+  function showInputError(msg) {
+    var err = document.getElementById(inputId + '-error');
+    if (!err) {
+      err = document.createElement('p');
+      err.id = inputId + '-error';
+      err.className = 'text-[11px] text-red-400 mt-[4px]';
+      input.parentNode.appendChild(err);
+    }
+    err.textContent = msg;
+    input.style.borderColor = 'rgba(248,113,113,0.5)';
+  }
+
+  function clearInputError() {
+    var err = document.getElementById(inputId + '-error');
+    if (err) err.remove();
+    input.style.borderColor = '';
+  }
+
   var debouncedFetch = window.__debounce(function () {
     var val = input.value.trim();
     if (val.length < minChars) { dropdown.classList.add('hidden'); return; }
     getSuggestions(val).then(function (items) { renderDropdown(items); });
   }, 250);
 
-  input.addEventListener('input', debouncedFetch);
+  input.addEventListener('input', function () {
+    input.dataset.searchValid = 'false';
+    input.dataset.searchLabel = '';
+    clearInputError();
+    debouncedFetch();
+  });
+
   input.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') { dropdown.classList.add('hidden'); return; }
     if (e.key === 'ArrowDown') { e.preventDefault(); moveSelect(1); return; }
     if (e.key === 'ArrowUp') { e.preventDefault(); moveSelect(-1); return; }
     if (e.key === 'Enter') {
       var sel = dropdown.querySelector('[data-selected]');
-      if (sel) { e.preventDefault(); input.value = sel.dataset.name; dropdown.classList.add('hidden'); input.focus(); }
+      if (sel) {
+        e.preventDefault();
+        input.value = sel.dataset.name;
+        markValid(sel.dataset.name);
+        dropdown.classList.add('hidden');
+        clearInputError();
+        if (opts.onSelect) opts.onSelect(sel.dataset.name);
+      } else {
+        e.preventDefault();
+        showInputError('Harap pilih destinasi atau paket dari daftar yang muncul');
+      }
     }
   });
+
   dropdown.addEventListener('click', function (e) {
     var btn = e.target.closest('[data-index]');
-    if (btn) { input.value = btn.dataset.name; dropdown.classList.add('hidden'); input.focus(); }
+    if (btn) {
+      input.value = btn.dataset.name;
+      markValid(btn.dataset.name);
+      dropdown.classList.add('hidden');
+      clearInputError();
+      if (opts.onSelect) opts.onSelect(btn.dataset.name);
+    }
   });
+
   document.addEventListener('click', function (e) {
     if (!input.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.add('hidden');
   });
