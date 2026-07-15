@@ -25,7 +25,7 @@ const iv = initialValues || {};
   <form id="search-form" method="GET" action="/cari">
     <!-- Text Search with Autocomplete -->
     <div class="relative mb-[16px]">
-      <label class="block text-[12px] font-semibold text-white/70 mb-[6px] uppercase tracking-[0.08em]">Cari Destinasi atau Paket</label>
+      <label for="search-input" class="block text-[12px] font-semibold text-white/80 mb-[6px] uppercase tracking-[0.08em]">Cari Destinasi atau Paket</label>
       <div class="relative">
         <i class="fa-solid fa-search absolute left-[18px] top-1/2 -translate-y-1/2 text-white/30 text-[16px] pointer-events-none"></i>
         <input
@@ -35,14 +35,14 @@ const iv = initialValues || {};
           placeholder="Ketik nama destinasi atau paket..."
           value={iv.q || ""}
           autocomplete="off"
-          class="w-full h-[52px] pl-[48px] pr-[100px] text-[15px] rounded-[var(--radius-lg)] bg-white/10 border-2 border-white/15 text-white placeholder:text-white/30 outline-none focus:border-orange-500 transition-all"
+          class="w-full h-[52px] pl-[48px] pr-[100px] text-[15px] rounded-[var(--radius-lg)] bg-white/10 border-2 border-white/15 text-white placeholder:text-white/50 outline-none focus:border-orange-500 transition-all"
         />
         <button type="submit" class="absolute right-[6px] top-1/2 -translate-y-1/2 h-[40px] px-[18px] bg-orange-500 hover:bg-orange-600 text-white font-semibold text-[13px] rounded-[var(--radius-sm)] transition-colors flex items-center gap-[6px] max-sm:hidden">
           Cari <i class="fa-solid fa-arrow-right text-[12px]"></i>
         </button>
       </div>
       <!-- Autocomplete Dropdown -->
-      <div id="search-dropdown" class="hidden absolute left-0 right-0 top-full mt-[4px] bg-white rounded-[var(--radius-lg)] shadow-[0_12px_40px_rgba(0,0,0,0.15)] border border-navy-100 z-[999] overflow-hidden max-h-[320px] overflow-y-auto"></div>
+      <div id="search-dropdown" role="listbox" class="hidden absolute left-0 right-0 top-full mt-[4px] bg-white rounded-[var(--radius-lg)] shadow-[0_12px_40px_rgba(0,0,0,0.15)] border border-navy-100 z-[999] overflow-hidden max-h-[320px] overflow-y-auto"></div>
     </div>
 
     <!-- Filters: tanggal + kegiatan + pax -->
@@ -50,9 +50,9 @@ const iv = initialValues || {};
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-[14px] items-end">
         <!-- Tanggal -->
         <div>
-          <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[5px]">Tanggal Berangkat</label>
+          <label for="search-form-date" class="block text-[11px] font-semibold text-white/80 uppercase tracking-[0.08em] mb-[5px]">Tanggal Berangkat</label>
           <div class="relative">
-            <input type="date" name="tanggal" value={iv.travelDate || ""}
+            <input type="date" name="tanggal" id="search-form-date" value={iv.travelDate || ""}
               class="w-full h-[44px] px-[12px] text-[13px] rounded-[var(--radius-sm)] bg-white/10 border border-white/15 text-white outline-none focus:border-orange-500 transition-colors [color-scheme:dark]" />
             <i class="fa-regular fa-calendar absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
           </div>
@@ -60,9 +60,9 @@ const iv = initialValues || {};
 
         <!-- Kegiatan -->
         <div>
-          <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[5px]">Kegiatan</label>
+          <label for="search-form-kegiatan" class="block text-[11px] font-semibold text-white/80 uppercase tracking-[0.08em] mb-[5px]">Kegiatan</label>
           <div class="relative">
-            <select name="kegiatan" class="w-full h-[44px] px-[12px] text-[13px] rounded-[var(--radius-sm)] bg-white/10 border border-white/15 text-white/80 outline-none focus:border-orange-500 transition-colors appearance-none">
+            <select name="kegiatan" id="search-form-kegiatan" class="w-full h-[44px] px-[12px] text-[13px] rounded-[var(--radius-sm)] bg-white/10 border border-white/15 text-white/90 outline-none focus:border-orange-500 transition-colors appearance-none">
               <option value="" class="text-navy-800">Semua Kegiatan</option>
               {activityTypes.map((a) => (
                 <option value={a.slug} selected={iv.activityType === a.slug} class="text-navy-800">{a.name}</option>
@@ -74,10 +74,10 @@ const iv = initialValues || {};
 
         <!-- Pax -->
         <div>
-          <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[5px]">Jumlah Peserta</label>
+          <label for="search-form-pax" class="block text-[11px] font-semibold text-white/80 uppercase tracking-[0.08em] mb-[5px]">Jumlah Peserta</label>
           <div class="relative">
-            <input type="number" name="pax" min="1" placeholder="Mis: 10" value={iv.paxCount || ""}
-              class="w-full h-[44px] px-[12px] text-[13px] rounded-[var(--radius-sm)] bg-white/10 border border-white/15 text-white placeholder:text-white/30 outline-none focus:border-orange-500 transition-colors" />
+            <input type="number" name="pax" id="search-form-pax" min="1" placeholder="Mis: 10" value={iv.paxCount || ""}
+              class="w-full h-[44px] px-[12px] text-[13px] rounded-[var(--radius-sm)] bg-white/10 border border-white/15 text-white placeholder:text-white/50 outline-none focus:border-orange-500 transition-colors" />
             <i class="fa-solid fa-user absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
           </div>
         </div>

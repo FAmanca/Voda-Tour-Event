@@ -21,7 +21,7 @@ const { destinations = [], activityTypes = [] } = Astro.props;
   <form id="search-card-form" method="GET" action="/cari" class="space-y-[14px]">
     <!-- Text Search with Autocomplete -->
     <div class="relative">
-      <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[6px]">Cari Destinasi atau Paket</label>
+      <label for="search-card-input" class="block text-[11px] font-semibold text-white/80 uppercase tracking-[0.08em] mb-[6px]">Cari Destinasi atau Paket</label>
       <div class="relative">
         <input
           id="search-card-input"
@@ -29,29 +29,29 @@ const { destinations = [], activityTypes = [] } = Astro.props;
           name="q"
           placeholder="Ketik nama destinasi atau paket..."
           autocomplete="off"
-          class="w-full h-[44px] bg-white/10 border border-white/15 rounded-[var(--radius-sm)] pl-[38px] pr-[14px] text-white text-[13px] placeholder:text-white/30 outline-none focus:border-orange-600/50 transition-all"
+          class="w-full h-[44px] bg-white/10 border border-white/15 rounded-[var(--radius-sm)] pl-[38px] pr-[14px] text-white text-[13px] placeholder:text-white/50 outline-none focus:border-orange-600/50 transition-all"
         />
         <i class="fa-solid fa-search absolute left-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
         <!-- Autocomplete Dropdown -->
-        <div id="search-card-dropdown" class="hidden absolute left-0 right-0 top-full mt-[4px] bg-white rounded-[var(--radius-lg)] shadow-[0_12px_40px_rgba(0,0,0,0.15)] border border-navy-100 z-[999] overflow-hidden max-h-[320px] overflow-y-auto"></div>
+        <div id="search-card-dropdown" role="listbox" class="hidden absolute left-0 right-0 top-full mt-[4px] bg-white rounded-[var(--radius-lg)] shadow-[0_12px_40px_rgba(0,0,0,0.15)] border border-navy-100 z-[999] overflow-hidden max-h-[320px] overflow-y-auto"></div>
       </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-[14px]">
       <!-- Travel Date -->
       <div>
-        <label class="flex min-h-[32px] items-end text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[6px]">Tanggal Berangkat</label>
+        <label for="search-date" class="flex min-h-[32px] items-end text-[11px] font-semibold text-white/80 uppercase tracking-[0.08em] mb-[6px]">Tanggal Berangkat</label>
         <div class="relative">
-          <input type="date" name="tanggal" class="custom-date-input w-full h-[44px] bg-white/10 border border-white/15 rounded-[var(--radius-sm)] pl-[14px] pr-[38px] text-white text-[13px] outline-none focus:border-orange-600/50 transition-all [color-scheme:dark] cursor-pointer" />
+          <input type="date" name="tanggal" id="search-date" class="custom-date-input w-full h-[44px] bg-white/10 border border-white/15 rounded-[var(--radius-sm)] pl-[14px] pr-[38px] text-white text-[13px] outline-none focus:border-orange-600/50 transition-all [color-scheme:dark] cursor-pointer" />
           <i class="fa-regular fa-calendar absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
         </div>
       </div>
 
       <!-- Kegiatan -->
       <div>
-        <label class="flex min-h-[32px] items-end text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[6px]">Jenis Kegiatan</label>
+        <label for="search-kegiatan" class="flex min-h-[32px] items-end text-[11px] font-semibold text-white/80 uppercase tracking-[0.08em] mb-[6px]">Jenis Kegiatan</label>
         <div class="relative">
-          <select name="kegiatan" class="w-full h-[44px] bg-white/10 border border-white/15 rounded-[var(--radius-sm)] pl-[14px] pr-[38px] text-white text-[13px] outline-none focus:border-orange-600/50 transition-all appearance-none cursor-pointer">
+          <select name="kegiatan" id="search-kegiatan" class="w-full h-[44px] bg-white/10 border border-white/15 rounded-[var(--radius-sm)] pl-[14px] pr-[38px] text-white text-[13px] outline-none focus:border-orange-600/50 transition-all appearance-none cursor-pointer">
             <option value="" class="text-navy-800">Semua Kegiatan</option>
             {activityTypes.map((a) => (
               <option value={a.slug} class="text-navy-800">{a.name}</option>
@@ -63,9 +63,9 @@ const { destinations = [], activityTypes = [] } = Astro.props;
 
       <!-- Pax -->
       <div>
-        <label class="flex min-h-[32px] items-end text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[6px]">Jumlah Peserta</label>
+        <label for="search-pax" class="flex min-h-[32px] items-end text-[11px] font-semibold text-white/80 uppercase tracking-[0.08em] mb-[6px]">Jumlah Peserta</label>
         <div class="relative">
-          <input type="number" name="pax" min="1" placeholder="Mis: 10" class="w-full h-[44px] bg-white/10 border border-white/15 rounded-[var(--radius-sm)] pl-[14px] pr-[38px] text-white text-[13px] placeholder:text-white/30 outline-none focus:border-orange-600/50 transition-all" />
+          <input type="number" name="pax" id="search-pax" min="1" placeholder="Mis: 10" class="w-full h-[44px] bg-white/10 border border-white/15 rounded-[var(--radius-sm)] pl-[14px] pr-[38px] text-white text-[13px] placeholder:text-white/50 outline-none focus:border-orange-600/50 transition-all" />
           <i class="fa-solid fa-user absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
         </div>
       </div>

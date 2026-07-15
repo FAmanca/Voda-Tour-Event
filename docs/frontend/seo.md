@@ -30,6 +30,7 @@
 ### Global
 - Sitemap.xml otomatis dari Astro
 - robots.txt
-- Responsive images (srcset)
+- **Resource Hints & LCP:** Aset hero/utama wajib menggunakan `fetchpriority="high"` dan `rel="preload"`.
+- Format gambar LCP statis menggunakan AVIF multi-resolusi via `srcset`. Gambar dari API menggunakan WebP.
 - Gzip / Brotli compression (Nginx)
 - Lazy loading untuk gambar di bawah fold

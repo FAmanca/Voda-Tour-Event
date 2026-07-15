@@ -14,12 +14,19 @@ const { settings = {}, destinations = [], activityTypes = [] } = Astro.props;
 const phone = settings.whatsapp || settings.phone || '6282112345678';
 ---
 
-<section class="relative overflow-hidden">
+<section class="relative overflow-hidden" aria-label="Hero">
   <img
-    src="/images/beach.avif"
+    src="/images/beach-1920.avif"
+    srcset="/images/beach-480.avif 480w, /images/beach-768.avif 768w, /images/beach-1920.avif 1920w"
+    sizes="100vw"
+    width="1920"
+    height="1080"
     alt=""
     class="absolute inset-0 w-full h-full object-cover"
     aria-hidden="true"
+    loading="eager"
+    fetchpriority="high"
+    decoding="async"
   />
   <div class="absolute inset-0 bg-gradient-to-r from-[rgba(10,59,82,0.92)] via-[rgba(10,59,82,0.5)] to-[rgba(10,59,82,0.05)]" aria-hidden="true"></div>
 

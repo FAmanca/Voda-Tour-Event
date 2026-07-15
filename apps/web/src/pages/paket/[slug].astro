@@ -91,7 +91,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
       <!-- ===== HERO ===== -->
       <section class="relative min-h-[420px] max-lg:min-h-[360px] flex items-center overflow-hidden bg-navy-900">
         {pkg.gallery?.[0] ? (
-          <img src={getAssetUrl(pkg.gallery[0], { width: 1440, height: 600, format: "webp", quality: 85 })} alt={pkg.name} class="absolute inset-0 w-full h-full object-cover" loading="eager" />
+          <img src={getAssetUrl(pkg.gallery[0], { width: 1440, height: 600, format: "webp", quality: 85 })} alt={pkg.name} class="absolute inset-0 w-full h-full object-cover" loading="eager" fetchpriority="high" decoding="async" />
         ) : (
           <div class="absolute inset-0 bg-gradient-to-br from-navy-800 via-navy-900 to-[#0F2C4C] flex items-center justify-center">
             <div class="text-center text-navy-400"><i class="fa-regular fa-image text-[56px]"></i><p class="text-[13px] mt-[6px] font-medium">No Image</p></div>
@@ -140,7 +140,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
             )}
 
             {pkg.description && (
-              <p class="text-white/60 text-[15px] leading-relaxed mt-[18px] max-w-[580px] line-clamp-3">{pkg.description}</p>
+              <div class="text-white/60 text-[15px] leading-relaxed mt-[18px] max-w-[580px] line-clamp-3" set:html={pkg.description}></div>
             )}
           </div>
         </div>
@@ -171,7 +171,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
             <span class="text-[11px] font-semibold text-orange-500 uppercase tracking-[0.15em]">Tentang Paket Ini</span>
             <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] max-lg:text-[22px] font-bold mt-[8px]">{pkg.name}</h2>
             <div class="w-[40px] h-[3px] bg-orange-500 rounded-full mt-[12px]"></div>
-            <p class="text-navy-600 text-[15px] leading-[1.8] mt-[16px]">{pkg.description}</p>
+            <div class="text-navy-600 text-[15px] leading-[1.8] mt-[16px]" set:html={pkg.description}></div>
           </div>
         </div></section>
       )}
