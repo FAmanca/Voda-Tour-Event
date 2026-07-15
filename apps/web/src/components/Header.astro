@@ -13,12 +13,12 @@ interface Props {
 const { active, settings = {} } = Astro.props;
 
 const navItems = [
-  { slug: 'beranda', label: 'Beranda', url: '/' },
-  { slug: 'paket', label: 'Paket Wisata', url: '/paket' },
-  { slug: 'gathering', label: 'Gathering & Event', url: '/gathering' },
-  { slug: 'destinasi', label: 'Destinasi', url: '/destinasi' },
-  { slug: 'tentang', label: 'Tentang Kami', url: '/tentang' },
-  { slug: 'kontak', label: 'Kontak', url: '/kontak' },
+  { slug: 'beranda', label: 'Beranda', url: '/', icon: 'fa-solid fa-house' },
+  { slug: 'paket', label: 'Paket Wisata', url: '/paket', icon: 'fa-solid fa-suitcase-rolling' },
+  { slug: 'gathering', label: 'Gathering & Event', url: '/gathering', icon: 'fa-solid fa-people-group' },
+  { slug: 'destinasi', label: 'Destinasi', url: '/destinasi', icon: 'fa-solid fa-map-location-dot' },
+  { slug: 'tentang', label: 'Tentang Kami', url: '/tentang', icon: 'fa-solid fa-circle-info' },
+  { slug: 'kontak', label: 'Kontak', url: '/kontak', icon: 'fa-solid fa-headset' },
 ];
 
 const phone = settings.phone || '6282112345678';
@@ -75,106 +75,139 @@ const phoneDisplay = settings.phone
         </a>
 
         <!-- Burger -->
-        <button id="menu-toggle" class="lg:hidden flex items-center justify-center w-[40px] h-[40px] text-navy-800 text-[20px] bg-transparent border-none cursor-pointer" aria-label="Buka menu" aria-expanded="false">
+        <button id="menu-toggle" class="lg:hidden flex items-center justify-center w-[42px] h-[42px] text-navy-800 text-[20px] bg-navy-50 border-none rounded-[10px] cursor-pointer transition-colors hover:bg-navy-100 active:bg-navy-200" aria-label="Buka menu" aria-expanded="false">
           <i id="menu-icon" class="fa-solid fa-bars"></i>
         </button>
       </div>
 
     </div>
   </div>
-  <!-- Mobile Menu Overlay -->
-  <div id="menu-overlay" class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden" aria-hidden="true"></div>
+</header>
 
-  <!-- Mobile Menu Panel -->
-  <div id="menu-panel" class="fixed top-0 right-0 z-50 h-full w-[300px] max-w-[85vw] bg-white shadow-2xl translate-x-full transition-transform duration-300 ease-out lg:hidden flex flex-col">
-    <!-- Panel header -->
-    <div class="flex items-center justify-between px-[24px] h-[76px] border-b border-[--color-line] shrink-0">
-      <span class="font-[family-name:var(--font-display)] text-navy-800 text-[18px] font-bold">Menu</span>
-      <button id="menu-close" class="flex items-center justify-center w-[36px] h-[36px] text-navy-500 text-[18px] bg-navy-50 rounded-full border-none cursor-pointer transition-colors hover:bg-navy-100" aria-label="Tutup menu">
+<!-- Mobile Menu Overlay — MUST be outside <header> because backdrop-blur creates a containing block for fixed children -->
+<div id="menu-overlay" class="fixed inset-0 z-[998] bg-black/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden" aria-hidden="true"></div>
+
+<!-- Mobile Menu Panel -->
+<div id="menu-panel" class="fixed top-0 right-0 z-[999] h-full w-[300px] max-w-[85vw] bg-white shadow-2xl translate-x-full transition-transform duration-300 ease-out lg:hidden flex flex-col">
+
+  <!-- Panel header with logo -->
+  <div class="relative shrink-0 overflow-hidden">
+    <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-orange-500 via-orange-400 to-orange-300"></div>
+    <div class="flex items-center justify-between px-[24px] h-[76px]">
+      <a href="/" class="flex items-center gap-[10px] no-underline">
+        <img src="/images/VodaTravelIcon.webp" alt="Voda Tour & Event" class="h-[44px] w-auto" />
+      </a>
+      <button id="menu-close" class="flex items-center justify-center w-[38px] h-[38px] text-navy-400 text-[16px] bg-navy-50 rounded-[10px] border border-[--color-line] cursor-pointer transition-all hover:bg-navy-100 hover:text-navy-600 active:scale-95" aria-label="Tutup menu">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
-
-    <!-- Panel nav links -->
-    <nav class="flex-1 overflow-y-auto py-[16px] px-[24px]">
-      <ul class="list-none p-0 m-0 flex flex-col gap-[4px]">
-        {navItems.map((item) => (
-          <li>
-            <a
-              href={item.url}
-              class:list={[
-                'flex items-center justify-between px-[16px] py-[14px] rounded-[12px] text-[15px] font-semibold no-underline transition-colors duration-[0.15s]',
-                active === item.slug
-                  ? 'text-orange-600 bg-orange-50'
-                  : 'text-navy-800 hover:bg-navy-50',
-              ]}
-              data-nav-link
-            >
-              <span>{item.label}</span>
-              <i class="fa-solid fa-chevron-right text-[10px] opacity-30"></i>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-
-    <!-- Panel footer: phone -->
-    <div class="px-[24px] py-[20px] border-t border-[--color-line] shrink-0">
-      <a
-        href={`tel:${phone}`}
-        class="flex items-center gap-[12px] px-[16px] py-[12px] rounded-[12px] bg-navy-50 text-navy-800 no-underline font-medium text-[14px] transition-colors hover:bg-navy-100"
-      >
-        <i class="fa-solid fa-phone text-[14px] text-orange-600"></i>
-        {phoneDisplay}
-      </a>
-    </div>
   </div>
 
-  <!-- Mobile Menu Script -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var toggle = document.getElementById('menu-toggle');
-      var closeBtn = document.getElementById('menu-close');
-      var panel = document.getElementById('menu-panel');
-      var overlay = document.getElementById('menu-overlay');
-      var links = panel.querySelectorAll('[data-nav-link]');
-      var icon = document.getElementById('menu-icon');
+  <!-- Panel nav links -->
+  <nav class="flex-1 overflow-y-auto py-[20px] px-[16px]">
+    <p class="text-[10px] font-bold text-navy-300 uppercase tracking-[0.15em] px-[14px] mb-[10px]">Navigasi</p>
+    <ul class="list-none p-0 m-0 flex flex-col gap-[2px]">
+      {navItems.map((item) => (
+        <li>
+          <a
+            href={item.url}
+            class:list={[
+              'flex items-center gap-[14px] px-[14px] py-[13px] rounded-[12px] text-[14px] font-semibold no-underline transition-all duration-[0.15s] group',
+              active === item.slug
+                ? 'text-orange-600 bg-gradient-to-r from-orange-50 to-orange-50/50 border-l-[3px] border-orange-500'
+                : 'text-navy-700 hover:bg-navy-50/80 hover:text-navy-900 border-l-[3px] border-transparent',
+            ]}
+            data-nav-link
+          >
+            <div class:list={[
+              'w-[34px] h-[34px] rounded-[10px] flex items-center justify-center text-[13px] shrink-0 transition-colors',
+              active === item.slug
+                ? 'bg-orange-500 text-white shadow-[0_4px_12px_rgba(238,125,15,0.3)]'
+                : 'bg-navy-50 text-navy-400 group-hover:bg-navy-100 group-hover:text-navy-600',
+            ]}>
+              <i class={item.icon}></i>
+            </div>
+            <span class="flex-1">{item.label}</span>
+            <i class:list={[
+              'fa-solid fa-chevron-right text-[9px] transition-transform group-hover:translate-x-[2px]',
+              active === item.slug ? 'text-orange-400' : 'text-navy-200',
+            ]}></i>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
 
-      function openMenu() {
-        panel.classList.remove('translate-x-full');
-        overlay.classList.remove('opacity-0', 'pointer-events-none');
-        toggle.setAttribute('aria-expanded', 'true');
-        toggle.setAttribute('aria-label', 'Tutup menu');
-        icon.className = 'fa-solid fa-xmark';
-        document.body.style.overflow = 'hidden';
-      }
+  <!-- Panel footer: CTA + phone -->
+  <div class="px-[16px] py-[20px] border-t border-[--color-line] shrink-0 space-y-[10px] bg-navy-50/50">
+    <a
+      href={`https://wa.me/${phone}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="flex items-center justify-center gap-[10px] w-full py-[13px] bg-gradient-to-r from-green-600 to-green-500 text-white rounded-[12px] font-semibold text-[14px] no-underline shadow-[0_8px_20px_-6px_rgba(22,163,74,0.4)] transition-all hover:shadow-[0_12px_24px_-6px_rgba(22,163,74,0.5)] hover:-translate-y-[1px] active:translate-y-0"
+    >
+      <i class="fa-brands fa-whatsapp text-[18px]"></i>
+      Chat via WhatsApp
+    </a>
+    <a
+      href={`tel:${phone}`}
+      class="flex items-center justify-center gap-[8px] w-full py-[11px] bg-white text-navy-700 rounded-[12px] font-medium text-[13px] no-underline border border-[--color-line] transition-colors hover:bg-navy-50"
+    >
+      <i class="fa-solid fa-phone text-[12px] text-orange-500"></i>
+      {phoneDisplay}
+    </a>
+  </div>
+</div>
 
-      function closeMenu() {
-        panel.classList.add('translate-x-full');
-        overlay.classList.add('opacity-0', 'pointer-events-none');
-        toggle.setAttribute('aria-expanded', 'false');
-        toggle.setAttribute('aria-label', 'Buka menu');
-        icon.className = 'fa-solid fa-bars';
-        document.body.style.overflow = '';
-      }
+<!-- Mobile Menu Script -->
+<script>
+  function setupMenu() {
+    var toggle = document.getElementById('menu-toggle');
+    var closeBtn = document.getElementById('menu-close');
+    var panel = document.getElementById('menu-panel');
+    var overlay = document.getElementById('menu-overlay');
+    if (!toggle || !panel || !overlay) return;
+    var links = panel.querySelectorAll('[data-nav-link]');
+    var icon = document.getElementById('menu-icon');
 
-      toggle.addEventListener('click', function () {
-        if (panel.classList.contains('translate-x-full')) openMenu();
-        else closeMenu();
-      });
+    function openMenu() {
+      panel.classList.remove('translate-x-full');
+      overlay.classList.remove('opacity-0', 'pointer-events-none');
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-label', 'Tutup menu');
+      if (icon) icon.className = 'fa-solid fa-xmark';
+      document.body.style.overflow = 'hidden';
+    }
 
-      closeBtn.addEventListener('click', closeMenu);
-      overlay.addEventListener('click', closeMenu);
+    function closeMenu() {
+      panel.classList.add('translate-x-full');
+      overlay.classList.add('opacity-0', 'pointer-events-none');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Buka menu');
+      if (icon) icon.className = 'fa-solid fa-bars';
+      document.body.style.overflow = '';
+    }
 
-      // Close on link click
+    toggle.addEventListener('click', function () {
+      if (panel.classList.contains('translate-x-full')) openMenu();
+      else closeMenu();
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+    overlay.addEventListener('click', closeMenu);
+
+    // Close on link click
+    if (links) {
       links.forEach(function (link) {
         link.addEventListener('click', closeMenu);
       });
+    }
 
-      // Close on Escape
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && !panel.classList.contains('translate-x-full')) closeMenu();
-      });
+    // Close on Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !panel.classList.contains('translate-x-full')) closeMenu();
     });
-  </script>
-</header>
+  }
+
+  setupMenu();
+</script>
