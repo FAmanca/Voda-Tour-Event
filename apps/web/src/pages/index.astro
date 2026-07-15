@@ -69,9 +69,9 @@ try {
     <FeatureStrip />
 
     <!-- 3.3 + 3.4 PackageGrid -->
-    <section id="paket" class="wrap py-[90px] max-lg:py-[60px] my-[500px]">
-      <div class="grid grid-cols-1 lg:grid-cols-5 gap-[30px] lg:gap-[40px] items-start">
-        <div>
+    <section id="paket" class="py-[90px] max-lg:py-[60px]">
+      <div class="wrap">
+        <div class="max-lg:text-center max-lg:mb-[32px]">
           <SectionHeader
             eyebrow="PAKET PILIHAN"
             title="Destinasi & Paket Favorit"
@@ -79,7 +79,7 @@ try {
             layout="default"
           />
         </div>
-        <div class="lg:col-span-4">
+        <div class="mt-[32px] lg:mt-[40px]">
           {fetchError ? (
             <div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[16px] text-red-700 text-[14px]">
               <i class="fa-solid fa-circle-exclamation mr-[8px]"></i>
