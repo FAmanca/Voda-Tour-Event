@@ -10,15 +10,7 @@ import CTABand from "../../components/CTABand.astro";
 import { getAssetUrl } from "../../lib/directus";
 import { getStartingPrice, formatPrice } from "../../lib/utils";
 
-export async function getStaticPaths() {
-  const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-  let pkgs = [];
-  try {
-    const r = await fetch(U + "/items/packages?fields=slug&filter[status][_eq]=published");
-    if (r.ok) { const j = await r.json(); pkgs = j.data || []; }
-  } catch {}
-  return pkgs.map((p) => ({ params: { slug: p.slug } }));
-}
+// SSR — no getStaticPaths needed
 
 const { slug } = Astro.params;
 const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
