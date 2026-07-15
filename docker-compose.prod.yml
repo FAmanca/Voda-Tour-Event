@@ -60,7 +60,7 @@ services:
       SECRET: ${DIRECTUS_SECRET}
 
       # Admin
-      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL:-admin@vodaevent.id}
+      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL:-admin@vodatrip.id}
       ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
 
       # Redis Cache
@@ -74,7 +74,7 @@ services:
 
       # CORS & Rate Limit
       CORS_ENABLED: "true"
-      CORS_ORIGIN: ${CORS_ORIGIN:-https://vodaevent.id,https://www.vodaevent.id}
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://vodatrip.id,https://www.vodatrip.id}
       RATE_LIMITER_ENABLED: "true"
       RATE_LIMITER_STORE: "memory"
 
@@ -93,14 +93,14 @@ services:
       dockerfile: infrastructure/docker/web/Dockerfile
       args:
         - DIRECTUS_URL=http://directus:8055
-        - PUBLIC_DIRECTUS_URL=${PUBLIC_DIRECTUS_URL:-http://api.vodaevent.id}
+        - PUBLIC_DIRECTUS_URL=${PUBLIC_DIRECTUS_URL:-http://api.vodatrip.id}
     container_name: voda-web-prod
     restart: always
     depends_on:
       - directus
     environment:
       - DIRECTUS_URL=http://directus:8055
-      - PUBLIC_DIRECTUS_URL=${PUBLIC_DIRECTUS_URL:-http://api.vodaevent.id}
+      - PUBLIC_DIRECTUS_URL=${PUBLIC_DIRECTUS_URL:-http://api.vodatrip.id}
     networks:
       - voda_net
 

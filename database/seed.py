@@ -312,7 +312,7 @@ def seed_settings():
         {"key": "site_name", "value": "Voda Tour & Event", "description": "Nama situs"},
         {"key": "site_description", "value": "Perjalanan Berkesan, Momen Tak Terlupakan — Voda Tour & Event adalah mitra perjalanan wisata, gathering, dan event organizer terpercaya di Indonesia.", "description": "Deskripsi situs untuk SEO"},
         {"key": "wa_number", "value": "6281234567890", "description": "Nomor WhatsApp bisnis"},
-        {"key": "email", "value": "info@vodaevent.id", "description": "Email kontak"},
+        {"key": "email", "value": "info@vodatrip.id", "description": "Email kontak"},
         {"key": "phone", "value": "(021) 1234-5678", "description": "Nomor telepon kantor"},
         {"key": "address", "value": "Jl. Contoh No. 123, Jakarta Selatan, Indonesia", "description": "Alamat kantor"},
         {"key": "instagram", "value": "https://instagram.com/vodatour.event", "description": "Akun Instagram"},

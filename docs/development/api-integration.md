@@ -6,7 +6,7 @@ Directus menyediakan REST API yang langsung bisa digunakan oleh Astro tanpa perl
 
 ```
 http://localhost:8055  (development)
-https://api.vodaevent.id  (production)
+https://api.vodatrip.id  (production)
 ```
 
 ## Public Role
@@ -256,7 +256,7 @@ export async function POST({ request }) {
   "data": [
     { "key": "site_name", "value": "Voda Tour & Event" },
     { "key": "whatsapp", "value": "6281234567890" },
-    { "key": "email", "value": "hello@vodaevent.id" },
+    { "key": "email", "value": "hello@vodatrip.id" },
     { "key": "address", "value": "Jakarta, Indonesia" },
     { "key": "instagram", "value": "@vodaevent" }
   ]

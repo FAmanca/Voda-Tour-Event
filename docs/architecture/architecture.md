@@ -12,7 +12,7 @@
 +-------------------+     +------------------------+
 |   Astro (SSR)     |     |  Directus Admin Panel  |
 |   Website Publik  |     |  (domain.com/directus) |
-|   vodaevent.id    |     +----------+-------------+
+|   vodatrip.id    |     +----------+-------------+
 +-------------------+                |
           |                          |
           v                          v

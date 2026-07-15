@@ -139,7 +139,7 @@ pnpm dev          # → http://localhost:4321
 
 # 4. Buka Directus admin
 # → http://localhost:8055
-# Login: admin@vodaevent.id / admin123
+# Login: admin@vodatrip.id / admin123
 # Bikin collections: regions, destinations, packages, activity_types, dll
 ```
 
