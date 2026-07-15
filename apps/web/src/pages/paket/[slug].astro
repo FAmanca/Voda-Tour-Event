@@ -30,6 +30,13 @@ try {
   }
 } catch { err = true; }
 
+let settings = {};
+try {
+  const r = await fetch(U + "/items/settings");
+  if (r.ok) { const j = await r.json(); if (j.data) j.data.forEach((s) => { settings[s.key] = s.value; }); }
+} catch {}
+const waNum = settings.wa_number || settings.whatsapp || "6282112345678";
+
 const dname = pkg ? (typeof pkg.destination_id === "object" ? pkg.destination_id?.name : "") : "";
 const dslug = pkg ? (typeof pkg.destination_id === "object" ? pkg.destination_id?.slug : "") : "";
 // Activity types untuk badges (via junction table)
@@ -156,7 +163,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
             </div>
             <div class="flex items-center gap-[10px] w-full sm:w-auto justify-between sm:justify-end">
               {sprice && <span class="text-navy-700 text-[13px] font-semibold">Mulai <strong class="text-orange-600 text-[16px]">{formatPrice(sprice)}</strong>/org</span>}
-              <WaButton variant="primary" message={"Halo Voda! Saya tertarik dengan paket " + pkg.name + " (" + pkg.duration + ") di " + dname + "."} class="shrink-0 text-[12.5px] px-[18px] py-[9px]">
+              <WaButton phone={waNum} variant="primary" message={encodeURIComponent(`Halo Voda Tour & Event, saya tertarik dengan paket ${pkg.name}.`)} class="shrink-0 text-[12.5px] px-[18px] py-[9px]">
                 <i class="fa-brands fa-whatsapp"></i>Pesan
               </WaButton>
             </div>
@@ -246,7 +253,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
         <h2 class="font-[family-name:var(--font-display)] text-white text-[26px] max-lg:text-[22px] font-bold">Tertarik dengan Paket Ini?</h2>
         <p class="text-white/60 text-[14px] mt-[8px] max-w-[400px] mx-auto">Hubungi kami via WhatsApp untuk konsultasi gratis.</p>
         <div class="mt-[24px] flex flex-wrap justify-center gap-[12px]">
-          <WaButton variant="primary" message={"Halo Voda! Saya tertarik dengan paket " + pkg.name + " (" + pkg.duration + ") di " + dname + "."}>
+          <WaButton phone={waNum} variant="primary" message={encodeURIComponent(`Halo Voda Tour & Event, saya tertarik dengan paket ${pkg.name}.`)}>
             <i class="fa-brands fa-whatsapp"></i>Pesan via WhatsApp
           </WaButton>
           <a href="/kontak" class="inline-flex items-center gap-[8px] bg-white/10 text-white rounded-[999px] px-[24px] py-[12px] font-semibold text-[13px] no-underline border border-white/20 transition-all hover:bg-white/20">
@@ -290,7 +297,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
         </div></section>
       )}
 
-      <CTABand />
+      <CTABand ctaUrl={"https://wa.me/" + waNum + "?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20tertarik%20untuk%20konsultasi%20mengenai%20trip%20dan%20event."} />
     </>}
   </main>
 </Layout>

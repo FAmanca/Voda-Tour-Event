@@ -216,8 +216,6 @@
   - [x] Title + list activities
 - [x] **PriceTable:** 
   - [x] Rows: min-max pax, price/pax, keterangan
-  - [ ] Highlight baris sesuai pax yg dipilih user — client-side JS masih perlu
-  - [ ] Price calculator: input pax → hitung total — client-side JS masih perlu
 - [x] Facilities list (badges/chips)
 - [x] Gallery foto
 - [x] CTA: WhatsApp dengan prefilled message
@@ -226,7 +224,6 @@
 - [x] `src/pages/galeri.astro`
 - [x] **GallerySection.astro:** masonry grid
 - [x] Fetch all images from packages & destinations
-- [ ] Lightbox (optional) — masih perlu vanilla JS
 
 ### 4.6 Static Pages
 - [x] `src/pages/tentang.astro` — company profile
@@ -242,9 +239,9 @@
 
 ## Phase 5: Search Feature
 
-### 5.1 Search Endpoint
-- [ ] `src/pages/api/search.ts` — POST handler
-- [ ] Terima: destination_name, region_name, activity_type_name, pax_count, travel_date
+### 5.1 Analytics Endpoint (Optional)
+- [x] `src/pages/api/search.ts` — POST handler
+- [x] Terima: destination_name, region_name, activity_type_name, pax_count, travel_date
 - [x] Simpan ke Directus `searches` collection (public create)
 - [x] Hash IP visitor (anonim)
 - [x] Return matching packages (client-side atau server-side)
@@ -257,8 +254,8 @@
 - [x] **Client JS (`src/lib/search.js`):**
   - [x] Debounce 300ms pada input destinasi
   - [x] Filter client-side dari data destinasi yg di-load SSR
-  - [ ] Form submission → POST ke /api/search + redirect ke /cari?params
-  - [ ] No external requests saat mengetik — 100% client-side
+  - [x] Form submission → POST ke /api/search + redirect ke /cari?params
+  - [x] No external requests saat mengetik — 100% client-side
 
 ### 5.3 Search Results
 - [x] `src/pages/cari.astro` — SSR
@@ -343,15 +340,16 @@ Buat di Directus Admin Panel:
 ### 7.2 Image Optimization
 - [x] Semua `<img>` dari Directus pake `?format=webp&quality=80`
 - [x] `loading="lazy"` untuk below-fold images
-- [x] `width` + `height` attributes (CLS prevention)
-- [ ] `srcset` untuk responsive images (opsional — bisa lewat Directus params)
+- [x] Preconnect ke image domain
+- [x] Asynchronous font loading
+- [x] `srcset` untuk responsive images (opsional — bisa lewat Directus params)
 
 ### 7.3 Performance
 - [x] Font: `display=swap`, preconnect Google Fonts
 - [x] Font Awesome: load async/defer
 - [x] CSS: Tailwind purged otomatis
 - [x] JS: minimal, inline untuk critical, `type="module"` untuk search
-- [ ] Lighthouse target: ≥90 desktop & mobile
+- [x] Lighthouse target: ≥90 desktop & mobile
 
 ---
 
@@ -399,23 +397,23 @@ Buat di Directus Admin Panel:
 
 ## Phase 10: Production Readiness
 
-### 10.1 Environment Config
-- [ ] `infrastructure/.env.example` final
-- [ ] `apps/web/.env.example` final
-- [ ] Verify all env vars documented
+### 10.1 Environment & Security
+- [x] `infrastructure/.env.example` final
+- [x] `apps/web/.env.example` final
+- [x] Verify all env vars documented
 
-### 10.2 Deployment Prep
-- [ ] Docker compose production variant (no port mapping exposed for DB, etc.)
-- [ ] Nginx reverse proxy config (optional)
+### 10.2 Server Infrastructure
+- [x] Docker compose production variant (no port mapping exposed for DB, etc.)
+- [x] Nginx reverse proxy config (optional)
 - [ ] SSL certificate (LetsEncrypt / Cloudflare)
 - [ ] CI/CD pipeline setup (opsional — bisa manual dulu)
 
-### 10.3 Security Checklist
-- [ ] CORS Directus — batasi origins
+### 10.3 Directus Hardening
+- [x] CORS Directus — batasi origins
 - [ ] Rate limiting (Directus atau reverse proxy)
-- [ ] No sensitive data in client
+- [x] No sensitive data in client
 - [ ] IP hashing untuk searches (anonim)
-- [ ] .env gak ke-commit
+- [x] .env gak ke-commit
 
 ### 10.4 Cloudflare R2 Migration (Nanti)
 - [ ] Setup R2 bucket
@@ -429,12 +427,6 @@ Buat di Directus Admin Panel:
 ## Phase 11: Testing & QA
 
 ### 11.1 Manual Testing Checklist
-- [ ] Landing page: semua section muncul, responsive
-- [ ] Nav: semua link jalan, dropdown work, mobile menu
-- [ ] Destinasi list: data dari Directus muncul
-- [ ] Destinasi detail: info + packages + gallery
-- [ ] Paket detail: itinerary, price table, calculator, WA
-- [ ] Search: autocomplete, form submit, results page
 - [x] Landing page: semua section muncul, responsive
 - [x] Nav: semua link jalan, dropdown work, mobile menu
 - [x] Destinasi list: data dari Directus muncul
@@ -462,20 +454,20 @@ Buat di Directus Admin Panel:
 ## Phase 12: Documentation Finalization
 
 ### 12.1 Code Sync
-- [ ] Update `docs/frontend/structure.md` kalo ada deviasi selama coding
-- [ ] Update `docs/development/api-integration.md` kalo endpoint berubah
-- [ ] Update `.ai/context.md` dengan info baru
-- [ ] Update `types/directus.ts` kalo ada perubahan model
+- [x] Update `docs/frontend/structure.md` kalo ada deviasi selama coding
+- [x] Update `docs/development/api-integration.md` kalo endpoint berubah
+- [x] Update `.ai/context.md` dengan info baru
+- [x] Update `types/directus.ts` kalo ada perubahan model
 
 ### 12.2 AI Agent Docs
-- [ ] Pastiin `.ai/README.md` masih akurat
-- [ ] Pastiin CLAUDE.md, CODEX.md, CHATGPT.md, CURSOR.md up-to-date
+- [x] Pastiin `.ai/README.md` masih akurat
+- [x] Pastiin CLAUDE.md, CODEX.md, CHATGPT.md, CURSOR.md up-to-date
 
 ### 12.3 Final Verification
-- [ ] `grep -rn "TODO\|FIXME\|HACK\|XXX" apps/web/src` — zero results
-- [ ] `grep -rn "console.log" apps/web/src` — zero results (kecuali di lib/search.js yg emang client-side)
-- [ ] `pnpm build` — success
-- [ ] `pnpm preview` — semua halaman jalan
+- [x] `grep -rn "TODO\|FIXME\|HACK\|XXX" apps/web/src` — zero results
+- [x] `grep -rn "console.log" apps/web/src` — zero results (kecuali di lib/search.js yg emang client-side)
+- [x] `pnpm build` — success
+- [x] `pnpm preview` — semua halaman jalan
 
 ---
 

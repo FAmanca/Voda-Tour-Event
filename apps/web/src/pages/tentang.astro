@@ -10,6 +10,7 @@ try {
 const year = settings.established_year || "2024";
 const clients = settings.total_clients || "500+";
 const dest_count = settings.destinations_served || "15+";
+const waNum = settings.wa_number || settings.whatsapp || "6282112345678";
 ---
 
 <Layout title="Tentang Kami | Voda Tour & Event" description="Kenali Voda Tour & Event." active="tentang">
@@ -65,7 +66,7 @@ const dest_count = settings.destinations_served || "15+";
     <section class="bg-gradient-to-r from-navy-900 via-navy-800 to-[#0F2C4C] py-[60px]"><div class="wrap text-center">
       <h2 class="font-[family-name:var(--font-display)] text-white text-[24px] font-bold">Siap Berpetualang?</h2>
       <p class="text-white/60 text-[14px] mt-[8px]">Hubungi kami dan rencanakan perjalanan impian Anda.</p>
-      <a href="/kontak" class="inline-flex items-center gap-[8px] mt-[20px] bg-orange-500 text-white rounded-[999px] px-[28px] py-[12px] font-semibold text-[14px] no-underline shadow-[0_10px_20px_-8px_rgba(238,125,15,0.4)] transition-all hover:-translate-y-[2px]">
+      <a href={`https://wa.me/${waNum}?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20tertarik%20untuk%20konsultasi%20mengenai%20trip%20perjalanan.`} target="_blank" class="inline-flex items-center gap-[8px] mt-[20px] bg-orange-500 text-white rounded-[999px] px-[28px] py-[12px] font-semibold text-[14px] no-underline shadow-[0_10px_20px_-8px_rgba(238,125,15,0.4)] transition-all hover:-translate-y-[2px]">
         <i class="fa-brands fa-whatsapp"></i>Hubungi Kami
       </a>
     </div></section>
