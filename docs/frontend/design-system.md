@@ -66,7 +66,7 @@ A warm, trustworthy travel/corporate-event brand: **deep navy authority** + **su
 ## 5. Components
 
 ### Navigation
-White sticky header, 88px tall, bottom hairline border. Logo = rotated navy square with orange plane glyph + wordmark (bold navy "VODA" / tracked-out orange "TOUR & EVENT"). Active nav link is orange with a 2.5px underline offset 10px below text. Header right side: outlined phone pill + solid orange WhatsApp CTA pill.
+White sticky header, 88px tall, bottom hairline border. Logo = optimized small WebP file (`VodaTravelIcon-small.webp`) lockup with orange plane glyph + wordmark. Active nav link is orange with a 2.5px underline offset 10px below text. Header right side: outlined phone pill + solid orange WhatsApp CTA pill.
 
 ### Hero
 Full-bleed gradient "photo" (never a flat color) with a two-column layout: copy left, floating dark **search/utility card** right, anchored with `margin-top` overlap so the next section's white card physically overlaps the hero bottom edge. This overlap is the page's signature move — it stitches the hero to the content below and gives the layout depth without a hard seam.
@@ -78,7 +78,7 @@ White rounded card (radius-lg, shadow-card) sitting on the overlap, 4-column ico
 Photo top (gradient block + circular icon badge pinned top-left, half-overlapping the photo edge), body with title, 2-line description, dashed divider, then a price row (`Mulai dari` micro-label + bold orange price) paired with a circular navy arrow button that turns orange on hover.
 
 ### Stats bar
-White floating card (`radius-lg`, `shadow-card`) dengan negative margin `-64px` overlap section sebelumnya — identik dengan FeatureStrip. 4-column horizontal grid: tiap item berisi 52px navy-800 solid circle icon (orange glyph) + bold navy number (28px/700) + label (14px/600) + optional sublabel muted. Testimonial tidak ada di komponen ini.
+Navy floating card (`bg-navy-900`, `radius-lg`, `shadow-card`) dengan negative margin overlap. Horizontal grid: section kiri berisi 4-kolom stats (icon outline/circle + bold number + label), section kanan berisi testimonial card (quote, avatar, rating).
 
 ### CTA band
 Deep navy/teal gradient "photo" section, top border rule, heading + supporting line, a row of small feature chips (rounded-square icon tile + 2-line label), ending in the primary orange CTA button. This is the mirror of the hero — same DNA (gradient photo, orange CTA, icon+label chips) used to close the page.
@@ -104,3 +104,12 @@ Bahasa Indonesia, warm and direct. Eyebrows in ALL CAPS orange (e.g. "PAKET PILI
 4. Cards default to `--radius-md` + `--shadow-soft`; only hero-adjacent floating panels get `--radius-lg` + `--shadow-card`.
 5. One italic Playfair phrase maximum per page — it's a rare accent, not a running style.
 6. Icons are always inside a shape (circle or rounded-square), never floating bare next to text.
+7. **Grid Layouts:** Ketika `SectionHeader` disandingkan dengan konten (seperti `PackageGrid`), gunakan wrapper `grid-cols-5` pada desktop (`lg`) agar *side-by-side*.
+
+---
+
+## 9. Accessibility (A11y) & Performance Wajib
+
+1. **Screen Reader:** Ikon FontAwesome wajib di-_hide_ secara semantik menggunakan `speak: never` di CSS global, dan semua tombol/link yang hanya berupa ikon wajib memiliki atribut `aria-label`.
+2. **Interaktivitas:** Elemen navigasi overlay (seperti menu mobile) wajib menggunakan `role="dialog"` dan `aria-expanded` untuk _toggles_.
+3. **Optimasi Gambar (LCP):** Format gambar statis wajib **AVIF** muti-resolusi (di-generate via FFmpeg, mis. `beach-480.avif`). Untuk konten dinamis API Directus, gunakan WebP. Aset LCP di-*preload* menggunakan `fetchpriority="high"`.

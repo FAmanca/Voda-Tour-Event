@@ -23,7 +23,7 @@ const {
 } = Astro.props;
 
 const siteUrl = "https://vodatour.event.id";
-const defaultImage = siteUrl + "/images/VodaTravelIcon.png";
+const defaultImage = siteUrl + "/images/VodaTravelIcon.webp";
 const ogImage = image || defaultImage;
 ---
 
@@ -36,6 +36,12 @@ const ogImage = image || defaultImage;
     <!-- SEO -->
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#0B2340" />
+
+    <!-- LCP Preload -->
+    <link rel="preload" as="image" href="/images/beach-1920.avif" type="image/avif" media="(min-width: 769px)" />
+    <link rel="preload" as="image" href="/images/beach-768.avif" type="image/avif" media="(min-width: 481px) and (max-width: 768px)" />
+    <link rel="preload" as="image" href="/images/beach-480.avif" type="image/avif" media="(max-width: 480px)" />
 
   <!-- Open Graph -->
   <meta property="og:title" content={title} />
@@ -55,31 +61,19 @@ const ogImage = image || defaultImage;
   <!-- Canonical -->
   {canonical && <link rel="canonical" href={canonical} />}
 
-  <!-- Open Graph -->
-  <meta property="og:title" content={title} />
-  <meta property="og:description" content={description} />
-  <meta property="og:image" content={ogImage} />
-  <meta property="og:url" content={canonical || siteUrl} />
-  <meta property="og:type" content="website" />
-  <meta property="og:locale" content="id_ID" />
-  <meta property="og:site_name" content="Voda Tour & Event" />
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content={title} />
-  <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content={ogImage} />
-
-  <!-- Canonical -->
-  {canonical && <link rel="canonical" href={canonical} />}
-
-    <!-- Google Fonts -->
+    <!-- Google Fonts (Optimized Async) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Playfair+Display:ital@1&family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Playfair+Display:ital@1&family=Inter:wght@400;600&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Playfair+Display:ital@1&family=Inter:wght@400;600&display=swap" />
+    </noscript>
 
     <!-- Font Awesome 6 (async, non-blocking) -->
     <link
@@ -98,7 +92,7 @@ const ogImage = image || defaultImage;
   "@type": "Organization",
   "name": "Voda Tour & Event",
   "url": "https://vodatour.event.id",
-  "logo": "https://vodatour.event.id/images/VodaTravelIcon.png",
+  "logo": "https://vodatour.event.id/images/VodaTravelIcon.webp",
   "contactPoint": {
     "@type": "ContactPoint",
     "telephone": "+62-821-1234-5678",
@@ -114,8 +108,15 @@ const ogImage = image || defaultImage;
     {jsonld && <script type="application/ld+json" set:html={jsonld}></script>}
 </head>
   <body class="pt-[88px] max-lg:pt-[76px]">
+    <!-- Skip to Content Link for Accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-orange-600 focus:text-white focus:px-6 focus:py-3 focus:rounded-[8px] focus:shadow-lg focus:text-[14px] focus:font-semibold focus:outline-none focus:ring-2 focus:ring-orange-400">
+      Langsung ke konten utama
+    </a>
+
     <Header {active} />
-    <slot />
+    <div id="main-content">
+      <slot />
+    </div>
     <Footer />
   </body>
 </html>

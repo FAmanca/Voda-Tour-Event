@@ -58,13 +58,13 @@ const initials = testimonial.name
               </div>
               <div class="min-w-0 flex flex-col justify-center">
                 {/* Stat Value */}
-                <div class="font-[family-name:var(--font-display)] text-white font-bold text-[18px] lg:text-[28px] leading-none shrink-0">
+                <div class="font-[family-name:var(--font-display)] text-white font-bold text-[20px] lg:text-[28px] leading-none shrink-0">
                   {s.value}
                 </div>
                 {/* Stat Label */}
-                <div class="text-white/70 text-[9px] lg:text-[12px] leading-tight mt-[2px] lg:mt-[4px] font-medium whitespace-normal">
-                  <span class="block text-white/80">{s.label}</span>
-                  {s.sublabel && <span class="block text-white/50 text-[8px] lg:text-[11px] mt-[1px]">{s.sublabel}</span>}
+                <div class="text-white/80 text-[10px] lg:text-[12px] leading-tight mt-[2px] lg:mt-[4px] font-medium whitespace-normal">
+                  <span class="block text-white/90">{s.label}</span>
+                  {s.sublabel && <span class="block text-white/60 text-[9px] lg:text-[11px] mt-[1px]">{s.sublabel}</span>}
                 </div>
               </div>
             </div>
@@ -76,7 +76,7 @@ const initials = testimonial.name
         <div class="flex items-start gap-[16px] max-w-[360px] shrink-0 max-lg:max-w-full max-lg:pt-[20px] max-lg:border-t max-lg:border-white/10">
           <i class="fa-solid fa-quote-left text-orange-500 text-[24px] shrink-0 mt-[2px] opacity-80"></i>
           <div class="min-w-0 flex-1">
-            <p class="text-white text-[13px] leading-relaxed italic opacity-90">
+            <p class="text-white text-[14px] leading-relaxed italic opacity-90">
               "{testimonial.quote}"
             </p>
             
@@ -96,15 +96,16 @@ const initials = testimonial.name
               )}
               
               <div class="min-w-0">
-                <div class="flex items-center gap-[2px] text-orange-500 text-[10px]">
+                {/* Rating Stars */}
+                <div class="flex gap-[4px] text-orange-400 text-[12px] lg:text-[13px]" aria-label={`Rating ${testimonial.rating ?? 5} bintang`}>
                   {Array.from({ length: testimonial.rating ?? 5 }).map(() => (
-                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star" aria-hidden="true"></i>
                   ))}
                 </div>
                 <div class="text-white text-[13px] font-semibold leading-tight mt-[3px] truncate">
                   {testimonial.name}
                 </div>
-                <div class="text-white/60 text-[11px] leading-tight mt-[1px] truncate">
+                <div class="text-white/70 text-[12px] leading-tight mt-[1px] truncate">
                   {testimonial.role}
                 </div>
               </div>

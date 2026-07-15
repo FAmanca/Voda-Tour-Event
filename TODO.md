@@ -435,21 +435,27 @@ Buat di Directus Admin Panel:
 - [ ] Destinasi detail: info + packages + gallery
 - [ ] Paket detail: itinerary, price table, calculator, WA
 - [ ] Search: autocomplete, form submit, results page
-- [ ] Galeri: grid masonry work
-- [ ] Sitemap: semua URL tercakup
-- [ ] 404: muncul kalo akses slug acak
-- [ ] Directus admin: bisa CRUD data, Public Read works
+- [x] Landing page: semua section muncul, responsive
+- [x] Nav: semua link jalan, dropdown work, mobile menu
+- [x] Destinasi list: data dari Directus muncul
+- [x] Destinasi detail: info + packages + gallery
+- [x] Paket detail: itinerary, price table, calculator, WA
+- [x] Search: autocomplete, form submit, results page
+- [x] Galeri: grid masonry work
+- [x] Sitemap: semua URL tercakup
+- [x] 404: muncul kalo akses slug acak
+- [x] Directus admin: bisa CRUD data, Public Read works
 
 ### 11.2 Lighthouse
-- [ ] Desktop ≥ 90
-- [ ] Mobile ≥ 90
-- [ ] Core Web Vitals: LCP, FID, CLS
+- [x] Desktop ≥ 90
+- [x] Mobile ≥ 90
+- [x] Core Web Vitals: LCP, FID, CLS
 
 ### 11.3 Accessibility
-- [ ] Tab order: nav → content → footer
-- [ ] Focus visible: all interactive elements
-- [ ] Color contrast: WCAG AA
-- [ ] Screen reader: semantic HTML, aria-label
+- [x] Tab order: nav → content → footer
+- [x] Focus visible: all interactive elements
+- [x] Color contrast: WCAG AA
+- [x] Screen reader: semantic HTML, aria-label
 
 ---
 

@@ -7,15 +7,7 @@ import PackageCard from "../../components/PackageCard.astro";
 import CTABand from "../../components/CTABand.astro";
 import GallerySection from "../../components/GallerySection.astro";
 
-export async function getStaticPaths() {
-  const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-  let destinations = [];
-  try {
-    const res = await fetch(DIRECTUS_URL + "/items/destinations?fields=slug&filter[status][_eq]=published");
-    if (res.ok) { const json = await res.json(); destinations = json.data || []; }
-  } catch {}
-  return destinations.map((d) => ({ params: { slug: d.slug } }));
-}
+// SSR — no getStaticPaths needed
 
 const { slug } = Astro.params;
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";

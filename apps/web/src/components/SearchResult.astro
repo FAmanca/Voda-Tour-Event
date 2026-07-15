@@ -2,8 +2,7 @@
 // Voda Tour & Event — SearchResult Component (Redesigned)
 // Client-side rendered search results with loading/empty/error states
 
-import type { Destination } from "../types/directus";
-import { getAssetUrl } from "../lib/directus";
+import PackageCard from "./PackageCard.astro";
 
 interface Props {
   packages: any[];
@@ -22,10 +21,10 @@ interface Props {
   )}
 
   {Astro.props.loading && (
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[20px]">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">
       {[1, 2, 3, 4, 5, 6].map((i) => (
-        <div class="rounded-[var(--radius-lg)] bg-navy-50 animate-pulse overflow-hidden" key={i}>
-          <div class="aspect-[16/10] bg-navy-100"></div>
+        <div class="rounded-[var(--radius-md)] bg-navy-50 animate-pulse overflow-hidden" key={i}>
+          <div class="h-[150px] bg-navy-100"></div>
           <div class="p-[18px] space-y-[10px]">
             <div class="h-[16px] bg-navy-100 rounded w-[70%]"></div>
             <div class="h-[12px] bg-navy-50 rounded w-[50%]"></div>
@@ -42,51 +41,14 @@ interface Props {
   {!Astro.props.loading && !Astro.props.error && (
     <>
       {Astro.props.totalCount !== undefined && (
-        <p class="text-navy-500 text-[14px] mb-[20px]">
+        <p class="text-navy-500 text-[13px] mb-[20px]">
           <strong class="text-navy-800">{Astro.props.totalCount}</strong> paket ditemukan
         </p>
       )}
 
       {Astro.props.packages.length > 0 ? (
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[20px]">
-          {Astro.props.packages.map((pkg) => {
-            const dname = typeof pkg.destination_id === "object" ? pkg.destination_id?.name : "";
-            const dslug = typeof pkg.destination_id === "object" ? pkg.destination_id?.slug : "";
-            const sprice = pkg.price_tiers && pkg.price_tiers.length > 0
-              ? Math.min(...pkg.price_tiers.map(t => t.price_per_pax).filter(p => p !== null && p > 0))
-              : null;
-            const hasImg = pkg.gallery && pkg.gallery.length > 0;
-            const destUrl = "/destinasi/" + dslug;
-            return (
-              <a href={"/paket/" + pkg.slug} class="group block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden no-underline hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-[4px]">
-                <div class="aspect-[16/10] overflow-hidden bg-navy-100">
-                  {hasImg ? (
-                    <img src={getAssetUrl(pkg.gallery[0], { width: 600, height: 400, format: "webp", quality: 85 })} alt={pkg.name} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />
-                  ) : (
-                    <div class="w-full h-full flex items-center justify-center text-navy-300">
-                      <i class="fa-regular fa-image text-[32px]"></i>
-                    </div>
-                  )}
-                </div>
-                <div class="p-[18px]">
-                  <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[15px] font-semibold group-hover:text-orange-500 transition-colors line-clamp-2">{pkg.name}</h3>
-                  {dname && (
-                    <p class="text-navy-400 text-[12.5px] mt-[4px]">
-                      <i class="fa-solid fa-location-dot text-orange-400 text-[10px] mr-[4px]"></i>{dname}
-                    </p>
-                  )}
-                  <div class="flex items-center justify-between mt-[10px] pt-[10px] border-t border-navy-100">
-                    <span class="text-navy-400 text-[12px]"><i class="fa-regular fa-clock mr-[4px]"></i>{pkg.duration}</span>
-                    {sprice ? (
-                      <span class="text-orange-600 text-[13px] font-bold">{new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(sprice)}</span>
-                    ) : (
-                      <span class="text-orange-500 text-[12px] font-semibold group-hover:translate-x-[2px] transition-transform">Detail <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
-                    )}
-                  </div>
-                </div>
-              </a>
-            );
-          })}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">
+          {Astro.props.packages.map((pkg) => <PackageCard package={pkg} showDestination />)}
         </div>
       ) : (
         <div class="text-center py-[60px]">

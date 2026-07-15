@@ -63,12 +63,12 @@ Contoh price_tiers:
 
 | Requirement | Target |
 |-------------|--------|
-| PageSpeed (Lighthouse) | ≥ 90 (desktop & mobile) |
-| Image format | WebP, auto-resize via Directus |
-| Font loading | swap + preconnect |
-| JavaScript | Zero JS on page load (kecuali search) |
-| SEO | Meta tags, JSON-LD, sitemap.xml, semantic HTML |
-| Accessibility | Contrast WCAG AA, aria-label, keyboard nav |
+| PageSpeed (Lighthouse) | ≥ 90 (desktop & mobile) ✅ |
+| Image format | WebP via Directus, AVIF multi-resolusi untuk aset statis LCP ✅ |
+| Font loading | swap + preconnect ✅ |
+| JavaScript | Zero JS on page load (kecuali search) ✅ |
+| SEO | Meta tags, JSON-LD, sitemap.xml, semantic HTML ✅ |
+| Accessibility | Contrast WCAG AA, aria-label, keyboard nav, ARIA roles ✅ |
 
 ## Struktur Folder
 

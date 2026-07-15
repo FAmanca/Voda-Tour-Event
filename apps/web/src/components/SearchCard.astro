@@ -20,8 +20,8 @@ const { destinations = [], activityTypes = [] } = Astro.props;
 
   <form id="search-card-form" method="GET" action="/cari" class="space-y-[14px]">
     <!-- Text Search with Autocomplete -->
-    <div class="sm:col-span-2 relative">
-      <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[6px]">Cari Destinasi atau Paket</label>
+    <div class="relative">
+      <label for="search-card-input" class="block text-[11px] font-semibold text-white/80 uppercase tracking-[0.08em] mb-[6px]">Cari Destinasi atau Paket</label>
       <div class="relative">
         <input
           id="search-card-input"
@@ -29,32 +29,32 @@ const { destinations = [], activityTypes = [] } = Astro.props;
           name="q"
           placeholder="Ketik nama destinasi atau paket..."
           autocomplete="off"
-          class="w-full bg-white/10 border border-white/15 rounded-[var(--radius-sm)] px-[14px] py-[11px] pl-[38px] text-white text-[13px] placeholder:text-white/30 outline-none focus:border-orange-600/50 transition-colors"
+          class="w-full h-[44px] bg-white/10 border border-white/15 rounded-[var(--radius-sm)] pl-[38px] pr-[14px] text-white text-[13px] placeholder:text-white/50 outline-none focus:border-orange-600/50 transition-all"
         />
         <i class="fa-solid fa-search absolute left-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
         <!-- Autocomplete Dropdown -->
-        <div id="search-card-dropdown" class="hidden absolute left-0 right-0 top-full mt-[4px] bg-white rounded-[var(--radius-lg)] shadow-[0_12px_40px_rgba(0,0,0,0.15)] border border-navy-100 z-[999] overflow-hidden max-h-[320px] overflow-y-auto"></div>
+        <div id="search-card-dropdown" role="listbox" class="hidden absolute left-0 right-0 top-full mt-[4px] bg-white rounded-[var(--radius-lg)] shadow-[0_12px_40px_rgba(0,0,0,0.15)] border border-navy-100 z-[999] overflow-hidden max-h-[320px] overflow-y-auto"></div>
       </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-[14px]">
       <!-- Travel Date -->
       <div>
-        <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[6px]">Tanggal Berangkat</label>
+        <label for="search-date" class="flex min-h-[32px] items-end text-[11px] font-semibold text-white/80 uppercase tracking-[0.08em] mb-[6px]">Tanggal Berangkat</label>
         <div class="relative">
-          <input type="date" name="tanggal" class="w-full bg-white/10 border border-white/15 rounded-[var(--radius-sm)] px-[14px] py-[11px] text-white text-[13px] outline-none focus:border-orange-600/50 transition-colors [color-scheme:dark]" />
+          <input type="date" name="tanggal" id="search-date" class="custom-date-input w-full h-[44px] bg-white/10 border border-white/15 rounded-[var(--radius-sm)] pl-[14px] pr-[38px] text-white text-[13px] outline-none focus:border-orange-600/50 transition-all [color-scheme:dark] cursor-pointer" />
           <i class="fa-regular fa-calendar absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
         </div>
       </div>
 
       <!-- Kegiatan -->
       <div>
-        <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[6px]">Kegiatan</label>
+        <label for="search-kegiatan" class="flex min-h-[32px] items-end text-[11px] font-semibold text-white/80 uppercase tracking-[0.08em] mb-[6px]">Jenis Kegiatan</label>
         <div class="relative">
-          <select name="kegiatan" class="w-full bg-white/10 border border-white/15 rounded-[var(--radius-sm)] px-[14px] py-[11px] text-white/70 text-[13px] outline-none focus:border-orange-600/50 transition-colors appearance-none">
+          <select name="kegiatan" id="search-kegiatan" class="w-full h-[44px] bg-white/10 border border-white/15 rounded-[var(--radius-sm)] pl-[14px] pr-[38px] text-white text-[13px] outline-none focus:border-orange-600/50 transition-all appearance-none cursor-pointer">
             <option value="" class="text-navy-800">Semua Kegiatan</option>
             {activityTypes.map((a) => (
-              <option value={a.slug}>{a.name}</option>
+              <option value={a.slug} class="text-navy-800">{a.name}</option>
             ))}
           </select>
           <i class="fa-solid fa-chevron-down absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[10px] pointer-events-none"></i>
@@ -63,21 +63,29 @@ const { destinations = [], activityTypes = [] } = Astro.props;
 
       <!-- Pax -->
       <div>
-        <label class="block text-[11px] font-semibold text-white/60 uppercase tracking-[0.08em] mb-[6px]">Jumlah Peserta</label>
+        <label for="search-pax" class="flex min-h-[32px] items-end text-[11px] font-semibold text-white/80 uppercase tracking-[0.08em] mb-[6px]">Jumlah Peserta</label>
         <div class="relative">
-          <input type="number" name="pax" min="1" placeholder="Mis: 10" class="w-full bg-white/10 border border-white/15 rounded-[var(--radius-sm)] px-[14px] py-[11px] text-white text-[13px] placeholder:text-white/30 outline-none focus:border-orange-600/50 transition-colors" />
+          <input type="number" name="pax" id="search-pax" min="1" placeholder="Mis: 10" class="w-full h-[44px] bg-white/10 border border-white/15 rounded-[var(--radius-sm)] pl-[14px] pr-[38px] text-white text-[13px] placeholder:text-white/50 outline-none focus:border-orange-600/50 transition-all" />
           <i class="fa-solid fa-user absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
         </div>
       </div>
     </div>
 
     <!-- Submit -->
-    <button type="submit" class="w-full py-[12px] bg-orange-600 hover:bg-orange-500 text-white font-semibold text-[14px] rounded-[var(--radius-sm)] transition-colors flex items-center justify-center gap-[8px]">
+    <button type="submit" class="w-full h-[44px] bg-orange-600 hover:bg-orange-500 text-white font-semibold text-[14px] rounded-[var(--radius-sm)] transition-all flex items-center justify-center gap-[8px] cursor-pointer hover:translate-y-[-2px] active:translate-y-[0px] shadow-sm">
       <i class="fa-solid fa-search"></i>
       Cari Paket
     </button>
   </form>
 </div>
+
+<style>
+  /* Hide Chrome's native calendar icon completely to prevent alignment/vertical shifting issues */
+  .custom-date-input::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+  }
+</style>
 
 <script>
 import { initAutocomplete, logSearch } from "../lib/search";
@@ -87,10 +95,63 @@ document.addEventListener("DOMContentLoaded", function () {
   // Init autocomplete
   initAutocomplete("search-card-input", "search-card-dropdown");
 
+  // Open date picker when the input is clicked
+  var dateInput = document.querySelector(".custom-date-input");
+  if (dateInput) {
+    dateInput.addEventListener("click", function () {
+      try {
+        this.showPicker();
+      } catch (e) {}
+    });
+  }
+
+  // Validation helper
+  function showFieldError(inputEl, msg) {
+    var key = (inputEl.id || inputEl.name || 'field') + '-error';
+    var err = document.getElementById(key);
+    if (!err) {
+      err = document.createElement('p');
+      err.id = key;
+      err.className = 'text-[11px] text-red-400 mt-[4px]';
+      inputEl.parentNode.appendChild(err);
+    }
+    err.textContent = msg;
+    inputEl.style.borderColor = 'rgba(248,113,113,0.5)';
+  }
+
+  function clearFieldError(inputEl) {
+    var key = (inputEl.id || inputEl.name || 'field') + '-error';
+    var err = document.getElementById(key);
+    if (err) err.remove();
+    inputEl.style.borderColor = '';
+  }
+
   // Log search on form submit
   var form = document.getElementById("search-card-form");
   if (form) {
     form.addEventListener("submit", function (e) {
+      // === VALIDATION ===
+      var valid = true;
+      var qInput = document.querySelector("#search-card-form input[name='q']");
+      var kegSelect = document.querySelector("#search-card-form select[name='kegiatan']");
+
+      if (qInput && qInput.dataset.searchValid !== 'true') {
+        showFieldError(qInput, 'Harap pilih destinasi atau paket dari daftar yang muncul');
+        valid = false;
+      } else if (qInput) {
+        clearFieldError(qInput);
+      }
+
+      if (kegSelect && !kegSelect.value) {
+        showFieldError(kegSelect, 'Harap pilih jenis kegiatan');
+        valid = false;
+      } else if (kegSelect) {
+        clearFieldError(kegSelect);
+      }
+
+      if (!valid) { e.preventDefault(); return; }
+
+      // === PROCEED ===
       e.preventDefault();
       var fd = new FormData(form);
       var q = fd.get("q") || "";
@@ -103,11 +164,9 @@ document.addEventListener("DOMContentLoaded", function () {
         travel_date: tgl,
         pax_count: pax ? parseInt(pax) : null,
       }).then(function () {
-        // Navigate after log completes
         var sp = new URLSearchParams();
         if (q) sp.set("q", q);
         if (keg) sp.set("kegiatan", keg);
-        // tanggal tidak dikirim ke URL (hanya untuk log)
         if (pax) sp.set("pax", pax);
         window.location.href = "/cari?" + sp.toString();
       });
