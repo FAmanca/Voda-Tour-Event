@@ -44,16 +44,18 @@ Fitur pencarian multi-step (deep search) untuk membantu visitor menemukan paket 
 Autocomplete input dengan debounce (300ms):
 
 ```html
-<div class="search-autocomplete relative">
+<div class="search-autocomplete relative" role="combobox" aria-expanded="false" aria-haspopup="listbox">
   <input
     type="text"
     id="searchInput"
     placeholder="Cari destinasi..."
     class="w-full px-4 py-3 rounded-lg border"
     autocomplete="off"
+    aria-autocomplete="list"
+    aria-controls="searchResults"
   />
-  <div id="searchResults" class="absolute top-full left-0 right-0 bg-white border rounded-lg mt-1 shadow-lg hidden">
-    <!-- Hasil pencarian di-render oleh JavaScript -->
+  <div id="searchResults" role="listbox" class="absolute top-full left-0 right-0 bg-white border rounded-lg mt-1 shadow-lg hidden">
+    <!-- Hasil pencarian di-render oleh JavaScript dengan role="option" -->
   </div>
 </div>
 ```
