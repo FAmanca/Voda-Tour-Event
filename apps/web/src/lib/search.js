@@ -249,10 +249,11 @@ function renderResults(container, packages, loading, error) {
           ? Math.min.apply(Math, pkg.price_tiers.map(function (t) { return t.price_per_pax; }).filter(function (p) { return p !== null && p > 0; }))
           : null;
         
-        var image = pkg.image
-          ? DIRECTUS_URL + '/assets/' + pkg.image + '?width=400&height=250&fit=cover'
-          : (pkg.gallery && pkg.gallery[0]
-            ? DIRECTUS_URL + '/assets/' + pkg.gallery[0] + '?width=400&height=250&fit=cover'
+        var publicApiUrl = window.__DIRECTUS_URL__ || 'http://localhost:8055';
+        var image = pkg.image 
+          ? publicApiUrl + '/assets/' + pkg.image + '?width=400&height=250&fit=cover'
+          : (pkg.gallery && pkg.gallery.length > 0 
+            ? publicApiUrl + '/assets/' + pkg.gallery[0] + '?width=400&height=250&fit=cover'
             : null);
           
         var destName = pkg.destination_id && typeof pkg.destination_id === 'object'

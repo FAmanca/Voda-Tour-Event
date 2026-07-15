@@ -186,7 +186,7 @@ export function getAssetUrl(uuid: string, opts?: {
   format?: "webp" | "avif" | "jpeg";
   quality?: number;
 }): string {
-  let url = `${DIRECTUS_URL}/assets/${uuid}`;
+  let url = `${import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055"}/assets/${uuid}`;
   if (opts) {
     const qs = new URLSearchParams();
     if (opts.width) qs.set("width", String(opts.width));

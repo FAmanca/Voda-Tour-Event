@@ -1,0 +1,152 @@
+version: "3.8"
+
+services:
+  # =======================================================
+  # POSTGRESQL DATABASE
+  # =======================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: voda-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-voda}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-voda123}
+      POSTGRES_DB: ${POSTGRES_DB:-voda_travel}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-voda} -d ${POSTGRES_DB:-voda_travel}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - voda_net
+
+  # =======================================================
+  # REDIS CACHE
+  # =======================================================
+  redis:
+    image: redis:7-alpine
+    container_name: voda-redis-prod
+    restart: always
+    volumes:
+      - redis_data_prod:/data
+    networks:
+      - voda_net
+
+  # =======================================================
+  # DIRECTUS CMS
+  # =======================================================
+  directus:
+    image: directus/directus:11
+    container_name: voda-directus-prod
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      # Database
+      DB_CLIENT: pg
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${POSTGRES_DB:-voda_travel}
+      DB_USER: ${POSTGRES_USER:-voda}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-voda123}
+
+      # Secrets
+      KEY: ${DIRECTUS_KEY}
+      SECRET: ${DIRECTUS_SECRET}
+
+      # Admin
+      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL:-admin@vodaevent.id}
+      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
+
+      # Redis Cache
+      CACHE_ENABLED: "true"
+      CACHE_STORE: "local"
+      
+      # Storage (Local for now, will be replaced with R2)
+      STORAGE_LOCATIONS: ${STORAGE_LOCATIONS:-local}
+      STORAGE_LOCAL_DRIVER: ${STORAGE_LOCAL_DRIVER:-local}
+      STORAGE_LOCAL_ROOT: ${STORAGE_LOCAL_ROOT:-/directus/uploads}
+
+      # CORS & Rate Limit
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://vodaevent.id,https://www.vodaevent.id}
+      RATE_LIMITER_ENABLED: "true"
+      RATE_LIMITER_STORE: "memory"
+
+    volumes:
+      - directus_uploads:/directus/uploads
+      - directus_database_prod:/directus/database
+    networks:
+      - voda_net
+
+  # =======================================================
+  # ASTRO WEB APP
+  # =======================================================
+  web:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/web/Dockerfile
+      args:
+        - DIRECTUS_URL=http://directus:8055
+        - PUBLIC_DIRECTUS_URL=${PUBLIC_DIRECTUS_URL:-http://api.vodaevent.id}
+    container_name: voda-web-prod
+    restart: always
+    depends_on:
+      - directus
+    environment:
+      - DIRECTUS_URL=http://directus:8055
+      - PUBLIC_DIRECTUS_URL=${PUBLIC_DIRECTUS_URL:-http://api.vodaevent.id}
+    networks:
+      - voda_net
+
+  # =======================================================
+  # NGINX REVERSE PROXY
+  # =======================================================
+  nginx:
+    image: nginx:alpine
+    container_name: voda-nginx-prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - certbot_conf:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    depends_on:
+      - web
+      - directus
+    networks:
+      - voda_net
+
+  # =======================================================
+  # CERTBOT (For SSL)
+  # =======================================================
+  certbot:
+    image: certbot/certbot
+    container_name: voda-certbot-prod
+    volumes:
+      - certbot_conf:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+networks:
+  voda_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    external: true
+    name: infrastructure_postgres_data
+  redis_data_prod:
+  directus_uploads:
+    external: true
+    name: infrastructure_directus_uploads
+  directus_database_prod:
+  certbot_conf:
+  certbot_www:
