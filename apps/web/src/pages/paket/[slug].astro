@@ -57,14 +57,14 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
 
 <Layout title={pkg ? pkg.name + " | Paket Voda Tour & Event" : "Paket Tidak Ditemukan"}
   description={pkg?.description || ""}
-  image={pkg?.gallery?.[0] ? U + "/assets/" + pkg.gallery[0] + "?width=1200&height=630&format=webp" : ""}
+  image={pkg?.gallery?.[0] ? (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + pkg.gallery[0] + "?width=1200&height=630&format=webp" : ""}
   canonical={pkg ? "https://vodatour.event.id/paket/" + pkg.slug : ""}
   jsonld={pkg ? JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Product",
     "name": pkg.name,
     "description": pkg.description,
-    "image": pkg.gallery?.length ? pkg.gallery.map(g => U + "/assets/" + g + "?width=800&format=webp") : [],
+    "image": pkg.gallery?.length ? pkg.gallery.map(g => (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + g + "?width=800&format=webp") : [],
     "url": "https://vodatour.event.id/paket/" + pkg.slug,
     "brand": { "@type": "Brand", "name": "Voda Tour & Event" },
     "offers": {

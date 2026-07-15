@@ -22,6 +22,10 @@ RUN pnpm install --frozen-lockfile
 COPY apps/web ./
 
 # Build the Astro app
+ARG DIRECTUS_URL=http://directus:8055
+ENV DIRECTUS_URL=$DIRECTUS_URL
+ARG PUBLIC_DIRECTUS_URL=http://api.vodaevent.id
+ENV PUBLIC_DIRECTUS_URL=$PUBLIC_DIRECTUS_URL
 RUN pnpm run build
 
 # Stage 2: Production Runner

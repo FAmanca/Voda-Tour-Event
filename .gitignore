@@ -10,6 +10,7 @@ dist/
 # Environment
 .env
 .env.local
+.env.prod
 .env.*.local
 apps/web/.env
 infrastructure/.env

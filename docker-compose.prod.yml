@@ -13,7 +13,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-voda123}
       POSTGRES_DB: ${POSTGRES_DB:-voda_travel}
     volumes:
-      - postgres_data_prod:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-voda} -d ${POSTGRES_DB:-voda_travel}"]
       interval: 10s
@@ -65,8 +65,7 @@ services:
 
       # Redis Cache
       CACHE_ENABLED: "true"
-      CACHE_STORE: "redis"
-      CACHE_REDIS: "redis://redis:6379"
+      CACHE_STORE: "local"
       
       # Storage (Local for now, will be replaced with R2)
       STORAGE_LOCATIONS: ${STORAGE_LOCATIONS:-local}
@@ -77,11 +76,10 @@ services:
       CORS_ENABLED: "true"
       CORS_ORIGIN: ${CORS_ORIGIN:-https://vodaevent.id,https://www.vodaevent.id}
       RATE_LIMITER_ENABLED: "true"
-      RATE_LIMITER_STORE: "redis"
-      RATE_LIMITER_REDIS: "redis://redis:6379"
+      RATE_LIMITER_STORE: "memory"
 
     volumes:
-      - directus_uploads_prod:/directus/uploads
+      - directus_uploads:/directus/uploads
       - directus_database_prod:/directus/database
     networks:
       - voda_net
@@ -93,12 +91,16 @@ services:
     build:
       context: .
       dockerfile: infrastructure/docker/web/Dockerfile
+      args:
+        - DIRECTUS_URL=http://directus:8055
+        - PUBLIC_DIRECTUS_URL=${PUBLIC_DIRECTUS_URL:-http://api.vodaevent.id}
     container_name: voda-web-prod
     restart: always
     depends_on:
       - directus
     environment:
       - DIRECTUS_URL=http://directus:8055
+      - PUBLIC_DIRECTUS_URL=${PUBLIC_DIRECTUS_URL:-http://api.vodaevent.id}
     networks:
       - voda_net
 
@@ -138,9 +140,13 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data_prod:
+  postgres_data:
+    external: true
+    name: infrastructure_postgres_data
   redis_data_prod:
-  directus_uploads_prod:
+  directus_uploads:
+    external: true
+    name: infrastructure_directus_uploads
   directus_database_prod:
   certbot_conf:
   certbot_www:
