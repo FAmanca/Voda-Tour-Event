@@ -5,11 +5,17 @@
 interface Props {
   settings?: {
     site_name?: string;
-    whatsapp?: string;
-    phone?: string;
     email?: string;
-    address?: string;
+    phone?: string;
+    whatsapp?: string;
+    wa_number?: string;
     instagram?: string;
+    facebook?: string;
+    youtube?: string;
+    tiktok?: string;
+    threads?: string;
+    x?: string;
+    address?: string;
   };
 }
 
@@ -17,11 +23,16 @@ const { settings = {} } = Astro.props;
 
 const s = {
   site_name: settings.site_name || 'Voda Tour & Event',
-  whatsapp: settings.whatsapp || '6282112345678',
+  email: settings.email || 'info@vodaeventorganizer.id',
   phone: settings.phone || '6282112345678',
-  email: settings.email || 'hello@vodaevent.id',
-  instagram: settings.instagram || 'vodaevent',
-  address: settings.address || 'Bandung, Jawa Barat, Indonesia',
+  wa_number: settings.wa_number || settings.whatsapp || '6282112345678',
+  instagram: settings.instagram || 'voda.event',
+  facebook: settings.facebook || 'voda.event',
+  youtube: settings.youtube || '@vodaevent',
+  tiktok: settings.tiktok || '@voda.event',
+  threads: settings.threads || '@voda.event',
+  x: settings.x || 'voda_event',
+  address: settings.address || 'Ruko Travelindo, Jl. Pariwisata Raya No. 42, Kota Baru, 12345',
 };
 
 const navLinks = [
@@ -49,15 +60,24 @@ const navLinks = [
           Perjalanan berkesan, momen tak terlupakan. Spesialis private tour &amp; corporate event terpercaya sejak 2024.
         </p>
         <!-- Social Icons Row -->
-        <div class="flex items-center gap-[10px]">
-          <a href={`https://instagram.com/${s.instagram}`} target="_blank" rel="noopener noreferrer" class="w-[36px] h-[36px] rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:bg-orange-500 hover:text-white hover:border-orange-500 hover:-translate-y-[2px] transition-all duration-[0.2s] focus-visible:ring-2 focus-visible:ring-orange-500" aria-label="Instagram">
+        <div class="flex flex-wrap gap-[10px]">
+          <a href={`https://facebook.com/${s.facebook}`} target="_blank" rel="noopener noreferrer" class="w-[36px] h-[36px] rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:bg-[#1877F2] hover:text-white hover:border-[#1877F2] hover:-translate-y-[2px] transition-all duration-[0.2s]" aria-label="Facebook">
+            <i class="fa-brands fa-facebook-f text-[15px]"></i>
+          </a>
+          <a href={`https://youtube.com/${s.youtube}`} target="_blank" rel="noopener noreferrer" class="w-[36px] h-[36px] rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:bg-[#FF0000] hover:text-white hover:border-[#FF0000] hover:-translate-y-[2px] transition-all duration-[0.2s]" aria-label="YouTube">
+            <i class="fa-brands fa-youtube text-[15px]"></i>
+          </a>
+          <a href={`https://instagram.com/${s.instagram}`} target="_blank" rel="noopener noreferrer" class="w-[36px] h-[36px] rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:bg-[#E4405F] hover:text-white hover:border-[#E4405F] hover:-translate-y-[2px] transition-all duration-[0.2s]" aria-label="Instagram">
             <i class="fa-brands fa-instagram text-[16px]"></i>
           </a>
-          <a href={`https://wa.me/${s.whatsapp}`} target="_blank" rel="noopener noreferrer" class="w-[36px] h-[36px] rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:bg-orange-500 hover:text-white hover:border-orange-500 hover:-translate-y-[2px] transition-all duration-[0.2s] focus-visible:ring-2 focus-visible:ring-orange-500" aria-label="WhatsApp">
-            <i class="fa-brands fa-whatsapp text-[16px]"></i>
+          <a href={`https://tiktok.com/${s.tiktok}`} target="_blank" rel="noopener noreferrer" class="w-[36px] h-[36px] rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:bg-[#000000] hover:text-white hover:border-white hover:-translate-y-[2px] transition-all duration-[0.2s]" aria-label="TikTok">
+            <i class="fa-brands fa-tiktok text-[15px]"></i>
           </a>
-          <a href={`mailto:${s.email}`} class="w-[36px] h-[36px] rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:bg-orange-500 hover:text-white hover:border-orange-500 hover:-translate-y-[2px] transition-all duration-[0.2s] focus-visible:ring-2 focus-visible:ring-orange-500" aria-label="Email">
-            <i class="fa-solid fa-envelope text-[15px]"></i>
+          <a href={`https://threads.net/${s.threads}`} target="_blank" rel="noopener noreferrer" class="w-[36px] h-[36px] rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:bg-[#000000] hover:text-white hover:border-white hover:-translate-y-[2px] transition-all duration-[0.2s]" aria-label="Threads">
+            <i class="fa-brands fa-threads text-[16px]"></i>
+          </a>
+          <a href={`https://x.com/${s.x}`} target="_blank" rel="noopener noreferrer" class="w-[36px] h-[36px] rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:bg-[#000000] hover:text-white hover:border-white hover:-translate-y-[2px] transition-all duration-[0.2s]" aria-label="X">
+            <i class="fa-brands fa-x-twitter text-[15px]"></i>
           </a>
         </div>
       </div>
@@ -84,11 +104,11 @@ const navLinks = [
         <h4 class="font-[family-name:var(--font-body)] font-semibold text-white text-[13px] tracking-[0.15em] uppercase pb-[8px] border-b border-orange-500/30 inline-block mb-[20px]">Hubungi Kami</h4>
         <ul class="space-y-[14px] list-none p-0 m-0">
           <li>
-            <a href={`https://wa.me/${s.whatsapp}`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-[12px] text-white/70 text-[13.5px] no-underline transition-colors hover:text-orange-400 group">
+            <a href={`https://wa.me/${s.wa_number}?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20mengenai%20layanan%20Anda.`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-[12px] text-white/70 text-[13.5px] no-underline transition-colors hover:text-orange-400 group">
               <div class="w-[32px] h-[32px] rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 shrink-0 text-[15px] group-hover:bg-orange-500 group-hover:text-white transition-colors duration-[0.2s]">
                 <i class="fa-brands fa-whatsapp"></i>
               </div>
-              <span class="truncate">{s.whatsapp}</span>
+              <span class="truncate">{s.wa_number}</span>
             </a>
           </li>
           <li>

@@ -1,6 +1,14 @@
 ---
 // Voda Tour & Event — Error Page
 import Layout from "../layouts/Layout.astro";
+
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+let settings = {};
+try {
+  const r = await fetch(DIRECTUS_URL + "/items/settings");
+  if (r.ok) { const j = await r.json(); if (j.data) j.data.forEach((s) => { settings[s.key] = s.value; }); }
+} catch {}
+const waNum = settings.wa_number || settings.whatsapp || "6282112345678";
 ---
 
 <Layout title="Terjadi Kesalahan | Voda Tour & Event"
@@ -35,7 +43,7 @@ import Layout from "../layouts/Layout.astro";
       </div>
 
       <p class="text-navy-300 text-[12px] mt-[40px]">
-        Jika masalah berlanjut, hubungi kami via <a href="https://wa.me/6282112345678" class="text-orange-600 hover:underline">WhatsApp</a>
+        Jika masalah berlanjut, hubungi kami via <a href={`https://wa.me/${waNum}?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20mendapatkan%20error%20di%20website.`} class="text-orange-600 hover:underline">WhatsApp</a>
       </p>
 
     </div>

@@ -22,7 +22,18 @@ const {
   active,
 } = Astro.props;
 
+const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+let settings = {};
+try {
+  const r = await fetch(U + "/items/settings");
+  if (r.ok) {
+    const j = await r.json();
+    if (j.data) j.data.forEach((s) => { settings[s.key] = s.value; });
+  }
+} catch {}
+
 const siteUrl = "https://vodatour.event.id";
+const waNum = settings.wa_number || settings.whatsapp || "6282112345678";
 const defaultImage = siteUrl + "/images/VodaTravelIcon.webp";
 const ogImage = image || defaultImage;
 ---
@@ -87,23 +98,28 @@ const ogImage = image || defaultImage;
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
     </noscript>
     <!-- JSON-LD Organization -->
-  <script type="application/ld+json">{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "Voda Tour & Event",
-  "url": "https://vodatour.event.id",
-  "logo": "https://vodatour.event.id/images/VodaTravelIcon.webp",
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "telephone": "+62-821-1234-5678",
-    "contactType": "customer service",
-    "availableLanguage": ["Indonesia", "English"]
-  },
-  "sameAs": [
-    "https://www.instagram.com/vodatour_event",
-    "https://wa.me/6282112345678"
-  ]
-}</script>
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Voda Tour & Event",
+    "url": "https://vodatour.event.id",
+    "logo": "https://vodatour.event.id/images/VodaTravelIcon.webp",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": settings.phone ? "+62-" + settings.phone.replace(/^62/, '') : "+62-821-1234-5678",
+      "contactType": "customer service",
+      "availableLanguage": ["Indonesia", "English"]
+    },
+    "sameAs": [
+      `https://facebook.com/${settings.facebook || 'voda.event'}`,
+      `https://youtube.com/${settings.youtube || '@vodaevent'}`,
+      `https://instagram.com/${settings.instagram || 'voda.event'}`,
+      `https://tiktok.com/${settings.tiktok || '@voda.event'}`,
+      `https://threads.net/${settings.threads || '@voda.event'}`,
+      `https://x.com/${settings.x || 'voda_event'}`,
+      `https://wa.me/${waNum}`
+    ]
+  })}></script>
 
     {jsonld && <script type="application/ld+json" set:html={jsonld}></script>}
 </head>
@@ -113,10 +129,10 @@ const ogImage = image || defaultImage;
       Langsung ke konten utama
     </a>
 
-    <Header {active} />
+    <Header {active} {settings} />
     <div id="main-content">
       <slot />
     </div>
-    <Footer />
+    <Footer {settings} />
   </body>
 </html>

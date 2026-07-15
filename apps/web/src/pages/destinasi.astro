@@ -61,7 +61,7 @@ try {
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">
               {destinations.map((d) => {
                 const regionName = d.region_id?.name || "";
-                const imgUrl = d.image ? DIRECTUS_URL + "/assets/" + d.image + "?width=600&height=400&fit=cover&format=webp&quality=85" : null;
+                const imgUrl = d.image ? (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + d.image + "?width=600&height=400&fit=cover&format=webp&quality=85" : null;
                 return (
                   <a href={"/destinasi/" + d.slug} class="group block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden no-underline hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-[6px]">
                     <div class="relative aspect-[4/3] overflow-hidden bg-navy-100">
