@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-const SITE_URL = import.meta.env.SITE_URL || "https://vodaeventorganizer.id";
+const SITE_URL = import.meta.env.SITE_URL || "https://vodatrip.id";
 
 export const GET: APIRoute = async () => {
   let destinations: { slug: string; updated_at: string }[] = [];
