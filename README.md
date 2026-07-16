@@ -228,6 +228,19 @@ lt --port 4321
 # Kirim link output (misal: https://voda-web.loca.lt) ke atasan/klien Anda.
 ```
 
+## 🤖 CI/CD Deployment Secrets
+
+Untuk mengaktifkan deployment otomatis via GitHub Actions, daftarkan variabel dan rahasia berikut pada repositori GitHub Anda di menu **Settings → Secrets and variables → Actions**:
+
+### Secrets (Repository Secrets)
+
+| Nama | Keterangan / Contoh Nilai |
+| --- | --- |
+| `VPS_HOST` | Alamat IP VPS Produksi (misal: `202.1xx.xx.xxx`) |
+| `VPS_USER` | Nama user SSH untuk deploy (misal: `deploy`) |
+| `VPS_SSH_KEY` | Private SSH Key hasil `ssh-keygen` yang authorized di VPS |
+| `VPS_PATH` | Lokasi folder project di VPS (misal: `/home/deploy/voda-tour-event`) |
+
 ---
 
 ## License
