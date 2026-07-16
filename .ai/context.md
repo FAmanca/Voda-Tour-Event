@@ -7,7 +7,7 @@
 ## Project Identity
 
 - **Nama:** Voda Tour & Event
-- **URL:** https://vodaeventorganizer.id (production)
+- **URL:** https://vodatrip.id (production)
 - **Bisnis:** Travel & Event Organizer — private trip, corporate gathering, team building
 - **Model:** Brosur online + WhatsApp inquiry. **Tidak ada booking, payment, atau user account.**
 

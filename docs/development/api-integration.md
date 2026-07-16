@@ -258,7 +258,7 @@ export async function POST({ request }) {
     { "key": "whatsapp", "value": "6281234567890" },
     { "key": "email", "value": "hello@vodatrip.id" },
     { "key": "address", "value": "Jakarta, Indonesia" },
-    { "key": "instagram", "value": "@vodaevent" }
+    { "key": "instagram", "value": "@vodatrip" }
   ]
 }
 ```

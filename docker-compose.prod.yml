@@ -81,6 +81,8 @@ services:
     volumes:
       - directus_uploads:/directus/uploads
       - directus_database_prod:/directus/database
+    ports:
+      - "8055:8055"
     networks:
       - voda_net
 
@@ -101,6 +103,8 @@ services:
     environment:
       - DIRECTUS_URL=http://directus:8055
       - PUBLIC_DIRECTUS_URL=${PUBLIC_DIRECTUS_URL:-http://api.vodatrip.id}
+    ports:
+      - "4322:4321"
     networks:
       - voda_net
 

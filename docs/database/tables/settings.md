@@ -33,7 +33,7 @@ Tabel `settings` menyimpan konfigurasi global website.
 | whatsapp      | 6281234567890                  |
 | email         | hello@vodatrip.id             |
 | address       | Jakarta, Indonesia             |
-| instagram     | @vodaevent                     |
+| instagram     | @vodatrip                     |
 | hero_title    | Jelajahi Keindahan Indonesia   |
 | hero_subtitle | Private trip & corporate gathering terbaik |
 
