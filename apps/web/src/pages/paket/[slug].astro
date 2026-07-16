@@ -90,7 +90,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
         <i class="fa-regular fa-face-frown text-[56px] text-white/30 block mb-[20px]"></i>
         <h1 class="font-[family-name:var(--font-display)] text-white text-[28px] font-bold">Paket Tidak Ditemukan</h1>
         <p class="text-white/60 mt-[10px]">Halaman tidak tersedia.</p>
-        <a href="/paket" class="inline-flex items-center gap-[8px] mt-[20px] text-orange-500 font-semibold text-[14px] hover:underline"><i class="fa-solid fa-arrow-left"></i> Kembali</a>
+        <a href="/paket" class="inline-flex items-center gap-[8px] mt-[20px] text-orange-600 font-semibold text-[14px] hover:underline"><i class="fa-solid fa-arrow-left"></i> Kembali</a>
       </div></section>
     )}
 
@@ -175,7 +175,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
       {pkg.description && (
         <section class="py-[70px] max-lg:py-[50px]"><div class="wrap">
           <div class="max-w-[720px]">
-            <span class="text-[11px] font-semibold text-orange-500 uppercase tracking-[0.15em]">Tentang Paket Ini</span>
+            <span class="text-[11px] font-semibold text-orange-600 uppercase tracking-[0.15em]">Tentang Paket Ini</span>
             <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] max-lg:text-[22px] font-bold mt-[8px]">{pkg.name}</h2>
             <div class="w-[40px] h-[3px] bg-orange-500 rounded-full mt-[12px]"></div>
             <div class="text-navy-600 text-[15px] leading-[1.8] mt-[16px]" set:html={pkg.description}></div>
@@ -187,7 +187,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
       {pkg.itinerary && pkg.itinerary.length > 0 && (
         <section class="bg-navy-50 py-[70px] max-lg:py-[50px]"><div class="wrap">
           <div class="text-center mb-[40px]">
-            <span class="text-[11px] font-semibold text-orange-500 uppercase tracking-[0.15em]">Itinerary</span>
+            <span class="text-[11px] font-semibold text-orange-600 uppercase tracking-[0.15em]">Itinerary</span>
             <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] max-lg:text-[22px] font-bold mt-[8px]">Rencana Perjalanan</h2>
             <p class="text-navy-500 text-[14px] mt-[6px]">Jadwal perjalanan selama {pkg.duration}.</p>
           </div>
@@ -201,7 +201,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
       {pkg.facilities && pkg.facilities.length > 0 && (
         <section class="py-[70px] max-lg:py-[50px]"><div class="wrap">
           <div class="text-center mb-[36px]">
-            <span class="text-[11px] font-semibold text-orange-500 uppercase tracking-[0.15em]">Fasilitas</span>
+            <span class="text-[11px] font-semibold text-orange-600 uppercase tracking-[0.15em]">Fasilitas</span>
             <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] max-lg:text-[22px] font-bold mt-[8px]">Apa yang Termasuk?</h2>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[14px] max-w-[800px] mx-auto">
@@ -221,7 +221,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
       {pkg.price_tiers && pkg.price_tiers.length > 0 && (
         <section class="bg-navy-50 py-[70px] max-lg:py-[50px]"><div class="wrap">
           <div class="text-center mb-[36px]">
-            <span class="text-[11px] font-semibold text-orange-500 uppercase tracking-[0.15em]">Harga</span>
+            <span class="text-[11px] font-semibold text-orange-600 uppercase tracking-[0.15em]">Harga</span>
             <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] max-lg:text-[22px] font-bold mt-[8px]">Harga Paket</h2>
             <p class="text-navy-500 text-[14px] mt-[6px]">Harga per orang berdasarkan jumlah peserta</p>
           </div>
@@ -239,7 +239,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
       {pkg.gallery && pkg.gallery.length > 1 && (
         <section class="py-[70px] max-lg:py-[50px]"><div class="wrap">
           <div class="text-center mb-[36px]">
-            <span class="text-[11px] font-semibold text-orange-500 uppercase tracking-[0.15em]">Galeri</span>
+            <span class="text-[11px] font-semibold text-orange-600 uppercase tracking-[0.15em]">Galeri</span>
             <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] max-lg:text-[22px] font-bold mt-[8px]">Foto {pkg.name}</h2>
             <p class="text-navy-500 text-[14px] mt-[6px]">{pkg.gallery.length} foto tersedia</p>
           </div>
@@ -267,10 +267,10 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
         <section class="py-[70px] max-lg:py-[50px]"><div class="wrap">
           <div class="flex items-end justify-between mb-[32px]">
             <div>
-              <span class="text-[11px] font-semibold text-orange-500 uppercase tracking-[0.15em]">Paket Lainnya</span>
+              <span class="text-[11px] font-semibold text-orange-600 uppercase tracking-[0.15em]">Paket Lainnya</span>
               <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[24px] font-bold mt-[4px]">Destinasi {dname}</h2>
             </div>
-            <a href={"/destinasi/" + dslug} class="hidden sm:inline-flex items-center gap-[6px] text-orange-500 text-[13px] font-semibold no-underline hover:underline">
+            <a href={"/destinasi/" + dslug} class="hidden sm:inline-flex items-center gap-[6px] text-orange-600 text-[13px] font-semibold no-underline hover:underline">
               Lihat Semua <i class="fa-solid fa-arrow-right text-[11px]"></i>
             </a>
           </div>
@@ -285,10 +285,10 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
                   )}
                 </div>
                 <div class="p-[18px]">
-                  <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[15px] font-semibold group-hover:text-orange-500 transition-colors line-clamp-2">{sp.name}</h3>
+                  <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[15px] font-semibold group-hover:text-orange-600 transition-colors line-clamp-2">{sp.name}</h3>
                   <div class="flex items-center justify-between mt-[10px]">
                     <span class="text-navy-400 text-[12px]"><i class="fa-regular fa-clock mr-[4px]"></i>{sp.duration}</span>
-                    <span class="text-orange-500 text-[12px] font-semibold group-hover:translate-x-[2px] transition-transform">Detail <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    <span class="text-orange-600 text-[12px] font-semibold group-hover:translate-x-[2px] transition-transform">Detail <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
                   </div>
                 </div>
               </a>
