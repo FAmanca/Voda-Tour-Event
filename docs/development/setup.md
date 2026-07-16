@@ -49,7 +49,7 @@ docker ps --filter "name=voda-"
 ```
 
 Akses Directus admin: `http://localhost:8055`
-Login: `admin@vodaevent.id` / `admin123`
+Login: `admin@vodatrip.id` / `admin123`
 
 ## Run Astro (Frontend)
 
@@ -71,7 +71,7 @@ Akses website di `http://localhost:4321`
 
 ## Directus Collections Setup
 
-1. Login ke `http://localhost:8055` (admin@vodaevent.id / admin123)
+1. Login ke `http://localhost:8055` (admin@vodatrip.id / admin123)
 2. Buat Collections sesuai `docs/database/tables/*.md`:
 
 | Collection | Type | Note |

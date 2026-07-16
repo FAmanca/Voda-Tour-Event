@@ -31,9 +31,9 @@ Tabel `settings` menyimpan konfigurasi global website.
 |---------------|--------------------------------|
 | site_name     | Voda Tour & Event           |
 | whatsapp      | 6281234567890                  |
-| email         | hello@vodaevent.id             |
+| email         | hello@vodatrip.id             |
 | address       | Jakarta, Indonesia             |
-| instagram     | @vodaevent                     |
+| instagram     | @vodatrip                     |
 | hero_title    | Jelajahi Keindahan Indonesia   |
 | hero_subtitle | Private trip & corporate gathering terbaik |
 

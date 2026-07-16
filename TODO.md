@@ -307,7 +307,7 @@ Buat di Directus Admin Panel:
   - activity_types: Read
   - settings: Read
   - searches: **Create only** (no read)
-- [x] Set admin user: `admin@vodaevent.id` / `admin123`
+- [x] Set admin user: `admin@vodatrip.id` / `admin123`
 - [x] Test: GET `/items/*` tanpa auth → ✅ semua accessible
 
 ### 6.3 Seed Data

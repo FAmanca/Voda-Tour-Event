@@ -4,7 +4,7 @@
 
 **Version:** 2.0
 **Status:** Planning
-**Domain:** vodaeventorganizer.id
+**Domain:** vodatrip.id
 
 ---
 

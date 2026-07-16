@@ -7,7 +7,7 @@
 ## Project Identity
 
 - **Nama:** Voda Tour & Event
-- **URL:** https://vodaeventorganizer.id (production)
+- **URL:** https://vodatrip.id (production)
 - **Bisnis:** Travel & Event Organizer — private trip, corporate gathering, team building
 - **Model:** Brosur online + WhatsApp inquiry. **Tidak ada booking, payment, atau user account.**
 
@@ -139,7 +139,7 @@ pnpm dev          # → http://localhost:4321
 
 # 4. Buka Directus admin
 # → http://localhost:8055
-# Login: admin@vodaevent.id / admin123
+# Login: admin@vodatrip.id / admin123
 # Bikin collections: regions, destinations, packages, activity_types, dll
 ```
 
