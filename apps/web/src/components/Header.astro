@@ -60,15 +60,6 @@ const phoneDisplay = settings.phone
       <!-- Actions -->
       <div class="flex items-center gap-[14px] shrink-0">
         <a
-          href={`tel:${phone}`}
-          aria-label="Telepon kami"
-          class="hidden sm:inline-flex items-center gap-[8px] px-[16px] py-[9px] border border-[--color-line] rounded-[999px] text-[13px] font-semibold text-navy-800 no-underline transition-colors hover:border-navy-800"
-        >
-          <i class="fa-solid fa-phone text-[12px]"></i>
-          <span class="hidden md:inline">{phoneDisplay}</span>
-        </a>
-
-        <a
           href={`https://wa.me/${wa_number}?text=${waMessage}`}
           aria-label="Konsultasi Gratis via WhatsApp"
           target="_blank"

@@ -490,3 +490,122 @@ Buat di Directus Admin Panel:
 | 12: Docs Final | ~8 | 🟢 Third |
 
 **Total:** ~168 task items
+
+# Phase 2 Voda Tour & Event - TODO List
+
+### 🛠️ 2.1 Layout & Visual Adjustments
+- [x] **Pembersihan Kontak Rumah (Header & Footer):**
+  - [x] Hapus/sembunyikan nomor telepon rumah statis (misal: "021-xxxx") di komponen [Header.astro](file:///home/famanca/voda-tour-event/apps/web/src/components/Header.astro).
+  - [x] Hapus/sembunyikan nomor telepon rumah statis di kolom kontak komponen [Footer.astro](file:///home/famanca/voda-tour-event/apps/web/src/components/Footer.astro).
+  - [x] Pastikan hanya menyisakan tombol WhatsApp dan Email yang aktif.
+  - [x] Sembunyikan Section Sosmed di footer dan Kontak
+
+---
+
+### 📰 2.2 Sistem Artikel & Blog (Directus CMS + Astro Frontend)
+
+#### A. Konfigurasi Directus CMS (Backend & Database)
+- [ ] **Setup Skema Collection `articles`:**
+  - Buat tabel/collection baru bernama `articles` dengan field-field berikut:
+    - [ ] `id` (Tipe: UUID, Primary Key, Auto-generated)
+    - [ ] `status` (Tipe: String, Dropdown: `draft`, `published`, `archived`)
+    - [ ] `title` (Tipe: String, Text Input, Required)
+    - [ ] `slug` (Tipe: String, Unique, interface: `wpslug` agar auto-generate dari title ala WordPress)
+    - [ ] `content` (Tipe: JSON, interface: `Editor.js` untuk block-based editor ala Notion/Gutenberg agar bisa pick-and-choose gambar dari File Library secara visual)
+    - [ ] `featured_image` (Tipe: File, M2O ke directus_files)
+    - [ ] `publish_date` (Tipe: DateTime, default to current time)
+    - [ ] `seo` (Tipe: JSON, interface: `seo-plugin` untuk meta title, meta desc, SERP preview, dan social OG card preview)
+    - [ ] System fields: `created_at`, `updated_at`, `created_by`, `updated_by`
+- [ ] **Instalasi Ekstensi di Directus Studio:**
+  - [ ] Install **`@directus-labs/seo-plugin`** via Extensions Marketplace.
+  - [ ] Install **`directus-extension-wpslug-interface`** untuk interface generator slug yang ramah pengguna.
+  - [ ] Install **`directus-extension-editorjs`** (atau sejenisnya) untuk editor berbasis blok Notion-style.
+- [ ] **Custom SEO Content Analyzer (Yoast/Rank Math Clone):**
+  - [ ] Buat Custom Interface Extension menggunakan Directus SDK (`defineInterface`).
+  - [ ] Gunakan Vue 3 `inject('values')` untuk memantau perubahan pada field `content` (WYSIWYG/Editor.js JSON) dan `seo` secara real-time.
+  - [ ] Integrasikan library NPM **`yoastseo`** di dalam ekstensi untuk memproses kata kunci fokus, kepadatan kata kunci, sebaran heading, dan alt tag gambar, lalu tampilkan checklist skor lampu merah/kuning/hijau di panel editor Directus.
+- [ ] **Konfigurasi Flows (Otomatisasi Rebuild):**
+  - [ ] Buat Flow baru bernama `Rebuild Web on Article Publish`.
+  - [ ] Trigger: `Event Hook` ➡️ `items.create` dan `items.update` pada collection `articles`.
+  - [ ] Condition: Pastikan payload memiliki `status` sama dengan `"published"`.
+  - [ ] Action: `Webhook` ➡️ Kirim POST request ke Deploy Hook hosting produksi (Vercel/Netlify/GitHub Actions) untuk memicu rebuild otomatis website Astro agar artikel langsung live di internet.
+- [ ] **Aksesibilitas Perizinan (Roles & Permissions):**
+  - [ ] Buka perizinan baca (**Read**) secara publik (*Public Role*) untuk collection `articles` agar bisa di-fetch oleh Astro.
+
+#### B. Implementasi di Frontend Astro
+- [ ] **Install Integrasi & SDK:**
+  - [ ] Jalankan `npx astro add sitemap` untuk menginstal `@astrojs/sitemap`.
+  - [ ] Pastikan `@directus/sdk` terinstal di `apps/web/package.json` untuk komunikasi API.
+- [ ] **Halaman Daftar Artikel (`src/pages/blog/index.astro`):**
+  - [ ] Buat halaman baru di `/blog` untuk menampilkan semua list artikel.
+  - [ ] Fetch data dari Directus menggunakan SDK, filter artikel dengan `status: "published"`, urutkan dari `publish_date` terbaru (`sort: "-publish_date"`).
+  - [ ] Gunakan tata letak grid kartu (*Card Grid*), tampilkan `featured_image` yang telah dioptimasi via query params Directus (`?format=webp&quality=80&width=600`).
+  - [ ] Berikan sistem penomoran halaman (*pagination*) sederhana jika jumlah artikel melebihi 12 item.
+- [ ] **Halaman Detail Artikel Dinamis (`src/pages/blog/[slug].astro`):**
+  - [ ] Buat halaman detail dinamis di `/blog/[slug]`.
+  - [ ] Lakukan fetch data artikel tunggal berdasarkan parameter `slug`.
+  - [ ] Jika slug tidak ditemukan, lempar ke halaman 404 (`Astro.redirect('/404')`).
+  - [ ] Parse data `content` (JSON Editor.js blocks) ke format HTML bersih menggunakan pustaka helper seperti `editorjs-html` atau buat parser custom di Astro.
+  - [ ] Ekstrak metadata dari field `seo` (Title, Description, OG Image) dan masukkan ke dalam tag `<head>` menggunakan komponen SEO Layout agar optimal.
+- [ ] **Integrasi Sitemap Dinamis (`astro.config.mjs`):**
+  - [ ] Daftarkan endpoint sitemap di config Astro.
+  - [ ] Tulis fungsi sitemap generator agar secara otomatis menarik seluruh `slug` artikel aktif dari Directus dan menambahkannya ke berkas `sitemap.xml` yang di-generate pas build.
+
+---
+
+### 🏷️ 2.3 Penyesuaian Dinamis Harga & Fitur Tambahan (Add-ons) pada Package
+
+#### A. Konfigurasi Directus CMS
+- [ ] **Modifikasi & Validasi Skema Collection `packages`:**
+  - [ ] **Struktur Nested JSON `price_tiers` (Repeater di dalam Repeater):**
+    Ubah skema/dokumentasi pengisian agar mendukung **maksimal 3 tabel harga** mandiri di dalam satu paket (misalnya: Tabel Harga Domestik WNI, Tabel Harga Asing WNA, atau Durasi Paket berbeda).
+    - Format struktur JSON bertingkat yang direncanakan:
+      ```json
+      [
+        {
+          "table_title": "Harga Domestik (WNI)",
+          "tiers": [
+            { "min_pax": 2, "max_pax": 4, "price_per_pax": 850000, "description": "Hotel Bintang 3" },
+            { "min_pax": 5, "max_pax": 10, "price_per_pax": 750000, "description": "Hotel Bintang 3" }
+          ]
+        },
+        {
+          "table_title": "Harga Internasional (WNA)",
+          "tiers": [
+            { "min_pax": 2, "max_pax": 4, "price_per_pax": 1200000, "description": "Hotel + Guide Inggris" }
+          ]
+        }
+      ]
+      ```
+  - [ ] **Tambah Field `addons` (Fitur Tambahan/Additional):**
+    - Buat field baru di dalam collection `packages` bernama `addons` dengan tipe **JSON** (agar bisa menampung daftar pilihan opsional).
+    - Format struktur JSON yang direncanakan:
+      ```json
+      [
+        {
+          "addon_name": "Banana Boat",
+          "price": 300000,
+          "description": "Tambahan wahana air Banana Boat selama 15 menit"
+        },
+        {
+          "addon_name": "Dokumentasi Drone",
+          "price": 1500000,
+          "description": "Dokumentasi foto & video udara menggunakan DJI Drone"
+        }
+      ]
+      ```
+
+#### B. Implementasi di Frontend Astro
+- [ ] **Optimasi Komponen Tabel Harga (`src/components/PriceTable.astro`):**
+  - [ ] Ubah komponen agar dapat merender **hingga maksimal 3 tabel harga** yang berbeda secara berurutan sesuai data bertingkat di JSON `price_tiers`.
+  - [ ] Tampilkan `table_title` sebagai judul di atas masing-masing tabel harga.
+  - [ ] Ubah logika kolom di dalam masing-masing tabel agar mendeteksi jumlah objek dalam array `tiers` dan menyesuaikan lebarnya secara dinamis (1, 2, atau 3 kolom).
+- [ ] **Implementasi Tabel/List Add-ons pada Halaman Detail Paket (`src/pages/paket/[slug].astro`):**
+  - [ ] **Tata Letak Layout:** Posisikan seksi/tabel tambahan ini **tepat di bawah komponen `PriceTable` (tabel harga utama)** di halaman detail paket `src/pages/paket/[slug].astro`.
+  - [ ] Buat komponen atau seksi baru untuk merender daftar `addons` tersebut (jika data JSON `addons` terisi di Directus).
+  - [ ] **Penyelarasan Desain (Styling):** Samakan gaya desain (*styling*), border, warna latar, tipografi, dan padding tabel add-on agar senada (*cohesive*) dengan gaya visual komponen `PriceTable` (tabel harga utama).
+  - [ ] Tampilkan informasi add-on dalam bentuk baris tabel atau list kartu mini:
+    - Nama tambahan (misal: "Banana Boat")
+    - Deskripsi singkat
+    - Format harga tambahan yang terformat rapi (misal: "+Rp 300.000 / orang" atau "+Rp 1.500.000 / grup").
+  - [ ] Berikan penanganan fallback jika data `addons` kosong (sembunyikan seksi add-ons secara anggun).
