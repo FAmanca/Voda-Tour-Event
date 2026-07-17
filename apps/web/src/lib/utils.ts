@@ -1,6 +1,7 @@
 // ============================================================================
 // Voda Tour & Event — Formatting Utilities
 // ============================================================================
+import type { PriceTier, PriceTierGroup } from "../types/directus";
 
 /** Format jumlah ke format Rupiah penuh (Rp 850.000). Kembalikan hubungi kami jika 0 */
 export function formatPrice(amount: number): string {
@@ -32,23 +33,25 @@ export function formatPriceDisplay(
   return `${prefix}${formatted}${suffix}`;
 }
 
-/** Dapatkan harga termurah dari price_tiers */
+/** Dapatkan harga termurah dari price_tiers atau groups of price_tiers */
 export function getStartingPrice(
-  tiers: { min_pax: number; price_per_pax: number | null }[]
+  input: (PriceTierGroup | PriceTier)[]
 ): number | null {
-  if (!tiers || tiers.length === 0) return null;
+  if (!input || input.length === 0) return null;
+  const flatTiers = input.flatMap(group => 'tiers' in group ? group.tiers : [group as PriceTier]);
   // Harga termurah -- filter null (kaya "Hubungi CS")
-  const prices = tiers.map(t => t.price_per_pax).filter((p): p is number => p !== null && p > 0);
+  const prices = flatTiers.map(tier => tier.price_per_pax || (tier as PriceTier & {price?: number}).price).filter((price): price is number => price !== null && price !== undefined && price > 0);
   if (prices.length === 0) return null;
   return Math.min(...prices);
 }
 
 /** Dapatkan range harga (termurah — termahal) */
 export function getPriceRange(
-  tiers: { min_pax: number; price_per_pax: number | null }[]
+  input: (PriceTierGroup | PriceTier)[]
 ): { min: number; max: number } | null {
-  if (!tiers || tiers.length === 0) return null;
-  const prices = tiers.map(t => t.price_per_pax).filter((p): p is number => p !== null && p > 0);
+  if (!input || input.length === 0) return null;
+  const flatTiers = input.flatMap(group => 'tiers' in group ? group.tiers : [group as PriceTier]);
+  const prices = flatTiers.map(tier => tier.price_per_pax || (tier as PriceTier & {price?: number}).price).filter((price): price is number => price !== null && price !== undefined && price > 0);
   if (prices.length === 0) return null;
   return { min: Math.min(...prices), max: Math.max(...prices) };
 }
@@ -56,8 +59,8 @@ export function getPriceRange(
 /** Format ISO date ke format Indonesia (12 Januari 2026) */
 export function formatDate(iso: string): string {
   try {
-    const d = new Date(iso);
-    return d.toLocaleDateString("id-ID", {
+    const date = new Date(iso);
+    return date.toLocaleDateString("id-ID", {
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -70,8 +73,8 @@ export function formatDate(iso: string): string {
 /** Format ISO ke format pendek (12 Jan 2026) */
 export function formatDateShort(iso: string): string {
   try {
-    const d = new Date(iso);
-    return d.toLocaleDateString("id-ID", {
+    const date = new Date(iso);
+    return date.toLocaleDateString("id-ID", {
       day: "numeric",
       month: "short",
       year: "numeric",

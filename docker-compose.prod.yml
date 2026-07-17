@@ -38,7 +38,7 @@ services:
   # DIRECTUS CMS
   # =======================================================
   directus:
-    image: directus/directus:11
+    image: directus/directus:12
     container_name: voda-directus-prod
     restart: always
     depends_on:

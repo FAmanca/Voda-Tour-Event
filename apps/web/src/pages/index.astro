@@ -10,42 +10,24 @@ import PackageGrid from "../components/PackageGrid.astro";
 import StatsBar from "../components/StatsBar.astro";
 import CTABand from "../components/CTABand.astro";
 
+import { getSettings, getDestinations, getPackages, getActivityTypes } from "../lib/directus";
+import type { DestinationWithRegion, Package, ActivityType } from "../types/directus";
+
 // -----------------------------------------------------------------------
 // SSR fetch dari Directus
 // -----------------------------------------------------------------------
-const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-
-interface Setting {
-  key: string;
-  value: string;
-}
 
 let settings: Record<string, string> = {};
-let destinations: any[] = [];
-let packages: any[] = [];
-let activityTypes: any[] = [];
+let destinations: DestinationWithRegion[] = [];
+let packages: Package[] = [];
+let activityTypes: ActivityType[] = [];
 let fetchError = false;
 
 try {
-  const base = `${DIRECTUS_URL}/items`;
-
-  const [settingsRes, destRes, pkgRes, actRes] = await Promise.all([
-    fetch(`${base}/settings`).then((r) => (r.ok ? r.json() : { data: [] })),
-    fetch(`${base}/destinations?limit=10&sort=name`).then((r) => (r.ok ? r.json() : { data: [] })),
-    fetch(`${base}/packages?limit=4&sort=-id`).then((r) => (r.ok ? r.json() : { data: [] })),
-    fetch(`${base}/activity_types?limit=20&sort=name`).then((r) => (r.ok ? r.json() : { data: [] })),
-  ]);
-
-  // Settings → flat key-value map
-  if (settingsRes.data) {
-    (settingsRes.data as Setting[]).forEach((s: Setting) => {
-      settings[s.key] = s.value;
-    });
-  }
-
-  destinations = destRes.data || [];
-  packages = pkgRes.data || [];
-  activityTypes = actRes.data || [];
+  settings = await getSettings();
+  destinations = await getDestinations("*,region_id.*") as DestinationWithRegion[];
+  packages = await getPackages(4) as Package[];
+  activityTypes = await getActivityTypes() as ActivityType[];
 } catch (e) {
   console.error("SSR fetch error:", e);
   fetchError = true;
@@ -69,7 +51,7 @@ try {
     <FeatureStrip />
 
     <!-- 3.3 + 3.4 PackageGrid -->
-    <section id="paket" class="wrap py-[90px] max-lg:py-[60px] my-[500px]">
+    <section id="paket" class="wrap py-[90px] max-lg:py-[60px]">
       <div class="grid grid-cols-1 lg:grid-cols-5 gap-[30px] lg:gap-[40px] items-start">
         <div>
           <SectionHeader

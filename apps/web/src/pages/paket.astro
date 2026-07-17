@@ -2,23 +2,30 @@
 import Layout from "../layouts/Layout.astro";
 import PackageCard from "../components/PackageCard.astro";
 import Eyebrow from "../components/Eyebrow.astro";
+import { getPackages, getActivityTypes } from "../lib/directus";
 
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let packages = [];
-let activityTypes = [];
-let destCount = 0;
+let packages: any[] = [];
+let activityTypes: any[] = [];
+let destinationCount = 0;
 let fetchError = false;
 
 try {
-  const [pkgRes, actRes, dstRes] = await Promise.all([
-    fetch(DIRECTUS_URL + "/items/packages?fields=*,destination_id.*&limit=50&filter[status][_eq]=published&sort=-id"),
-    fetch(DIRECTUS_URL + "/items/activity_types?filter[status][_eq]=published&sort=name"),
-    fetch(DIRECTUS_URL + "/items/destinations?fields=id&filter[status][_eq]=published&limit=1&meta=total_count"),
+  const destinationCountRes = await fetch(
+    `${DIRECTUS_URL}/items/destinations?fields=id&filter[status][_eq]=published&limit=1&meta=total_count`
+  );
+  if (destinationCountRes.ok) {
+    const destinationCountJson = await destinationCountRes.json();
+    destinationCount = destinationCountJson.meta?.total_count ?? 0;
+  }
+
+  [packages, activityTypes] = await Promise.all([
+    getPackages(50),
+    getActivityTypes(),
   ]);
-  if (pkgRes.ok) { const json = await pkgRes.json(); packages = json.data || []; }
-  if (actRes.ok) { const json = await actRes.json(); activityTypes = json.data || []; }
-  if (dstRes.ok) { const json = await dstRes.json(); destCount = json.meta?.total_count || 0; }
-} catch { fetchError = true; }
+} catch {
+  fetchError = true;
+}
 ---
 
 <Layout title="Paket Wisata | Voda Tour & Event" description="Jelajahi semua paket wisata, gathering, dan outbound." active="paket">
@@ -34,11 +41,11 @@ try {
         <p class="text-white/65 text-[16px] max-lg:text-[14px] mt-[10px] max-w-[520px] mx-auto leading-relaxed">
           Dari private trip santai sampai corporate gathering seru &mdash; pilih pengalaman yang cocok buat Anda.
         </p>
-        {!fetchError && (packages.length > 0 || destCount > 0) && (
+        {!fetchError && (packages.length > 0 || destinationCount > 0) && (
           <div class="flex flex-wrap justify-center gap-[32px] mt-[36px]">
             <div class="text-center"><span class="block text-white text-[28px] font-bold font-[family-name:var(--font-display)]">{packages.length}</span><span class="text-white/50 text-[12px] uppercase tracking-wider">Paket</span></div>
             <div class="w-[1px] bg-white/15 self-stretch max-sm:hidden"></div>
-            <div class="text-center"><span class="block text-white text-[28px] font-bold font-[family-name:var(--font-display)]">{destCount}</span><span class="text-white/50 text-[12px] uppercase tracking-wider">Destinasi</span></div>
+            <div class="text-center"><span class="block text-white text-[28px] font-bold font-[family-name:var(--font-display)]">{destinationCount}</span><span class="text-white/50 text-[12px] uppercase tracking-wider">Destinasi</span></div>
             <div class="w-[1px] bg-white/15 self-stretch max-sm:hidden"></div>
             <div class="text-center"><span class="block text-white text-[28px] font-bold font-[family-name:var(--font-display)]">{activityTypes.length}</span><span class="text-white/50 text-[12px] uppercase tracking-wider">Kategori</span></div>
           </div>

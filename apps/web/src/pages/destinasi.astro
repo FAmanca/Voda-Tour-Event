@@ -1,20 +1,20 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Eyebrow from "../components/Eyebrow.astro";
+import { getDestinations, getRegions, getAssetUrl } from "../lib/directus";
 
-const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let destinations = [];
-let regions = [];
+let destinations: any[] = [];
+let regions: any[] = [];
 let fetchError = false;
 
 try {
-  const [dstRes, regRes] = await Promise.all([
-    fetch(DIRECTUS_URL + "/items/destinations?fields=*,region_id.*&filter[status][_eq]=published&sort=name"),
-    fetch(DIRECTUS_URL + "/items/regions?fields=id,name,slug&filter[status][_eq]=published&sort=name"),
+  [destinations, regions] = await Promise.all([
+    getDestinations("*,region_id.*"),
+    getRegions(),
   ]);
-  if (dstRes.ok) { const json = await dstRes.json(); destinations = json.data || []; }
-  if (regRes.ok) { const json = await regRes.json(); regions = json.data || []; }
-} catch { fetchError = true; }
+} catch {
+  fetchError = true;
+}
 ---
 
 <Layout title="Destinasi Wisata | Voda Tour & Event" description="Jelajahi destinasi wisata terbaik." active="destinasi">
@@ -32,9 +32,9 @@ try {
             Temukan pengalaman tak terlupakan di berbagai destinasi terbaik.
           </p>
           <div class="flex flex-wrap gap-[12px] mt-[28px]">
-            {regions.map((r) => (
-              <a href={"?region=" + r.slug} class="inline-flex items-center gap-[5px] bg-white/10 hover:bg-white/20 text-white text-[12.5px] font-medium px-[14px] py-[6px] rounded-full no-underline transition-all backdrop-blur-sm border border-white/10">
-                <i class="fa-solid fa-location-dot text-orange-400 text-[9px]"></i>{r.name}
+            {regions.map((region) => (
+              <a href={"?region=" + region.slug} class="inline-flex items-center gap-[5px] bg-white/10 hover:bg-white/20 text-white text-[12.5px] font-medium px-[14px] py-[6px] rounded-full no-underline transition-all backdrop-blur-sm border border-white/10">
+                <i class="fa-solid fa-location-dot text-orange-400 text-[9px]"></i>{region.name}
               </a>
             ))}
           </div>
@@ -59,14 +59,16 @@ try {
               <p class="text-navy-500 text-[13px]"><strong class="text-navy-800">{destinations.length}</strong> destinasi tersedia</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">
-              {destinations.map((d) => {
-                const regionName = d.region_id?.name || "";
-                const imgUrl = d.image ? (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + d.image + "?width=600&height=400&fit=cover&format=webp&quality=85" : null;
+              {destinations.map((destination) => {
+                const regionName = destination.region_id?.name || "";
+                const imgUrl = destination.image
+                  ? getAssetUrl(destination.image, { width: 600, height: 400, format: "webp", quality: 85 })
+                  : null;
                 return (
-                  <a href={"/destinasi/" + d.slug} class="group block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden no-underline hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-[6px]">
+                  <a href={"/destinasi/" + destination.slug} class="group block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden no-underline hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-[6px]">
                     <div class="relative aspect-[4/3] overflow-hidden bg-navy-100">
                       {imgUrl ? (
-                        <img src={imgUrl} alt={d.name} class="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-110" loading="lazy" />
+                        <img src={imgUrl} alt={destination.name} class="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-110" loading="lazy" />
                       ) : (
                         <div class="absolute inset-0 flex flex-col items-center justify-center text-navy-300">
                           <i class="fa-regular fa-image text-[36px]"></i>
@@ -80,8 +82,8 @@ try {
                       )}
                     </div>
                     <div class="p-[20px]">
-                      <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[16px] font-semibold group-hover:text-orange-600 transition-colors">{d.name}</h3>
-                      {d.description && <p class="text-navy-500 text-[13px] leading-relaxed mt-[4px] line-clamp-2">{d.description}</p>}
+                      <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[16px] font-semibold group-hover:text-orange-600 transition-colors">{destination.name}</h3>
+                      {destination.description && <p class="text-navy-500 text-[13px] leading-relaxed mt-[4px] line-clamp-2">{destination.description}</p>}
                       <div class="flex items-center gap-[8px] mt-[14px] text-[12px] text-orange-600 font-medium">
                         <span>Lihat Paket</span>
                         <i class="fa-solid fa-arrow-right text-[10px]"></i>

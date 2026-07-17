@@ -1,59 +1,63 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import SectionHeader from "../../components/SectionHeader.astro";
-import Eyebrow from "../../components/Eyebrow.astro";
 import WaButton from "../../components/WaButton.astro";
 import ItineraryTimeline from "../../components/ItineraryTimeline.astro";
 import PriceTable from "../../components/PriceTable.astro";
+import AdditionalTable from "../../components/AdditionalTable.astro";
 import GallerySection from "../../components/GallerySection.astro";
 import CTABand from "../../components/CTABand.astro";
-import { getAssetUrl } from "../../lib/directus";
+import PackageHero from "../../components/PackageHero.astro";
+import PackageFacilities from "../../components/PackageFacilities.astro";
+import PackageSimilar from "../../components/PackageSimilar.astro";
+import { getAssetUrl, getSettings } from "../../lib/directus";
 import { getStartingPrice, formatPrice } from "../../lib/utils";
+
+import type { Package, ActivityType } from "../../types/directus";
 
 // SSR — no getStaticPaths needed
 
 const { slug } = Astro.params;
-const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let pkg = null;
-let similar = [];
-let err = false;
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+let pkg: Package | null = null;
+let similarPackages: Package[] = [];
+let fetchError = false;
 
 try {
-  const r = await fetch(U + "/items/packages?fields=*,destination_id.*&filter[slug][_eq]=" + slug + "&filter[status][_eq]=published");
-  if (r.ok) { const j = await r.json(); pkg = j.data?.[0] || null; }
+  const packageRes = await fetch(DIRECTUS_URL + "/items/packages?fields=*,destination_id.*&filter[slug][_eq]=" + slug + "&filter[status][_eq]=published");
+  if (packageRes.ok) { const packageJson = await packageRes.json(); pkg = packageJson.data?.[0] || null; }
   if (pkg) {
-    const did = typeof pkg.destination_id === "object" ? pkg.destination_id?.id : pkg.destination_id;
-    if (did) {
-      const s = await fetch(U + "/items/packages?fields=*,destination_id.*&limit=3&filter[id][_neq]=" + pkg.id + "&filter[destination_id][_eq]=" + did + "&filter[status][_eq]=published&sort=-id");
-      if (s.ok) { const j = await s.json(); similar = j.data || []; }
+    const destinationId = typeof pkg.destination_id === "object" ? pkg.destination_id?.id : pkg.destination_id;
+    if (destinationId) {
+      const similarRes = await fetch(DIRECTUS_URL + "/items/packages?fields=*,destination_id.*&limit=3&filter[id][_neq]=" + pkg.id + "&filter[destination_id][_eq]=" + destinationId + "&filter[status][_eq]=published&sort=-id");
+      if (similarRes.ok) { const similarJson = await similarRes.json(); similarPackages = similarJson.data || []; }
     }
   }
-} catch { err = true; }
+} catch (error) { fetchError = true; if (import.meta.env.DEV) console.error("Error fetching package:", error); }
 
-let settings = {};
+let settings: Record<string, string> = {};
 try {
-  const r = await fetch(U + "/items/settings");
-  if (r.ok) { const j = await r.json(); if (j.data) j.data.forEach((s) => { settings[s.key] = s.value; }); }
+  settings = await getSettings();
 } catch {}
-const waNum = settings.wa_number || settings.whatsapp || "6282112345678";
+const waNumber = settings.wa_number || settings.whatsapp || "6282112345678";
 
-const dname = pkg ? (typeof pkg.destination_id === "object" ? pkg.destination_id?.name : "") : "";
-const dslug = pkg ? (typeof pkg.destination_id === "object" ? pkg.destination_id?.slug : "") : "";
+const destinationName = pkg ? (typeof pkg.destination_id === "object" ? pkg.destination_id?.name : "") : "";
+const destinationSlug = pkg ? (typeof pkg.destination_id === "object" ? pkg.destination_id?.slug : "") : "";
 // Activity types untuk badges (via junction table)
-const activityTypes = [];
+const packageActivityTypes: ActivityType[] = [];
 if (pkg) {
   try {
-    const jat = await fetch(U + "/items/packages_activity_types?fields=activity_type_id.*&filter[package_id][_eq]=" + pkg.id + "&limit=10");
-    if (jat.ok) {
-      const jatd = await jat.json();
-      (jatd.data || []).forEach(function(j) {
-        if (j.activity_type_id) activityTypes.push(j.activity_type_id);
+    const activityTypeRes = await fetch(DIRECTUS_URL + "/items/packages_activity_types?fields=activity_type_id.*&filter[package_id][_eq]=" + pkg.id + "&limit=10");
+    if (activityTypeRes.ok) {
+      const activityTypeJson = await activityTypeRes.json();
+      (activityTypeJson.data || []).forEach(function(junction) {
+        if (junction.activity_type_id) packageActivityTypes.push(junction.activity_type_id);
       });
     }
-  } catch {} // silently fail
+  } catch (err) { if (import.meta.env.DEV) console.error("Error fetching activity types:", err); }
 }
-const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
+const startingPrice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
 ---
+
 
 <Layout title={pkg ? pkg.name + " | Paket Voda Tour & Event" : "Paket Tidak Ditemukan"}
   description={pkg?.description || ""}
@@ -70,22 +74,22 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
     "offers": {
       "@type": "AggregateOffer",
       "priceCurrency": "IDR",
-      "lowPrice": Math.min(...pkg.price_tiers.map(t => t.price_per_pax).filter((p): p is number => p !== null && p > 0)),
-      "highPrice": Math.max(...pkg.price_tiers.map(t => t.price_per_pax).filter((p): p is number => p !== null && p > 0)),
-      "offerCount": pkg.price_tiers.length,
+      "lowPrice": pkg.price_tiers ? Math.min(...pkg.price_tiers.flatMap(g => g.tiers ? g.tiers : [g]).map(t => t.price_per_pax || t.price).filter(p => p !== null && p > 0)) : 0,
+      "highPrice": pkg.price_tiers ? Math.max(...pkg.price_tiers.flatMap(g => g.tiers ? g.tiers : [g]).map(t => t.price_per_pax || t.price).filter(p => p !== null && p > 0)) : 0,
+      "offerCount": pkg.price_tiers ? pkg.price_tiers.length : 0,
       "availability": "https://schema.org/InStock"
     }
   }) : ""}
   active="paket">
   <main>
-    {err && (
+    {fetchError && (
       <section class="bg-navy-900"><div class="wrap py-[120px] text-center text-white/80">
         <i class="fa-solid fa-triangle-exclamation text-[40px] text-orange-500 block mb-[16px]"></i>
         <p>Gagal memuat halaman.</p>
       </div></section>
     )}
 
-    {!err && !pkg && (
+    {!fetchError && !pkg && (
       <section class="bg-navy-900"><div class="wrap py-[120px] text-center">
         <i class="fa-regular fa-face-frown text-[56px] text-white/30 block mb-[20px]"></i>
         <h1 class="font-[family-name:var(--font-display)] text-white text-[28px] font-bold">Paket Tidak Ditemukan</h1>
@@ -96,89 +100,23 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
 
     {pkg && <>
       <!-- ===== HERO ===== -->
-      <section class="relative min-h-[420px] max-lg:min-h-[360px] flex items-center overflow-hidden bg-navy-900">
-        {pkg.gallery?.[0] ? (
-          <img src={getAssetUrl(pkg.gallery[0], { width: 1440, height: 600, format: "webp", quality: 85 })} alt={pkg.name} class="absolute inset-0 w-full h-full object-cover" loading="eager" fetchpriority="high" decoding="async" />
-        ) : (
-          <div class="absolute inset-0 bg-gradient-to-br from-navy-800 via-navy-900 to-[#0F2C4C] flex items-center justify-center">
-            <div class="text-center text-navy-400"><i class="fa-regular fa-image text-[56px]"></i><p class="text-[13px] mt-[6px] font-medium">No Image</p></div>
-          </div>
-        )}
-        <div class="absolute inset-0 bg-gradient-to-r from-[rgba(10,59,82,0.95)] via-[rgba(10,59,82,0.7)] to-[rgba(10,59,82,0.15)]"></div>
-        <div class="absolute top-[-60px] right-[-30px] w-[200px] h-[200px] rounded-full bg-orange-500/10 blur-[60px]" aria-hidden="true"></div>
-
-        <div class="wrap relative z-10 py-[100px] max-lg:py-[60px] w-full">
-          {dname && (
-            <a href={"/destinasi/" + dslug} class="inline-flex items-center gap-[6px] text-white/50 hover:text-orange-400 text-[12.5px] font-medium transition-colors mb-[16px] no-underline">
-              <i class="fa-solid fa-arrow-left text-[10px]"></i>
-              <i class="fa-solid fa-location-dot text-orange-400 text-[10px] mr-[2px]"></i>{dname}
-            </a>
-          )}
-          <div class="max-w-[700px]">
-            <h1 class="font-[family-name:var(--font-display)] text-white text-[40px] max-lg:text-[30px] max-md:text-[26px] font-bold leading-tight">{pkg.name}</h1>
-            <div class="flex flex-wrap items-center gap-[12px] mt-[20px]">
-              <span class="inline-flex items-center gap-[6px] bg-white/15 backdrop-blur-sm text-white text-[12.5px] font-medium px-[12px] py-[5px] rounded-full">
-                <i class="fa-regular fa-clock text-orange-400 text-[11px]"></i>{pkg.duration}
-              </span>
-              {pkg.max_participants && (
-                <span class="inline-flex items-center gap-[6px] bg-white/15 backdrop-blur-sm text-white text-[12.5px] font-medium px-[12px] py-[5px] rounded-full">
-                  <i class="fa-solid fa-user text-orange-400 text-[11px]"></i>Max {pkg.max_participants} orang
-                </span>
-              )}
-              {sprice && (
-                <span class="inline-flex items-center gap-[6px] bg-orange-500/20 backdrop-blur-sm text-orange-300 text-[12.5px] font-medium px-[12px] py-[5px] rounded-full">
-                  <i class="fa-solid fa-tag text-[11px]"></i>Mulai {formatPrice(sprice)}/org
-                </span>
-              )}
-            </div>
-
-            {activityTypes.length > 0 && (
-              <div class="flex flex-wrap items-center gap-[8px] mt-[14px]">
-                {activityTypes.map((at) => (
-                  <a
-                    href={"/cari?kegiatan=" + at.slug}
-                    class="inline-flex items-center gap-[5px] bg-orange-500/10 border border-orange-500/20 backdrop-blur-sm text-orange-300 text-[11.5px] font-medium px-[10px] py-[4px] rounded-full no-underline hover:bg-orange-500/20 transition-colors"
-                  >
-                    <i class="fa-solid fa-tag text-[9px]"></i>
-                    {at.name}
-                  </a>
-                ))}
-              </div>
-            )}
-
-            {pkg.description && (
-              <div class="text-white/60 text-[15px] leading-relaxed mt-[18px] max-w-[580px] line-clamp-3" set:html={pkg.description}></div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== QUICK CTA ===== -->
-      <section class="sticky top-[88px] z-20 bg-white/95 backdrop-blur-md border-b border-[--color-line]">
-        <div class="wrap py-[10px]">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-[10px] max-sm:hidden">
-              <i class="fa-regular fa-circle-check text-green-500"></i>
-              <span class="text-navy-600 text-[12.5px]">Tersedia untuk {dname || "destinasi pilihan"}</span>
-            </div>
-            <div class="flex items-center gap-[10px] w-full sm:w-auto justify-between sm:justify-end">
-              {sprice && <span class="text-navy-700 text-[13px] font-semibold">Mulai <strong class="text-orange-600 text-[16px]">{formatPrice(sprice)}</strong>/org</span>}
-              <WaButton phone={waNum} variant="primary" message={encodeURIComponent(`Halo Voda Tour & Event, saya tertarik dengan paket ${pkg.name}.`)} class="shrink-0 text-[12.5px] px-[18px] py-[9px]">
-                <i class="fa-brands fa-whatsapp"></i>Pesan
-              </WaButton>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PackageHero 
+        pkg={pkg}
+        destinationName={destinationName}
+        destinationSlug={destinationSlug}
+        startingPrice={startingPrice}
+        packageActivityTypes={packageActivityTypes}
+        waNumber={waNumber}
+      />
 
       <!-- ===== DESCRIPTION ===== -->
       {pkg.description && (
-        <section class="py-[70px] max-lg:py-[50px]"><div class="wrap">
-          <div class="max-w-[720px]">
-            <span class="text-[11px] font-semibold text-orange-600 uppercase tracking-[0.15em]">Tentang Paket Ini</span>
-            <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] max-lg:text-[22px] font-bold mt-[8px]">{pkg.name}</h2>
-            <div class="w-[40px] h-[3px] bg-orange-500 rounded-full mt-[12px]"></div>
-            <div class="text-navy-600 text-[15px] leading-[1.8] mt-[16px]" set:html={pkg.description}></div>
+        <section class="py-16 max-lg:py-12"><div class="wrap">
+          <div class="max-w-3xl">
+            <span class="text-xs font-semibold text-orange-600 uppercase tracking-widest">Tentang Paket Ini</span>
+            <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-3xl max-lg:text-2xl font-bold mt-2">{pkg.name}</h2>
+            <div class="w-10 h-1 bg-orange-500 rounded-full mt-3"></div>
+            <div class="text-navy-600 text-base leading-relaxed mt-4" set:html={pkg.description}></div>
           </div>
         </div></section>
       )}
@@ -199,35 +137,29 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
 
       <!-- ===== FACILITIES ===== -->
       {pkg.facilities && pkg.facilities.length > 0 && (
-        <section class="py-[70px] max-lg:py-[50px]"><div class="wrap">
-          <div class="text-center mb-[36px]">
-            <span class="text-[11px] font-semibold text-orange-600 uppercase tracking-[0.15em]">Fasilitas</span>
-            <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] max-lg:text-[22px] font-bold mt-[8px]">Apa yang Termasuk?</h2>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[14px] max-w-[800px] mx-auto">
-            {pkg.facilities.map((f) => (
-              <div class="flex items-start gap-[12px] bg-white border border-[--color-line] rounded-[var(--radius-md)] p-[16px] hover:border-orange-200 hover:shadow-sm transition-all">
-                <div class="w-[28px] h-[28px] rounded-full bg-green-100 flex items-center justify-center text-green-600 text-[12px] shrink-0 mt-[1px]">
-                  <i class="fa-solid fa-check"></i>
-                </div>
-                <span class="text-navy-700 text-[14px] leading-relaxed">{f}</span>
-              </div>
-            ))}
-          </div>
-        </div></section>
+        <PackageFacilities facilities={pkg.facilities} />
       )}
 
-      <!-- ===== PRICE ===== -->
-      {pkg.price_tiers && pkg.price_tiers.length > 0 && (
+      <!-- ===== PRICE & ADDONS ===== -->
+      {(pkg.price_tiers?.length > 0 || pkg.addons?.length > 0) && (
         <section class="bg-navy-50 py-[70px] max-lg:py-[50px]"><div class="wrap">
           <div class="text-center mb-[36px]">
             <span class="text-[11px] font-semibold text-orange-600 uppercase tracking-[0.15em]">Harga</span>
-            <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] max-lg:text-[22px] font-bold mt-[8px]">Harga Paket</h2>
+            <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] max-lg:text-[22px] font-bold mt-[8px]">Harga Paket & Tambahan</h2>
             <p class="text-navy-500 text-[14px] mt-[6px]">Harga per orang berdasarkan jumlah peserta</p>
           </div>
-          <div class="max-w-[600px] mx-auto">
-            <PriceTable tiers={pkg.price_tiers} />
-            <div class="mt-[16px] flex items-start gap-[8px] text-navy-400 text-[12px] bg-white rounded-[var(--radius-sm)] p-[12px] border border-[--color-line]">
+          <div class="max-w-[1140px] mx-auto flex flex-col gap-[32px]">
+            {pkg.price_tiers && pkg.price_tiers.length > 0 && (
+              <PriceTable priceTiers={pkg.price_tiers} />
+            )}
+            
+            {pkg.addons && pkg.addons.length > 0 && (
+              <div class="max-w-[800px] mx-auto w-full">
+                <AdditionalTable addons={pkg.addons} />
+              </div>
+            )}
+
+            <div class="max-w-[800px] mx-auto w-full mt-[16px] flex items-start gap-[8px] text-navy-400 text-[12px] bg-white rounded-[var(--radius-sm)] p-[12px] border border-[--color-line]">
               <i class="fa-solid fa-circle-info text-orange-400 mt-[2px] text-[12px]"></i>
               <span>Harga dapat berubah sesuai musim dan ketersediaan. Hubungi kami untuk penawaran terbaik.</span>
             </div>
@@ -253,9 +185,7 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
         <h2 class="font-[family-name:var(--font-display)] text-white text-[26px] max-lg:text-[22px] font-bold">Tertarik dengan Paket Ini?</h2>
         <p class="text-white/60 text-[14px] mt-[8px] max-w-[400px] mx-auto">Hubungi kami via WhatsApp untuk konsultasi gratis.</p>
         <div class="mt-[24px] flex flex-wrap justify-center gap-[12px]">
-          <WaButton phone={waNum} variant="primary" message={encodeURIComponent(`Halo Voda Tour & Event, saya tertarik dengan paket ${pkg.name}.`)}>
-            <i class="fa-brands fa-whatsapp"></i>Pesan via WhatsApp
-          </WaButton>
+          <WaButton phone={waNumber} variant="primary" message={encodeURIComponent(`Halo Voda Tour & Event, saya tertarik dengan paket ${pkg.name}.`)}>Pesan via WhatsApp</WaButton>
           <a href="/kontak" class="inline-flex items-center gap-[8px] bg-white/10 text-white rounded-[999px] px-[24px] py-[12px] font-semibold text-[13px] no-underline border border-white/20 transition-all hover:bg-white/20">
             <i class="fa-regular fa-envelope"></i>Hubungi Kami
           </a>
@@ -263,41 +193,15 @@ const sprice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
       </div></section>
 
       <!-- ===== SIMILAR PACKAGES ===== -->
-      {similar.length > 0 && (
-        <section class="py-[70px] max-lg:py-[50px]"><div class="wrap">
-          <div class="flex items-end justify-between mb-[32px]">
-            <div>
-              <span class="text-[11px] font-semibold text-orange-600 uppercase tracking-[0.15em]">Paket Lainnya</span>
-              <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[24px] font-bold mt-[4px]">Destinasi {dname}</h2>
-            </div>
-            <a href={"/destinasi/" + dslug} class="hidden sm:inline-flex items-center gap-[6px] text-orange-600 text-[13px] font-semibold no-underline hover:underline">
-              Lihat Semua <i class="fa-solid fa-arrow-right text-[11px]"></i>
-            </a>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
-            {similar.map((sp) => (
-              <a href={"/paket/" + sp.slug} class="group block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden no-underline hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-[6px]">
-                <div class="aspect-[16/9] overflow-hidden bg-navy-100">
-                  {sp.gallery?.[0] ? (
-                    <img src={getAssetUrl(sp.gallery[0], { width: 600, height: 338, format: "webp", quality: 85 })} alt={sp.name} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />
-                  ) : (
-                    <div class="w-full h-full flex items-center justify-center text-navy-300"><i class="fa-regular fa-image text-[28px]"></i></div>
-                  )}
-                </div>
-                <div class="p-[18px]">
-                  <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[15px] font-semibold group-hover:text-orange-600 transition-colors line-clamp-2">{sp.name}</h3>
-                  <div class="flex items-center justify-between mt-[10px]">
-                    <span class="text-navy-400 text-[12px]"><i class="fa-regular fa-clock mr-[4px]"></i>{sp.duration}</span>
-                    <span class="text-orange-600 text-[12px] font-semibold group-hover:translate-x-[2px] transition-transform">Detail <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div></section>
+      {similarPackages.length > 0 && (
+        <PackageSimilar 
+          similarPackages={similarPackages} 
+          destinationName={destinationName} 
+          destinationSlug={destinationSlug} 
+        />
       )}
 
-      <CTABand ctaUrl={"https://wa.me/" + waNum + "?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20tertarik%20untuk%20konsultasi%20mengenai%20trip%20dan%20event."} />
+      <CTABand ctaUrl={"https://wa.me/" + waNumber + "?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20tertarik%20untuk%20konsultasi%20mengenai%20trip%20dan%20event."} />
     </>}
   </main>
 </Layout>

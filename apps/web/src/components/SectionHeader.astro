@@ -1,6 +1,7 @@
 ---
 // Voda Tour & Event — SectionHeader Component
 // Reusable section header: eyebrow + H2 + description + optional CTA
+import Eyebrow from "./Eyebrow.astro";
 
 interface Props {
   eyebrow?: string;
@@ -18,11 +19,7 @@ const { eyebrow, title, description, ctaLabel, ctaUrl, layout = 'default' } = As
   layout === 'split' ? (
     <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-[14px]">
       <div>
-        {eyebrow && (
-          <div class="flex items-center gap-[10px]">
-            <span class="font-[family-name:var(--font-body)] font-bold tracking-[0.14em] uppercase text-[12.5px] text-orange-600 leading-none">{eyebrow}</span>
-          </div>
-        )}
+        {eyebrow && <Eyebrow text={eyebrow} />}
         <h2 class="font-[family-name:var(--font-display)] text-navy-900 font-bold text-[34px] max-lg:text-[28px] leading-[1.15] mt-[10px]">{title}</h2>
       </div>
       {ctaLabel && ctaUrl && (
@@ -36,12 +33,7 @@ const { eyebrow, title, description, ctaLabel, ctaUrl, layout = 'default' } = As
     </div>
   ) : (
     <div>
-      {eyebrow && (
-        <div class="flex items-center gap-[10px]">
-          <span class="block w-[22px] h-[2px] bg-orange-600 rounded-full shrink-0"></span>
-          <span class="font-[family-name:var(--font-body)] font-bold tracking-[0.14em] uppercase text-[12.5px] text-orange-600 leading-none">{eyebrow}</span>
-        </div>
-      )}
+      {eyebrow && <Eyebrow text={eyebrow} />}
       <h2 class="font-[family-name:var(--font-display)] text-navy-900 font-bold text-[34px] max-lg:text-[28px] leading-[1.15] mt-[10px]">{title}</h2>
       {description && <p class="text-body text-[15px] leading-relaxed max-w-[600px] mt-[8px]">{description}</p>}
     </div>

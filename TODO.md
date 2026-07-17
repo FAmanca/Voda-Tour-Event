@@ -502,6 +502,11 @@ Buat di Directus Admin Panel:
 
 ---
 
+### 🏷️ 2.3 Penyesuaian Dinamis Harga & Fitur Tambahan (Add-ons) pada Package
+- [x] **Refactor Code**
+  - [x] Check All file ganti variable yg ga jelas namanya biar memudahkan maintenance
+---
+
 ### 📰 2.2 Sistem Artikel & Blog (Directus CMS + Astro Frontend)
 
 #### A. Konfigurasi Directus CMS (Backend & Database)
@@ -556,8 +561,8 @@ Buat di Directus Admin Panel:
 ### 🏷️ 2.3 Penyesuaian Dinamis Harga & Fitur Tambahan (Add-ons) pada Package
 
 #### A. Konfigurasi Directus CMS
-- [ ] **Modifikasi & Validasi Skema Collection `packages`:**
-  - [ ] **Struktur Nested JSON `price_tiers` (Repeater di dalam Repeater):**
+- [x] **Modifikasi & Validasi Skema Collection `packages`:**
+  - [x] **Struktur Nested JSON `price_tiers` (Repeater di dalam Repeater):**
     Ubah skema/dokumentasi pengisian agar mendukung **maksimal 3 tabel harga** mandiri di dalam satu paket (misalnya: Tabel Harga Domestik WNI, Tabel Harga Asing WNA, atau Durasi Paket berbeda).
     - Format struktur JSON bertingkat yang direncanakan:
       ```json
@@ -577,7 +582,7 @@ Buat di Directus Admin Panel:
         }
       ]
       ```
-  - [ ] **Tambah Field `addons` (Fitur Tambahan/Additional):**
+  - [x] **Tambah Field `addons` (Fitur Tambahan/Additional):**
     - Buat field baru di dalam collection `packages` bernama `addons` dengan tipe **JSON** (agar bisa menampung daftar pilihan opsional).
     - Format struktur JSON yang direncanakan:
       ```json
@@ -596,16 +601,16 @@ Buat di Directus Admin Panel:
       ```
 
 #### B. Implementasi di Frontend Astro
-- [ ] **Optimasi Komponen Tabel Harga (`src/components/PriceTable.astro`):**
-  - [ ] Ubah komponen agar dapat merender **hingga maksimal 3 tabel harga** yang berbeda secara berurutan sesuai data bertingkat di JSON `price_tiers`.
-  - [ ] Tampilkan `table_title` sebagai judul di atas masing-masing tabel harga.
-  - [ ] Ubah logika kolom di dalam masing-masing tabel agar mendeteksi jumlah objek dalam array `tiers` dan menyesuaikan lebarnya secara dinamis (1, 2, atau 3 kolom).
-- [ ] **Implementasi Tabel/List Add-ons pada Halaman Detail Paket (`src/pages/paket/[slug].astro`):**
-  - [ ] **Tata Letak Layout:** Posisikan seksi/tabel tambahan ini **tepat di bawah komponen `PriceTable` (tabel harga utama)** di halaman detail paket `src/pages/paket/[slug].astro`.
-  - [ ] Buat komponen atau seksi baru untuk merender daftar `addons` tersebut (jika data JSON `addons` terisi di Directus).
-  - [ ] **Penyelarasan Desain (Styling):** Samakan gaya desain (*styling*), border, warna latar, tipografi, dan padding tabel add-on agar senada (*cohesive*) dengan gaya visual komponen `PriceTable` (tabel harga utama).
-  - [ ] Tampilkan informasi add-on dalam bentuk baris tabel atau list kartu mini:
+- [x] **Optimasi Komponen Tabel Harga (`src/components/PriceTable.astro`):**
+  - [x] Ubah komponen agar dapat merender **hingga maksimal 3 tabel harga** yang berbeda secara berurutan sesuai data bertingkat di JSON `price_tiers`.
+  - [x] Tampilkan `table_title` sebagai judul di atas masing-masing tabel harga.
+  - [x] Ubah logika kolom di dalam masing-masing tabel agar mendeteksi jumlah objek dalam array `tiers` dan menyesuaikan lebarnya secara dinamis (1, 2, atau 3 kolom).
+- [x] **Implementasi Tabel/List Add-ons pada Halaman Detail Paket (`src/pages/paket/[slug].astro`):**
+  - [x] **Tata Letak Layout:** Posisikan seksi/tabel tambahan ini **tepat di bawah komponen `PriceTable` (tabel harga utama)** di halaman detail paket `src/pages/paket/[slug].astro`.
+  - [x] Buat komponen atau seksi baru untuk merender daftar `addons` tersebut (jika data JSON `addons` terisi di Directus).
+  - [x] **Penyelarasan Desain (Styling):** Samakan gaya desain (*styling*), border, warna latar, tipografi, dan padding tabel add-on agar senada (*cohesive*) dengan gaya visual komponen `PriceTable` (tabel harga utama).
+  - [x] Tampilkan informasi add-on dalam bentuk baris tabel atau list kartu mini:
     - Nama tambahan (misal: "Banana Boat")
     - Deskripsi singkat
     - Format harga tambahan yang terformat rapi (misal: "+Rp 300.000 / orang" atau "+Rp 1.500.000 / grup").
-  - [ ] Berikan penanganan fallback jika data `addons` kosong (sembunyikan seksi add-ons secara anggun).
+  - [x] Berikan penanganan fallback jika data `addons` kosong (sembunyikan seksi add-ons secara anggun).

@@ -1,17 +1,14 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { getSettings } from "../lib/directus";
 
-const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let settings = {};
-try {
-  const r = await fetch(U + "/items/settings");
-  if (r.ok) { const j = await r.json(); if (j.data) j.data.forEach((s) => { settings[s.key] = s.value; }); }
-} catch {}
-const year = settings.established_year || "2024";
-const clients = settings.total_clients || "500+";
-const dest_count = settings.destinations_served || "15+";
-const waNum = settings.wa_number || settings.whatsapp || "6282112345678";
----
+const settings = await getSettings().catch(() => ({} as Record<string, string>));
+
+const establishedYear   = settings.established_year    || "2013";
+const totalClients      = settings.total_clients       || "500+";
+const destinationCount  = settings.destinations_served || "15+";
+const waNumber          = settings.wa_number || settings.whatsapp || "6282112345678";
+  ---
 
 <Layout title="Tentang Kami | Voda Tour & Event" description="Kenali Voda Tour & Event." active="tentang">
   <main>
@@ -38,9 +35,9 @@ const waNum = settings.wa_number || settings.whatsapp || "6282112345678";
           <p class="text-navy-600 text-[15px] leading-relaxed mt-[12px]">Dengan jaringan luas di berbagai destinasi dan tim profesional, kami pastikan setiap momen bersama Voda menjadi kenangan yang tak terlupakan.</p>
         </div>
         <div class="grid grid-cols-2 gap-[16px]">
-          <div class="bg-navy-50 rounded-[var(--radius-lg)] p-[28px] text-center"><span class="block text-[34px] font-bold font-[family-name:var(--font-display)] text-orange-600">{year}</span><span class="text-navy-500 text-[12px] font-medium">Berdiri Sejak</span></div>
-          <div class="bg-orange-50 rounded-[var(--radius-lg)] p-[28px] text-center"><span class="block text-[34px] font-bold font-[family-name:var(--font-display)] text-navy-800">{clients}</span><span class="text-navy-500 text-[12px] font-medium">Klien Puas</span></div>
-          <div class="bg-orange-50 rounded-[var(--radius-lg)] p-[28px] text-center"><span class="block text-[34px] font-bold font-[family-name:var(--font-display)] text-navy-800">{dest_count}</span><span class="text-navy-500 text-[12px] font-medium">Destinasi</span></div>
+          <div class="bg-navy-50 rounded-[var(--radius-lg)] p-[28px] text-center"><span class="block text-[34px] font-bold font-[family-name:var(--font-display)] text-orange-600">{establishedYear}</span><span class="text-navy-500 text-[12px] font-medium">Berdiri Sejak</span></div>
+          <div class="bg-orange-50 rounded-[var(--radius-lg)] p-[28px] text-center"><span class="block text-[34px] font-bold font-[family-name:var(--font-display)] text-navy-800">{totalClients}</span><span class="text-navy-500 text-[12px] font-medium">Klien Puas</span></div>
+          <div class="bg-orange-50 rounded-[var(--radius-lg)] p-[28px] text-center"><span class="block text-[34px] font-bold font-[family-name:var(--font-display)] text-navy-800">{destinationCount}</span><span class="text-navy-500 text-[12px] font-medium">Destinasi</span></div>
           <div class="bg-navy-50 rounded-[var(--radius-lg)] p-[28px] text-center"><span class="block text-[34px] font-bold font-[family-name:var(--font-display)] text-orange-600">24/7</span><span class="text-navy-500 text-[12px] font-medium">Support</span></div>
         </div>
       </div>
@@ -66,7 +63,7 @@ const waNum = settings.wa_number || settings.whatsapp || "6282112345678";
     <section class="bg-gradient-to-r from-navy-900 via-navy-800 to-[#0F2C4C] py-[60px]"><div class="wrap text-center">
       <h2 class="font-[family-name:var(--font-display)] text-white text-[24px] font-bold">Siap Berpetualang?</h2>
       <p class="text-white/60 text-[14px] mt-[8px]">Hubungi kami dan rencanakan perjalanan impian Anda.</p>
-      <a href={`https://wa.me/${waNum}?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20tertarik%20untuk%20konsultasi%20mengenai%20trip%20perjalanan.`} target="_blank" class="inline-flex items-center gap-[8px] mt-[20px] bg-orange-500 text-white rounded-[999px] px-[28px] py-[12px] font-semibold text-[14px] no-underline shadow-[0_10px_20px_-8px_rgba(238,125,15,0.4)] transition-all hover:-translate-y-[2px]">
+      <a href={`https://wa.me/${waNumber}?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20tertarik%20untuk%20konsultasi%20mengenai%20trip%20perjalanan.`} target="_blank" class="inline-flex items-center gap-[8px] mt-[20px] bg-orange-500 text-white rounded-[999px] px-[28px] py-[12px] font-semibold text-[14px] no-underline shadow-[0_10px_20px_-8px_rgba(238,125,15,0.4)] transition-all hover:-translate-y-[2px]">
         <i class="fa-brands fa-whatsapp"></i>Hubungi Kami
       </a>
     </div></section>

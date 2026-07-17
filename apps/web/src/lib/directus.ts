@@ -19,6 +19,14 @@ const BASE = `${DIRECTUS_URL}/items`;
 // Generic fetch wrapper
 // ---------------------------------------------------------------------------
 
+/**
+ * Fungsi fetch internal untuk mengambil data dari koleksi Directus.
+ * 
+ * @param path Nama koleksi API (misal: "packages").
+ * @param params Query params seperti filter, fields, dan sort.
+ * @returns Array dari objek tipe T.
+ * @throws Error jika response HTTP tidak sukses (non-2xx).
+ */
 async function fetchApi<T>(path: string, params?: Record<string, string>): Promise<T[]> {
   const url = new URL(`${BASE}/${path}`);
   if (params) {
@@ -42,6 +50,10 @@ async function fetchSingle<T>(path: string): Promise<T | null> {
 // Settings
 // ---------------------------------------------------------------------------
 
+/**
+ * Mengambil konfigurasi global aplikasi dari tabel `settings` di Directus.
+ * Mengembalikan objek berbentuk key-value untuk kemudahan akses (misalnya setting.wa_number).
+ */
 export async function getSettings(): Promise<Record<string, string>> {
   const items = await fetchApi<Setting>("settings");
   const map: Record<string, string> = {};
@@ -64,12 +76,18 @@ export async function getRegions(): Promise<Region[]> {
 // Destinations
 // ---------------------------------------------------------------------------
 
+/**
+ * Mengambil seluruh destinasi wisata yang berstatus "published".
+ *
+ * @param fields Daftar kolom yang ingin diambil (default: "*").
+ * @returns Array dari destinasi yang diurutkan berdasarkan nama.
+ */
 export async function getDestinations(fields = "*"): Promise<Destination[]> {
   return fetchApi<Destination>("destinations", {
     fields,
     filter: JSON.stringify({ status: { _eq: "published" } }),
     sort: "name",
-  });
+  }); 
 }
 
 export async function getDestinationsByRegion(
@@ -102,6 +120,12 @@ export async function getDestinationBySlug(
 // Packages
 // ---------------------------------------------------------------------------
 
+/**
+ * Mengambil daftar paket wisata berstatus "published" beserta data relasi destinasinya.
+ * 
+ * @param limit Batas maksimal paket yang diambil (default: 50).
+ * @param fields Daftar kolom yang diambil (default: "*").
+ */
 export async function getPackages(
   limit = 50,
   fields = "*"
@@ -213,6 +237,12 @@ export interface SearchResult {
   destinationName?: string;
 }
 
+/**
+ * Melakukan pencarian global (Destinasi & Paket Wisata) berdasarkan string pencarian.
+ *
+ * @param q String pencarian pengguna.
+ * @returns Array hasil pencarian yang terpadu dari destinasi dan paket.
+ */
 export async function searchAll(q: string): Promise<SearchResult[]> {
   const results: SearchResult[] = [];
 
@@ -279,7 +309,9 @@ export async function logSearch(params: {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(params),
     });
-  } catch {
-    // Silently fail — logging is non-critical
+  } catch (err) {
+    if (import.meta.env.DEV) {
+      console.warn("Directus API: Failed to log search event.", err);
+    }
   }
 }

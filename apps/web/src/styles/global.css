@@ -12,6 +12,7 @@
 
 @theme {
   /* ---- Colors ---- */
+  --color-navy-950: #06121E;
   --color-navy-900: #0B2340;
   --color-navy-800: #0F2C4C;
   --color-navy-700: #173A5E;
@@ -19,6 +20,8 @@
   --color-orange-600: #C2410C;
   --color-orange-500: #EE7D0F;
   --color-orange-100: #FFE9D2;
+  --color-navy-50: #F8FAFC;
+  --color-navy-100: #F1F5F9;
   --color-ink: #0B2340;
   --color-body: #5B6B80;
   --color-body-light: #8A97A8;

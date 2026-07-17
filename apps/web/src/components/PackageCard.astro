@@ -2,9 +2,13 @@
 // Voda Tour & Event — PackageCard Component
 // Individual package card with photo area, icon badge, price
 
+import type { PackageWithDestination } from "../types/directus";
+import { getAssetUrl } from "../lib/directus";
+import { getStartingPrice } from "../lib/utils";
+
 interface Props {
   /** Alternate: pass full package object */
-  package?: any;
+  package?: PackageWithDestination;
   /** Show destination name */
   showDestination?: boolean;
   title?: string;
@@ -30,25 +34,14 @@ const {
 } = Astro.props;
 
 // Support both individual props AND full package object
-const BASE_URL = import.meta.env.DIRECTUS_URL || 'http://localhost:8055';
 const title = _title || pkg?.name || '';
 const description = _desc || pkg?.description || '';
 const slug = _slug || pkg?.slug || '';
-const priceFrom = _priceFrom ?? (pkg?.price_tiers ? Math.min(...pkg.price_tiers.map(t => t.price_per_pax).filter(p => p !== null && p > 0)) : undefined);
-const BASE_PUBLIC_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'http://localhost:8055';
-const image = _img || (pkg?.image ? BASE_PUBLIC_URL + '/assets/' + pkg.image + '?width=400&height=250&fit=cover&format=webp' : undefined);
+const priceFrom = _priceFrom ?? (pkg ? getStartingPrice(pkg.price_tiers || []) : undefined);
+const image = _img || (pkg?.image ? getAssetUrl(pkg.image) + '?width=400&height=250&fit=cover&format=webp' : undefined);
 const destName = pkg?.destination_id
   ? (typeof pkg.destination_id === 'object' ? pkg.destination_id?.name : '')
   : '';
-
-const gradientMap: Record<string, string> = {
-  wisata: 'from-[#0A3B52] to-[#2A7A6E]',
-  gathering: 'from-[#122A3D] to-[#356E78]',
-  corporate: 'from-[#0F2C4C] to-[#173A5E]',
-  outbound: 'from-[#2A527A] to-[#8FD6B4]',
-};
-
-const gradient = gradientMap[category] || gradientMap.wisata;
 
 const displayPrice = priceFrom
   ? new Intl.NumberFormat('id-ID').format(priceFrom)
@@ -57,7 +50,7 @@ const displayPrice = priceFrom
 
 <a
   href={`/paket/${slug}`}
-  class="group relative block w-full min-h-[340px] flex flex-col justify-end rounded-[var(--radius-md)] shadow-[var(--shadow-soft)] overflow-hidden no-underline transition-all duration-[0.25s] hover:-translate-y-[6px] hover:shadow-[var(--shadow-card)]"
+  class="group relative block w-full min-h-[340px] flex flex-col justify-end rounded-[var(--radius-md)] shadow-[var(--shadow-soft)] overflow-hidden no-underline transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[var(--shadow-card)]"
 >
   <!-- Background Image & Overlay -->
   <div class="absolute inset-0 bg-navy-950 z-0">
@@ -67,46 +60,46 @@ const displayPrice = priceFrom
         alt={title}
         width="400"
         height="250"
-        class="absolute inset-0 w-full h-full object-cover transition-transform duration-[0.6s] ease-out group-hover:scale-[1.08] group-hover:rotate-1"
+        class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 group-hover:rotate-1"
         loading="lazy"
       />
     ) : (
       <div class="w-full h-full flex flex-col items-center justify-center text-white/20">
-        <i class="fa-regular fa-image text-[48px]"></i>
-        <span class="text-[12px] mt-[8px] font-medium">No Image</span>
+        <i class="fa-regular fa-image text-5xl"></i>
+        <span class="text-xs mt-2 font-medium">No Image</span>
       </div>
     )}
     <!-- Dark Navy Gradient overlay from bottom to top -->
-    <div class="absolute inset-0 bg-gradient-to-t from-[#06121E] via-[#06121E]/85 to-[#06121E]/20"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/85 to-navy-950/20"></div>
   </div>
 
   <!-- Icon badge pinned top-left -->
-  <div class="absolute top-[16px] left-[16px] z-10 w-[38px] h-[38px] bg-white rounded-full flex items-center justify-center text-navy-800 text-[16px] shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+  <div class="absolute top-4 left-4 z-10 w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy-800 text-base shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
     <i class={icon}></i>
   </div>
 
   <!-- Body Content -->
-  <div class="relative z-10 p-[18px]">
-    <h3 class="font-[family-name:var(--font-display)] text-white font-semibold text-[15.5px] leading-tight line-clamp-2">{title}</h3>
-    <p class="text-white/70 text-[12.8px] leading-relaxed mt-[6px] line-clamp-2">{description}</p>
-    {showDestination && destName && <p class="text-[11px] text-white/50 mt-[8px]"><i class="fa-solid fa-location-dot text-orange-400 text-[10px] mr-[3px]"></i>{destName}</p>}
+  <div class="relative z-10 p-5">
+    <h3 class="font-[family-name:var(--font-display)] text-white font-semibold text-base leading-tight line-clamp-2">{title}</h3>
+    <p class="text-white/70 text-sm leading-relaxed mt-1.5 line-clamp-2">{description}</p>
+    {showDestination && destName && <p class="text-xs text-white/50 mt-2"><i class="fa-solid fa-location-dot text-orange-400 text-[10px] mr-1"></i>{destName}</p>}
 
     <!-- Dashed divider -->
-    <div class="border-t border-dashed border-white/15 my-[14px]"></div>
+    <div class="border-t border-dashed border-white/15 my-3.5"></div>
 
     <!-- Price row -->
     <div class="flex items-center justify-between">
       <div>
         {displayPrice ? (
           <>
-            <span class="text-[11px] text-white/50 font-medium block leading-none">Mulai dari</span>
-            <span class="font-[family-name:var(--font-display)] text-orange-400 font-bold text-[16px] leading-tight">Rp {displayPrice}</span>
+            <span class="text-xs text-white/50 font-medium block leading-none">Mulai dari</span>
+            <span class="font-[family-name:var(--font-display)] text-orange-400 font-bold text-base leading-tight">Rp {displayPrice}</span>
           </>
         ) : (
-          <span class="text-[12px] text-white/60 italic">Hubungi kami</span>
+          <span class="text-xs text-white/60 italic">Hubungi kami</span>
         )}
       </div>
-      <div class="w-[38px] h-[38px] bg-white rounded-full flex items-center justify-center text-[#06121E] text-[14px] transition-all duration-[0.2s] group-hover:bg-orange-500 group-hover:text-white group-hover:scale-110">
+      <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy-950 text-sm transition-all duration-200 group-hover:bg-orange-500 group-hover:text-white group-hover:scale-110">
         <i class="fa-solid fa-arrow-right"></i>
       </div>
     </div>
