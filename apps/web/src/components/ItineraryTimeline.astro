@@ -17,7 +17,7 @@ interface Props {
     {Astro.props.itinerary.map((day) => (
       <div class="relative pl-[56px]">
         <!-- Day marker (circle) -->
-        <div class="absolute left-0 top-0 w-[40px] h-[40px] rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-[13px] z-10 shadow-[var(--shadow-soft)]">
+        <div class="absolute left-0 top-0 w-[40px] h-[40px] rounded-full bg-orange-600 flex items-center justify-center text-white font-bold text-[13px] z-10 shadow-[var(--shadow-soft)]">
           {String(day.day).padStart(2, "0")}
         </div>
 

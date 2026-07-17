@@ -53,14 +53,14 @@ const navLinks = [
       <div class="flex flex-col gap-[20px]">
         <div class="inline-block">
           <a href="/" class="inline-flex items-center bg-white rounded-[var(--radius-md)] px-[14px] py-[8px] shadow-[0_4px_12px_rgba(255,255,255,0.05)] border border-white/10 hover:opacity-95 transition-opacity">
-            <img src="/images/VodaTravelIcon-small.webp" width="80" height="40" alt="Voda Tour & Event" class="h-[40px] w-auto object-contain" />
+            <img src="/images/VodaTravelIcon-small.webp" width="60" height="40" alt="Voda Tour & Event" class="h-[40px] w-auto object-contain" />
           </a>
         </div>
         <p class="text-white/60 text-[13.5px] leading-relaxed max-w-[280px] m-0">
           Perjalanan berkesan, momen tak terlupakan. Spesialis private tour &amp; corporate event terpercaya sejak 2024.
         </p>
         <!-- Social Icons Row -->
-        <div class="flex flex-wrap gap-[10px]">
+        <!-- <div class="flex flex-wrap gap-[10px]">
           <a href={`https://facebook.com/${s.facebook}`} target="_blank" rel="noopener noreferrer" class="w-[36px] h-[36px] rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:bg-[#1877F2] hover:text-white hover:border-[#1877F2] hover:-translate-y-[2px] transition-all duration-[0.2s]" aria-label="Facebook">
             <i class="fa-brands fa-facebook-f text-[15px]"></i>
           </a>
@@ -79,12 +79,12 @@ const navLinks = [
           <a href={`https://x.com/${s.x}`} target="_blank" rel="noopener noreferrer" class="w-[36px] h-[36px] rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:bg-[#000000] hover:text-white hover:border-white hover:-translate-y-[2px] transition-all duration-[0.2s]" aria-label="X">
             <i class="fa-brands fa-x-twitter text-[15px]"></i>
           </a>
-        </div>
+        </div> -->
       </div>
 
       <!-- Col 2: Navigasi -->
       <div>
-        <h4 class="font-[family-name:var(--font-body)] font-semibold text-white text-[13px] tracking-[0.15em] uppercase pb-[8px] border-b border-orange-500/30 inline-block mb-[20px]">Navigasi</h4>
+        <p class="font-[family-name:var(--font-body)] font-semibold text-white text-[13px] tracking-[0.15em] uppercase pb-[8px] border-b border-orange-500/30 inline-block mb-[20px]">Navigasi</p>
         <ul class="space-y-[10px] list-none p-0 m-0">
           {navLinks.map((link) => (
             <li>
@@ -101,7 +101,7 @@ const navLinks = [
 
       <!-- Col 3: Kontak -->
       <div>
-        <h4 class="font-[family-name:var(--font-body)] font-semibold text-white text-[13px] tracking-[0.15em] uppercase pb-[8px] border-b border-orange-500/30 inline-block mb-[20px]">Hubungi Kami</h4>
+        <p class="font-[family-name:var(--font-body)] font-semibold text-white text-[13px] tracking-[0.15em] uppercase pb-[8px] border-b border-orange-500/30 inline-block mb-[20px]">Hubungi Kami</p>
         <ul class="space-y-[14px] list-none p-0 m-0">
           <li>
             <a href={`https://wa.me/${s.wa_number}?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20mengenai%20layanan%20Anda.`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-[12px] text-white/70 text-[13.5px] no-underline transition-colors hover:text-orange-400 group">
@@ -109,14 +109,6 @@ const navLinks = [
                 <i class="fa-brands fa-whatsapp"></i>
               </div>
               <span class="truncate">{s.wa_number}</span>
-            </a>
-          </li>
-          <li>
-            <a href={`tel:${s.phone}`} class="flex items-center gap-[12px] text-white/70 text-[13.5px] no-underline transition-colors hover:text-orange-400 group">
-              <div class="w-[32px] h-[32px] rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 shrink-0 text-[14px] group-hover:bg-orange-500 group-hover:text-white transition-colors duration-[0.2s]">
-                <i class="fa-solid fa-phone"></i>
-              </div>
-              <span class="truncate">{s.phone}</span>
             </a>
           </li>
           <li>
@@ -132,7 +124,7 @@ const navLinks = [
 
       <!-- Col 4: Kantor & Alamat -->
       <div>
-        <h4 class="font-[family-name:var(--font-body)] font-semibold text-white text-[13px] tracking-[0.15em] uppercase pb-[8px] border-b border-orange-500/30 inline-block mb-[20px]">Kantor Kami</h4>
+        <p class="font-[family-name:var(--font-body)] font-semibold text-white text-[13px] tracking-[0.15em] uppercase pb-[8px] border-b border-orange-500/30 inline-block mb-[20px]">Kantor Kami</p>
         <div class="flex items-start gap-[12px] text-white/70 text-[13.5px]">
           <div class="w-[32px] h-[32px] rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 shrink-0 text-[14px]">
             <i class="fa-solid fa-location-dot"></i>

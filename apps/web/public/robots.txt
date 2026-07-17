@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://vodatour.event.id/sitemap.xml
+Sitemap: https://vodatrip.id/sitemap.xml

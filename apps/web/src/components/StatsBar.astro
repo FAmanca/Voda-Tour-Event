@@ -64,7 +64,7 @@ const initials = testimonial.name
                 {/* Stat Label */}
                 <div class="text-white/80 text-[10px] lg:text-[12px] leading-tight mt-[2px] lg:mt-[4px] font-medium whitespace-normal">
                   <span class="block text-white/90">{s.label}</span>
-                  {s.sublabel && <span class="block text-white/60 text-[9px] lg:text-[11px] mt-[1px]">{s.sublabel}</span>}
+                  {s.sublabel && <span class="block text-white/80 text-[9px] lg:text-[11px] mt-[1px]">{s.sublabel}</span>}
                 </div>
               </div>
             </div>
@@ -90,14 +90,14 @@ const initials = testimonial.name
                   class="w-[40px] h-[40px] rounded-full object-cover shrink-0 border border-white/10"
                 />
               ) : (
-                <div class="w-[40px] h-[40px] rounded-full bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-orange-500 text-[13px] font-bold shrink-0">
+                <div class="w-[40px] h-[40px] rounded-full bg-orange-600 flex items-center justify-center text-white text-[13px] font-bold shrink-0">
                   {initials}
                 </div>
               )}
               
               <div class="min-w-0">
                 {/* Rating Stars */}
-                <div class="flex gap-[4px] text-orange-400 text-[12px] lg:text-[13px]" aria-label={`Rating ${testimonial.rating ?? 5} bintang`}>
+                <div class="flex gap-[4px] text-orange-400 text-[12px] lg:text-[13px]" role="img" aria-label={`Rating ${testimonial.rating ?? 5} bintang`}>
                   {Array.from({ length: testimonial.rating ?? 5 }).map(() => (
                     <i class="fa-solid fa-star" aria-hidden="true"></i>
                   ))}
@@ -105,7 +105,7 @@ const initials = testimonial.name
                 <div class="text-white text-[13px] font-semibold leading-tight mt-[3px] truncate">
                   {testimonial.name}
                 </div>
-                <div class="text-white/70 text-[12px] leading-tight mt-[1px] truncate">
+                <div class="text-white/80 text-[12px] leading-tight mt-[1px] truncate">
                   {testimonial.role}
                 </div>
               </div>
