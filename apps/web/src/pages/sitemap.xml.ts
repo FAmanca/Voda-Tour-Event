@@ -12,8 +12,8 @@ export const GET: APIRoute = async () => {
       fetch(DIRECTUS_URL + "/items/destinations?fields=slug,updated_at&filter[status][_eq]=published"),
       fetch(DIRECTUS_URL + "/items/packages?fields=slug,updated_at&filter[status][_eq]=published"),
     ]);
-    if (destRes.ok) { const j = await destRes.json(); destinations = j.data || []; }
-    if (pkgRes.ok) { const j = await pkgRes.json(); packages = j.data || []; }
+    if (destRes.ok) { const data = await destRes.json(); destinations = data.data || []; }
+    if (pkgRes.ok) { const data = await pkgRes.json(); packages = data.data || []; }
   } catch {}
 
   const staticPages = [
@@ -32,18 +32,18 @@ export const GET: APIRoute = async () => {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   ${staticPages
     .map(
-      (p) => `  <url>
-    <loc>${SITE_URL}${p.loc}</loc>
-    <priority>${p.priority}</priority>
-    <changefreq>${p.changefreq}</changefreq>
+      (page) => `  <url>
+    <loc>${SITE_URL}${page.loc}</loc>
+    <priority>${page.priority}</priority>
+    <changefreq>${page.changefreq}</changefreq>
   </url>`
     )
     .join(NL)}
   ${destinations
     .map(
-      (d) => `  <url>
-    <loc>${SITE_URL}/destinasi/${d.slug}</loc>
-    <lastmod>${d.updated_at}</lastmod>
+      (dest) => `  <url>
+    <loc>${SITE_URL}/destinasi/${dest.slug}</loc>
+    <lastmod>${dest.updated_at}</lastmod>
     <priority>0.7</priority>
     <changefreq>weekly</changefreq>
   </url>`
@@ -51,9 +51,9 @@ export const GET: APIRoute = async () => {
     .join(NL)}
   ${packages
     .map(
-      (p) => `  <url>
-    <loc>${SITE_URL}/paket/${p.slug}</loc>
-    <lastmod>${p.updated_at}</lastmod>
+      (pkg) => `  <url>
+    <loc>${SITE_URL}/paket/${pkg.slug}</loc>
+    <lastmod>${pkg.updated_at}</lastmod>
     <priority>0.6</priority>
     <changefreq>weekly</changefreq>
   </url>`

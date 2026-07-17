@@ -5,9 +5,13 @@
 import PackageCard from "./PackageCard.astro";
 import SkeletonCard from "./SkeletonCard.astro";
 
+import type { PackageWithDestination } from "../types/directus";
+import { getPackages, getAssetUrl } from "../lib/directus";
+import { getStartingPrice } from "../lib/utils";
+
 interface Props {
   /** Pre-fetched packages from Directus — kalau ada skip fetch client-side */
-  packages?: any[];
+  packages?: PackageWithDestination[];
 }
 
 const { packages: fetched } = Astro.props;
@@ -18,14 +22,7 @@ let loadError = false;
 
 if (!packages) {
   try {
-    const directusUrl = process.env.DIRECTUS_URL || 'http://localhost:8055';
-    const res = await fetch(`${directusUrl}/items/packages?limit=4&sort[]=id&filter[status][_eq]=published`);
-    if (res.ok) {
-      const json = await res.json();
-      packages = json.data || [];
-    } else {
-      loadError = true;
-    }
+    packages = await getPackages(4) as PackageWithDestination[];
   } catch {
     loadError = true;
   }
@@ -55,10 +52,10 @@ if (!packages) {
           title={pkg.name}
           description={pkg.description}
           slug={pkg.slug}
-          priceFrom={pkg.price_tiers ? Math.min(...pkg.price_tiers.flatMap((g: any) => g.tiers ? g.tiers : [g]).map((t: any) => t.price_per_pax || t.price).filter((p: any) => p !== null && p > 0)) : undefined}
+          priceFrom={getStartingPrice(pkg.price_tiers || [])}
           icon={'fa-solid fa-map-marked-alt'}
           category={'wisata'}
-          image={pkg.image ? `${import.meta.env.PUBLIC_DIRECTUS_URL || 'http://localhost:8055'}/assets/${pkg.image}?width=400&height=250&fit=cover&format=webp` : undefined}
+          image={pkg.image ? `${getAssetUrl(pkg.image)}?width=400&height=250&fit=cover&format=webp` : undefined}
         />
       ))}
     </div>

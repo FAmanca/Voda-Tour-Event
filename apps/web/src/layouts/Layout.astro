@@ -3,6 +3,8 @@
 import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import { getSettings } from "../lib/directus";
+import { DEFAULT_WA_NUMBER } from "../lib/constants";
 
 interface Props {
   title?: string;
@@ -22,18 +24,13 @@ const {
   active,
 } = Astro.props;
 
-const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let settings = {};
+let settings: Record<string, string> = {};
 try {
-  const r = await fetch(U + "/items/settings");
-  if (r.ok) {
-    const j = await r.json();
-    if (j.data) j.data.forEach((s) => { settings[s.key] = s.value; });
-  }
+  settings = await getSettings();
 } catch {}
 
 const siteUrl = "https://vodatrip.id";
-const waNum = settings.wa_number || settings.whatsapp || "6282112345678";
+const waNum = settings.wa_number || settings.whatsapp || DEFAULT_WA_NUMBER;
 const defaultImage = siteUrl + "/images/VodaTravelIcon.webp";
 const ogImage = image || defaultImage;
 ---

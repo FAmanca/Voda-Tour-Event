@@ -204,6 +204,7 @@ export interface HeroProps {
   secondaryCta?: { text: string; href: string };
   destinations: DestinationWithRegion[];
   activityTypes: ActivityType[];
+  settings: Record<string, string>;
   gradientClass?: string;
 }
 
@@ -241,9 +242,10 @@ export interface StatsBarProps {
 }
 
 export interface CTABandProps {
-  title: string;
-  description: string;
-  cta: { text: string; href: string };
+  heading?: string;
+  description?: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
   features?: { icon: string; label: string }[];
 }
 
@@ -275,7 +277,7 @@ export interface SearchFormProps {
   destinations: DestinationWithRegion[];
   activityTypes: ActivityType[];
   initialValues?: {
-    destination?: string;
+    q?: string;
     activityType?: string;
     paxCount?: number;
     travelDate?: string;
@@ -316,7 +318,7 @@ export interface WaButtonProps {
 }
 
 export interface SkeletonCardProps {
-  type?: "package" | "destinasi" | "feature";
+  variant?: "package" | "destinasi" | "feature";
 }
 
 // ---------------------------------------------------------------------------

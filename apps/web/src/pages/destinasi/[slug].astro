@@ -7,11 +7,12 @@ import PackageCard from "../../components/PackageCard.astro";
 import CTABand from "../../components/CTABand.astro";
 import GallerySection from "../../components/GallerySection.astro";
 
+import type { Destination } from "../../types/directus";
 // SSR — no getStaticPaths needed
 
 const { slug } = Astro.params;
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let destination = null;
+let destination: Destination | null = null;
 let packages = [];
 let fetchError = false;
 
@@ -37,7 +38,7 @@ try {
       <>
         <DestinasiHeader destination={destination} packageCount={packages.length} />
         <section><div class="wrap py-[70px] max-lg:py-[50px]">
-          <SectionHeader title="Paket Tersedia" subtitle={packages.length + " paket wisata di " + destination.name} layout="split" />
+          <SectionHeader title="Paket Tersedia" description={packages.length + " paket wisata di " + destination.name} layout="split" />
           {packages.length > 0 ? (
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px] mt-[34px]">{packages.map((pkg) => <PackageCard package={pkg} />)}</div>
           ) : (
@@ -46,7 +47,7 @@ try {
         </div></section>
         {destination.gallery && destination.gallery.length > 0 && (
           <section class="bg-navy-50"><div class="wrap py-[70px] max-lg:py-[50px]">
-            <SectionHeader title="Galeri Foto" subtitle={destination.gallery.length + " foto " + destination.name} layout="default" />
+            <SectionHeader title="Galeri Foto" description={destination.gallery.length + " foto " + destination.name} layout="default" />
             <div class="mt-[34px]"><GallerySection images={destination.gallery} columns={3} /></div>
           </div></section>
         )}

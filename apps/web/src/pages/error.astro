@@ -1,14 +1,14 @@
 ---
 // Voda Tour & Event — Error Page
 import Layout from "../layouts/Layout.astro";
+import { getSettings } from "../lib/directus";
+import { DEFAULT_WA_NUMBER } from "../lib/constants";
 
-const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let settings = {};
+let settings: Record<string, string> = {};
 try {
-  const r = await fetch(DIRECTUS_URL + "/items/settings");
-  if (r.ok) { const j = await r.json(); if (j.data) j.data.forEach((s) => { settings[s.key] = s.value; }); }
+  settings = await getSettings();
 } catch {}
-const waNum = settings.wa_number || settings.whatsapp || "6282112345678";
+const waNum = settings.wa_number || settings.whatsapp || DEFAULT_WA_NUMBER;
 ---
 
 <Layout title="Terjadi Kesalahan | Voda Tour & Event"

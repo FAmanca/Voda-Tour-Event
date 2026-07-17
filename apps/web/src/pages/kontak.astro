@@ -2,18 +2,17 @@
 import Layout from "../layouts/Layout.astro";
 import WaButton from "../components/WaButton.astro";
 
-const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-const WA_NUMBER = import.meta.env.WA_NUMBER || "6281234567890";
+import { getSettings } from "../lib/directus";
+import { DEFAULT_WA_NUMBER, DEFAULT_EMAIL, DEFAULT_ADDRESS } from "../lib/constants";
 
-let settings = {};
+let settings: Record<string, string> = {};
 try {
-  const res = await fetch(DIRECTUS_URL + "/items/settings");
-  if (res.ok) { const json = await res.json(); if (json.data) json.data.forEach((s) => { settings[s.key] = s.value; }); }
+  settings = await getSettings();
 } catch {}
 
-const waNum = settings.wa_number || settings.whatsapp || WA_NUMBER;
-const email = settings.email || "hello@vodatrip.id";
-const address = settings.address || "Ruko Travelindo, Jl. Pariwisata Raya No. 42, Kota Baru, 12345";
+const waNum = settings.wa_number || settings.whatsapp || DEFAULT_WA_NUMBER;
+const email = settings.email || DEFAULT_EMAIL;
+const address = settings.address || DEFAULT_ADDRESS;
 const ig = settings.instagram || "voda.event";
 const fb = settings.facebook || "voda.event";
 const yt = settings.youtube || "@vodatrip";
