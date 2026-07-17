@@ -246,7 +246,7 @@ function renderResults(container, packages, loading, error) {
         var description = pkg.description || '';
         var slug = pkg.slug || '';
         var priceFrom = pkg.price_tiers && pkg.price_tiers.length
-          ? Math.min.apply(Math, pkg.price_tiers.map(function (t) { return t.price_per_pax; }).filter(function (p) { return p !== null && p > 0; }))
+          ? Math.min.apply(Math, pkg.price_tiers.flatMap(function (g) { return g.tiers ? g.tiers : [g]; }).map(function (t) { return t.price_per_pax || t.price; }).filter(function (p) { return p !== null && p > 0; }))
           : null;
         
         var publicApiUrl = window.__DIRECTUS_URL__ || 'http://localhost:8055';

@@ -34,7 +34,7 @@ const BASE_URL = import.meta.env.DIRECTUS_URL || 'http://localhost:8055';
 const title = _title || pkg?.name || '';
 const description = _desc || pkg?.description || '';
 const slug = _slug || pkg?.slug || '';
-const priceFrom = _priceFrom ?? (pkg?.price_tiers ? Math.min(...pkg.price_tiers.map(t => t.price_per_pax).filter(p => p !== null && p > 0)) : undefined);
+const priceFrom = _priceFrom ?? (pkg?.price_tiers ? Math.min(...pkg.price_tiers.flatMap((g: any) => g.tiers ? g.tiers : [g]).map((t: any) => t.price_per_pax || t.price).filter((p: any) => p !== null && p > 0)) : undefined);
 const BASE_PUBLIC_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'http://localhost:8055';
 const image = _img || (pkg?.image ? BASE_PUBLIC_URL + '/assets/' + pkg.image + '?width=400&height=250&fit=cover&format=webp' : undefined);
 const destName = pkg?.destination_id

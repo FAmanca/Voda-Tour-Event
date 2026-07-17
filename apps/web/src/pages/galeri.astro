@@ -3,24 +3,71 @@ import Layout from "../layouts/Layout.astro";
 import Eyebrow from "../components/Eyebrow.astro";
 import GallerySection from "../components/GallerySection.astro";
 
-const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let imgs = [];
-let err = false;
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+let imageIds: string[] = [];
+let fetchError = false;
+
 try {
-  const [dr, pr] = await Promise.all([
-    fetch(U + "/items/destinations?fields=gallery,image&filter[status][_eq]=published"),
-    fetch(U + "/items/packages?fields=gallery&filter[status][_eq]=published"),
+  const [destResponse, pkgResponse] = await Promise.all([
+    fetch(`${DIRECTUS_URL}/items/destinations?fields=gallery,image&filter[status][_eq]=published&limit=100`),
+    fetch(`${DIRECTUS_URL}/items/packages?fields=gallery&filter[status][_eq]=published&limit=100`),
   ]);
-  if (dr.ok) { const j = await dr.json(); (j.data || []).forEach((d) => { if (d.image) imgs.push(d.image); if (d.gallery) d.gallery.forEach((g) => imgs.push(g)); }); }
-  if (pr.ok) { const j = await pr.json(); (j.data || []).forEach((p) => { if (p.gallery) p.gallery.forEach((g) => imgs.push(g)); }); }
-  imgs = [...new Set(imgs)];
-} catch { err = true; }
+
+  if (destResponse.ok) {
+    const destJson = await destResponse.json();
+    (destJson.data || []).forEach((dest: any) => {
+      if (dest.image) imageIds.push(dest.image);
+      if (dest.gallery) dest.gallery.forEach((galleryId: string) => imageIds.push(galleryId));
+    });
+  }
+
+  if (pkgResponse.ok) {
+    const pkgJson = await pkgResponse.json();
+    (pkgJson.data || []).forEach((pkg: any) => {
+      if (pkg.gallery) pkg.gallery.forEach((galleryId: string) => imageIds.push(galleryId));
+    });
+  }
+
+  // Deduplicate
+  imageIds = [...new Set(imageIds)];
+} catch {
+  fetchError = true;
+}
 ---
 
 <Layout title="Galeri Foto | Voda Tour & Event" description="Galeri foto destinasi dan event." active="galeri">
   <main>
-    <section class="bg-navy-900 py-[80px] max-lg:py-[50px]"><div class="wrap text-center"><Eyebrow text="Galeri" /><h1 class="font-[family-name:var(--font-display)] text-white text-[38px] max-lg:text-[28px] font-bold mt-[12px]">Galeri Foto</h1><p class="text-white/70 text-[16px] max-lg:text-[14px] mt-[10px] max-w-[500px] mx-auto">Momen-momen terbaik dari perjalanan dan event kami.</p></div></section>
-    {err && <section><div class="wrap py-[60px]"><div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[20px] text-red-700 text-[14px] text-center"><i class="fa-solid fa-circle-exclamation mr-[8px]"></i>Gagal memuat galeri.</div></div></section>}
-    {!err && <section><div class="wrap py-[60px] max-lg:py-[40px]">{imgs.length > 0 ? <GallerySection images={imgs} columns={4} /> : <div class="text-center py-[60px]"><i class="fa-regular fa-image text-[48px] text-navy-300 block mb-[16px]"></i><p class="text-navy-500 text-[16px]">Belum ada galeri tersedia.</p></div>}</div></section>}
+    <section class="bg-navy-900 py-[80px] max-lg:py-[50px]">
+      <div class="wrap text-center">
+        <Eyebrow text="Galeri" />
+        <h1 class="font-[family-name:var(--font-display)] text-white text-[38px] max-lg:text-[28px] font-bold mt-[12px]">Galeri Foto</h1>
+        <p class="text-white/70 text-[16px] max-lg:text-[14px] mt-[10px] max-w-[500px] mx-auto">Momen-momen terbaik dari perjalanan dan event kami.</p>
+      </div>
+    </section>
+
+    {fetchError && (
+      <section>
+        <div class="wrap py-[60px]">
+          <div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[20px] text-red-700 text-[14px] text-center">
+            <i class="fa-solid fa-circle-exclamation mr-[8px]"></i>Gagal memuat galeri.
+          </div>
+        </div>
+      </section>
+    )}
+
+    {!fetchError && (
+      <section>
+        <div class="wrap py-[60px] max-lg:py-[40px]">
+          {imageIds.length > 0 ? (
+            <GallerySection images={imageIds} columns={4} />
+          ) : (
+            <div class="text-center py-[60px]">
+              <i class="fa-regular fa-image text-[48px] text-navy-300 block mb-[16px]"></i>
+              <p class="text-navy-500 text-[16px]">Belum ada galeri tersedia.</p>
+            </div>
+          )}
+        </div>
+      </section>
+    )}
   </main>
 </Layout>

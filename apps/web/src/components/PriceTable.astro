@@ -2,58 +2,72 @@
 // Voda Tour & Event — PriceTable Component
 // Tabel harga per tier (pax range)
 
-import type { PriceTier } from "../types/directus";
+import type { PriceTierGroup, PriceTier } from "../types/directus";
 import { formatPrice } from "../lib/utils";
 
 interface Props {
-  tiers: PriceTier[];
+  priceTiers: PriceTierGroup[];
   activePax?: number | null;
 }
 
-const { tiers, activePax } = Astro.props;
+const { priceTiers, activePax } = Astro.props;
 
-function getActiveTierIndex(): number | null {
-  if (!activePax || !tiers) return null;
-  for (let i = 0; i < tiers.length; i++) {
-    const t = tiers[i];
-    if (activePax >= t.min_pax && activePax <= t.max_pax) return i;
+function getActiveTier(groups: PriceTierGroup[]): { gIdx: number; tIdx: number } | null {
+  if (!activePax || !groups) return null;
+  for (let gIdx = 0; gIdx < groups.length; gIdx++) {
+    const group = groups[gIdx];
+    if (group.tiers) {
+      for (let tIdx = 0; tIdx < group.tiers.length; tIdx++) {
+        const t = group.tiers[tIdx];
+        if (activePax >= t.min_pax && activePax <= t.max_pax) return { gIdx, tIdx };
+      }
+    }
   }
   return null;
 }
 
-const activeIdx = getActiveTierIndex();
+const activeInfo = getActiveTier(priceTiers);
 ---
 
-{tiers && tiers.length > 0 && (
-  <div class="overflow-hidden rounded-[var(--radius-md)] border border-navy-100">
-    <table class="w-full text-left">
-      <thead>
-        <tr class="bg-navy-800 text-white text-[13px] font-semibold">
-          <th class="px-[18px] py-[12px]">Jumlah Peserta</th>
-          <th class="px-[18px] py-[12px]">Harga / Orang</th>
-          <th class="px-[18px] py-[12px]">Keterangan</th>
-        </tr>
-      </thead>
-      <tbody>
-        {tiers.map((tier, i) => {
-          const isActive = activeIdx !== null && i === activeIdx;
-          return (
-            <tr
-              class={[                "border-t border-navy-100 text-[14px] transition-colors",                isActive ? "bg-orange-50 border-orange-200" : "bg-white hover:bg-navy-50",              ].join(" ")}
-            >
-              <td class="px-[18px] py-[12px] font-semibold text-navy-800">
-                {tier.min_pax}{tier.max_pax ? (tier.max_pax === tier.min_pax ? ' orang' : ` - ${tier.max_pax} orang`) : ' + orang'}
-              </td>
-              <td class="px-[18px] py-[12px]">
-                <span class="font-bold text-orange-600">{formatPrice(tier.price_per_pax)}</span>
-              </td>
-              <td class="px-[18px] py-[12px] text-navy-500 text-[13px]">
-                {tier.description || "—"}
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+{priceTiers && priceTiers.length > 0 && (
+  <div class={["grid gap-6 items-start", priceTiers.length === 1 ? "grid-cols-1 max-w-[800px] mx-auto w-full" : priceTiers.length === 2 ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1 lg:grid-cols-3"].join(" ")}>
+    {priceTiers.slice(0, 3).map((group, gIdx) => (
+      <div class="flex flex-col gap-3">
+        {group.table_title && (
+          <h4 class="text-[16px] font-semibold text-navy-800">{group.table_title}</h4>
+        )}
+        <div class="overflow-hidden rounded-[var(--radius-md)] border border-navy-100">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="bg-navy-800 text-white text-[13px] font-semibold">
+                <th class="px-[18px] py-[12px]">Jumlah Peserta</th>
+                <th class="px-[18px] py-[12px]">Harga / Orang</th>
+                <th class="px-[18px] py-[12px]">Keterangan</th>
+              </tr>
+            </thead>
+            <tbody>
+              {group.tiers && group.tiers.map((tier, tIdx) => {
+                const isActive = activeInfo !== null && activeInfo.gIdx === gIdx && activeInfo.tIdx === tIdx;
+                return (
+                  <tr
+                  class={["border-t border-navy-100 text-[14px] transition-colors",isActive ? "bg-orange-50 border-orange-200" : "bg-white hover:bg-navy-50",].join(" ")}
+                  >
+                    <td class="px-[18px] py-[12px] font-semibold text-navy-800 whitespace-nowrap">
+                      {tier.min_pax}{tier.max_pax ? (tier.max_pax === tier.min_pax ? ' orang' : ` - ${tier.max_pax} orang`) : ' + orang'}
+                    </td>
+                    <td class="px-[18px] py-[12px] whitespace-nowrap">
+                      <span class="font-bold text-orange-600">{formatPrice(tier.price_per_pax)}</span>
+                    </td>
+                    <td class="px-[18px] py-[12px] text-navy-500 text-[13px]">
+                      {tier.description || "—"}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    ))}
   </div>
 )}

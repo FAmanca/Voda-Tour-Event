@@ -4,15 +4,19 @@
 
 import Layout from "../layouts/Layout.astro";
 import SearchForm from "../components/SearchForm.astro";
+import { getDestinations, getActivityTypes } from "../lib/directus";
 
-const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-const [dr, ar] = await Promise.all([
-  fetch(U + "/items/destinations?fields=slug,name&filter[status][_eq]=published&sort=name"),
-  fetch(U + "/items/activity_types?filter[status][_eq]=published&sort=name"),
-]);
-let alld = [], acts = [];
-if (dr.ok) { const j = await dr.json(); alld = j.data || []; }
-if (ar.ok) { const j = await ar.json(); acts = j.data || []; }
+let destinations: any[] = [];
+let activityTypes: any[] = [];
+
+try {
+  [destinations, activityTypes] = await Promise.all([
+    getDestinations("slug,name"),
+    getActivityTypes(),
+  ]);
+} catch {
+  // halaman masih bisa render — JS client yang handle pencarian
+}
 ---
 
 <Layout
@@ -35,7 +39,7 @@ if (ar.ok) { const j = await ar.json(); acts = j.data || []; }
           </p>
         </div>
         <div class="mt-[28px] max-w-[860px]">
-          <SearchForm destinations={alld} activityTypes={acts} />
+          <SearchForm destinations={destinations} activityTypes={activityTypes} />
         </div>
       </div>
     </section>
@@ -69,6 +73,6 @@ if (ar.ok) { const j = await ar.json(); acts = j.data || []; }
 
 <script>
 import { initSearchPage } from "../lib/search";
-window.__DIRECTUS_URL__ = "{import.meta.env.DIRECTUS_URL || 'http://localhost:8055'}";
+window.__DIRECTUS_URL__ = import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055";
 document.addEventListener("DOMContentLoaded", initSearchPage);
 </script>

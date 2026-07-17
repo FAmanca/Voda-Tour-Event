@@ -19,8 +19,19 @@ export type Status = "published" | "draft" | "archived";
 export interface PriceTier {
   min_pax: number;
   max_pax: number;
-  price: number;       // Rupiah, per pax
-  note: string | null; // e.g. "Minimal 5 orang"
+  price_per_pax: number;       // Rupiah, per pax
+  description: string | null; // e.g. "Minimal 5 orang"
+}
+
+export interface PriceTierGroup {
+  table_title: string;
+  tiers: PriceTier[];
+}
+
+export interface Addon {
+  addon_name: string;
+  price: number;
+  description: string | null;
 }
 
 export interface DayActivity {
@@ -89,7 +100,8 @@ export interface Package {
   duration: string;                 // "2D1N", "3D2N", "Half Day", "1D"
   itinerary: DayActivity[] | null;  // JSON
   facilities: string[] | null;      // JSON array of strings
-  price_tiers: PriceTier[] | null;  // JSON
+  price_tiers: PriceTierGroup[] | null;  // JSON
+  addons: Addon[] | null;           // JSON
   gallery: FileUuid[] | null;
 
   status: Status;
@@ -247,7 +259,7 @@ export interface ItineraryTimelineProps {
 }
 
 export interface PriceTableProps {
-  tiers: PriceTier[];
+  priceTiers: PriceTierGroup[];
   activePax?: number | null;
 }
 

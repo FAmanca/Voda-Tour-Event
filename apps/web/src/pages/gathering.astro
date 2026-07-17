@@ -1,25 +1,16 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import PackageCard from "../components/PackageCard.astro";
+import { getPackagesByActivityType } from "../lib/directus";
 
-const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let packages = [];
-let err = false;
+let packages: any[] = [];
+let fetchError = false;
 
 try {
-  const ar = await fetch(U + "/items/activity_types?filter[slug][_eq]=corporate-gathering");
-  let aid = "";
-  if (ar.ok) { const aj = await ar.json(); aid = aj.data?.[0]?.id || ""; }
-  if (aid) {
-    const jr = await fetch(U + "/items/packages_activity_types?fields=package_id&filter[activity_type_id][_eq]=" + aid);
-    let ids = [];
-    if (jr.ok) { const jj = await jr.json(); ids = (jj.data || []).map((x) => x.package_id); }
-    if (ids.length > 0) {
-      const pr = await fetch(U + "/items/packages?fields=*,destination_id.*&filter[id][_in]=" + ids.join(",") + "&filter[status][_eq]=published&sort=-id");
-      if (pr.ok) { const pj = await pr.json(); packages = pj.data || []; }
-    }
-  }
-} catch { err = true; }
+  packages = await getPackagesByActivityType("corporate-gathering");
+} catch {
+  fetchError = true;
+}
 ---
 
 <Layout title="Gathering & Event | Voda Tour & Event" description="Solusi gathering perusahaan, outbound, team building profesional." active="gathering">
@@ -87,7 +78,7 @@ try {
     </div></section>
 
     <section id="paket" class="py-[60px] max-lg:py-[40px] bg-[--color-bg-subtle]"><div class="wrap">
-      {err ? (
+      {fetchError ? (
         <div class="text-center py-[60px]">
           <i class="fa-solid fa-circle-exclamation text-[36px] text-red-400 block mb-[12px]"></i>
           <p class="text-red-600 text-[14px] font-medium">Gagal memuat paket.</p>

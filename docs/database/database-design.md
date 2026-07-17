@@ -65,7 +65,8 @@ Berikut collection yang **harus dibuat manual** di admin panel Directus.
 | duration | string | "2D1N", "3D2N", "Half Day" |
 | itinerary | JSON | Array: day -> list kegiatan |
 | facilities | JSON | Array: list fasilitas |
-| price_tiers | JSON | Array: { min_pax, max_pax, price, note } |
+| price_tiers | JSON | Array multi-tabel: { table_title, tiers: [{ min_pax, max_pax, price_per_pax, description }] } |
+| addons | JSON | Array: { addon_name, price, description } (fitur tambahan opsional) |
 | gallery | JSON | Array URL gambar |
 | sort_order | integer | Urutan tampilan |
 | status | string | published / draft |

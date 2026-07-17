@@ -69,7 +69,7 @@ export async function getDestinations(fields = "*"): Promise<Destination[]> {
     fields,
     filter: JSON.stringify({ status: { _eq: "published" } }),
     sort: "name",
-  });
+  }); 
 }
 
 export async function getDestinationsByRegion(
