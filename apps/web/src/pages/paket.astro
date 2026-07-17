@@ -3,10 +3,11 @@ import Layout from "../layouts/Layout.astro";
 import PackageCard from "../components/PackageCard.astro";
 import Eyebrow from "../components/Eyebrow.astro";
 import { getPackages, getActivityTypes } from "../lib/directus";
+import type { PackageWithDestination, ActivityType } from "../types/directus";
 
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let packages: any[] = [];
-let activityTypes: any[] = [];
+let packages: PackageWithDestination[] = [];
+let activityTypes: ActivityType[] = [];
 let destinationCount = 0;
 let fetchError = false;
 

@@ -268,29 +268,31 @@ function esc(s: string): string {
 
 export function renderResults(container: HTMLElement | null, packages: PackageWithDestination[] | null, loading: boolean, error: string | null): void {
   if (!container) return;
+
+  const skeletonTpl = document.getElementById('package-skeleton-template') as HTMLTemplateElement;
+  const cardTpl = document.getElementById('package-card-template') as HTMLTemplateElement;
+
   if (loading) {
     container.className = 'text-left py-0';
-    container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">'
-      + Array.from({length: 6}).map(() => {
-          return '<div class="rounded-[var(--radius-md)] bg-navy-50 animate-pulse overflow-hidden">'
-            + '<div class="h-40 bg-navy-100"></div>'
-            + '<div class="p-5 space-y-2.5">'
-            + '<div class="h-4 bg-navy-100 rounded w-[70%]"></div>'
-            + '<div class="h-3 bg-navy-50 rounded w-[50%]"></div>'
-            + '<div class="flex justify-between pt-2.5 border-t border-navy-100">'
-            + '<div class="h-3 bg-navy-50 rounded w-16"></div>'
-            + '<div class="h-3 bg-navy-50 rounded w-20"></div>'
-            + '</div>'
-            + '</div>'
-            + '</div>';
-        }).join('') + '</div>';
+    if (skeletonTpl) {
+      container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7"></div>';
+      const grid = container.firstChild as HTMLElement;
+      for (let i = 0; i < 6; i++) {
+        grid.appendChild(skeletonTpl.content.cloneNode(true));
+      }
+    } else {
+      // Fallback if template is somehow missing
+      container.innerHTML = '<div class="animate-pulse flex space-x-4"><div class="flex-1 space-y-6 py-1"><div class="h-2 bg-navy-100 rounded"></div></div></div>';
+    }
     return;
   }
+  
   if (error) {
     container.className = 'text-center py-20';
     container.innerHTML = '<div class="rounded-lg bg-red-50 border border-red-200 p-5 text-red-700 text-sm flex items-start gap-3"><i class="fa-solid fa-circle-exclamation mt-0.5 shrink-0"></i><span>' + error + '</span></div>';
     return;
   }
+  
   if (!packages || packages.length === 0) {
     container.className = 'text-center py-20';
     container.innerHTML = ''
@@ -306,72 +308,77 @@ export function renderResults(container: HTMLElement | null, packages: PackageWi
       + '</div></div>';
     return;
   }
+  
   container.className = 'text-left py-0';
-  container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">'
-    + packages.map((pkg) => {
-        const title = pkg.name || '';
-        const description = pkg.description || '';
-        const slug = pkg.slug || '';
-        const startingPrice = getStartingPrice(pkg.price_tiers || []);
-        const publicApiUrl = (window as unknown as { __DIRECTUS_URL__?: string }).__DIRECTUS_URL__ || 'http://localhost:8055';
-        
-        let imageStr: string | null = null;
-        if (pkg.image) {
-            imageStr = `${publicApiUrl}/assets/${pkg.image}?width=400&height=250&fit=cover`;
-        } else if (pkg.gallery && pkg.gallery.length > 0) {
-            imageStr = `${publicApiUrl}/assets/${pkg.gallery[0]}?width=400&height=250&fit=cover`;
-        }
-          
-        const destName = pkg.destination_id && typeof pkg.destination_id === 'object' ? pkg.destination_id.name : '';
-        const icon = 'fa-solid fa-map-marked-alt';
-        const displayPrice = startingPrice ? Number(startingPrice).toLocaleString('id-ID') : null;
+  if (!cardTpl) {
+    container.innerHTML = '<p class="text-red-500">Template kartu paket tidak ditemukan.</p>';
+    return;
+  }
 
-        const imgHtml = imageStr
-          ? `<img src="${imageStr}" alt="${esc(title)}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 group-hover:rotate-1" loading="lazy" />`
-          : '<div class="w-full h-full flex flex-col items-center justify-center text-white/20">'
-            + '<i class="fa-regular fa-image text-5xl"></i>'
-            + '<span class="text-xs mt-2 font-medium">No Image</span>'
-            + '</div>';
+  container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7"></div>';
+  const grid = container.firstChild as HTMLElement;
 
-        const destHtml = destName
-          ? `<p class="text-xs text-white/50 mt-2"><i class="fa-solid fa-location-dot text-orange-400 text-[10px] mr-1"></i>${esc(destName)}</p>`
-          : '';
+  packages.forEach((pkg) => {
+    const title = pkg.name || '';
+    const description = pkg.description || '';
+    const slug = pkg.slug || '';
+    const startingPrice = getStartingPrice(pkg.price_tiers || []);
+    const publicApiUrl = (window as unknown as { __DIRECTUS_URL__?: string }).__DIRECTUS_URL__ || 'http://localhost:8055';
+    
+    let imageStr: string | null = null;
+    if (pkg.image) {
+      imageStr = `${publicApiUrl}/assets/${pkg.image}?width=400&height=250&fit=cover`;
+    } else if (pkg.gallery && pkg.gallery.length > 0) {
+      imageStr = `${publicApiUrl}/assets/${pkg.gallery[0]}?width=400&height=250&fit=cover`;
+    }
+      
+    const destName = pkg.destination_id && typeof pkg.destination_id === 'object' ? pkg.destination_id.name : '';
+    const displayPrice = startingPrice ? Number(startingPrice).toLocaleString('id-ID') : null;
 
-        const priceHtml = displayPrice
-          ? '<span class="text-xs text-white/50 font-medium block leading-none">Mulai dari</span>'
-            + `<span class="font-[family-name:var(--font-display)] text-orange-400 font-bold text-base leading-tight">Rp ${displayPrice}</span>`
-          : '<span class="text-xs text-white/60 italic">Hubungi kami</span>';
+    const clone = cardTpl.content.cloneNode(true) as DocumentFragment;
+    
+    const a = clone.querySelector('a');
+    if (a) a.href = `/paket/${slug}`;
 
-        return `<a href="/paket/${slug}" class="group relative block w-full min-h-[340px] flex flex-col justify-end rounded-[var(--radius-md)] shadow-[var(--shadow-soft)] overflow-hidden no-underline transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[var(--shadow-card)]">`
-          + '<!-- Background Image & Overlay -->'
-          + '<div class="absolute inset-0 bg-navy-950 z-0">'
-          + imgHtml
-          + '<!-- Dark Navy Gradient overlay from bottom to top -->'
-          + '<div class="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/85 to-navy-950/20"></div>'
-          + '</div>'
-          + '<!-- Icon badge pinned top-left -->'
-          + '<div class="absolute top-4 left-4 z-10 w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy-800 text-base shadow-[0_4px_12px_rgba(0,0,0,0.15)]">'
-          + `<i class="${icon}"></i>`
-          + '</div>'
-          + '<!-- Body Content -->'
-          + '<div class="relative z-10 p-5">'
-          + `<h3 class="font-[family-name:var(--font-display)] text-white font-semibold text-base leading-tight line-clamp-2">${esc(title)}</h3>`
-          + `<p class="text-white/70 text-sm leading-relaxed mt-1.5 line-clamp-2">${esc(description)}</p>`
-          + destHtml
-          + '<!-- Dashed divider -->'
-          + '<div class="border-t border-dashed border-white/15 my-3.5"></div>'
-          + '<!-- Price row -->'
-          + '<div class="flex items-center justify-between">'
-          + '<div>'
-          + priceHtml
-          + '</div>'
-          + '<div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy-950 text-sm transition-all duration-200 group-hover:bg-orange-500 group-hover:text-white group-hover:scale-110">'
-          + '<i class="fa-solid fa-arrow-right"></i>'
-          + '</div>'
-          + '</div>'
-          + '</div>'
-          + '</a>';
-      }).join('') + '</div>';
+    const imgEl = clone.querySelector('[data-img]') as HTMLImageElement;
+    const noImgEl = clone.querySelector('[data-no-img]') as HTMLElement;
+    if (imageStr) {
+      if (imgEl) {
+        imgEl.src = imageStr;
+        imgEl.alt = title;
+        imgEl.classList.remove('hidden');
+      }
+      if (noImgEl) noImgEl.classList.add('hidden');
+    } else {
+      if (imgEl) imgEl.classList.add('hidden');
+      if (noImgEl) noImgEl.classList.remove('hidden');
+    }
+
+    const titleEl = clone.querySelector('[data-title]') as HTMLElement;
+    if (titleEl) titleEl.textContent = title;
+
+    const descEl = clone.querySelector('[data-desc]') as HTMLElement;
+    if (descEl) descEl.textContent = description;
+
+    const destWrapEl = clone.querySelector('[data-dest]') as HTMLElement;
+    const destTextEl = clone.querySelector('[data-dest-text]') as HTMLElement;
+    if (destName) {
+      if (destTextEl) destTextEl.textContent = destName;
+      if (destWrapEl) destWrapEl.classList.remove('hidden');
+    }
+
+    const priceWrapEl = clone.querySelector('[data-price-wrapper]') as HTMLElement;
+    const noPriceWrapEl = clone.querySelector('[data-no-price-wrapper]') as HTMLElement;
+    const priceTextEl = clone.querySelector('[data-price]') as HTMLElement;
+    if (displayPrice) {
+      if (priceTextEl) priceTextEl.textContent = `Rp ${displayPrice}`;
+      if (priceWrapEl) priceWrapEl.classList.remove('hidden');
+    } else {
+      if (noPriceWrapEl) noPriceWrapEl.classList.remove('hidden');
+    }
+
+    grid.appendChild(clone);
+  });
 }
 
 // ---------------------------------------------------------------------------

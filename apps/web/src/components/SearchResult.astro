@@ -3,9 +3,10 @@
 // Client-side rendered search results with loading/empty/error states
 
 import PackageCard from "./PackageCard.astro";
+import type { PackageWithDestination } from "../types/directus";
 
 interface Props {
-  packages: any[];
+  packages: PackageWithDestination[];
   loading?: boolean;
   error?: string | null;
   totalCount?: number;
