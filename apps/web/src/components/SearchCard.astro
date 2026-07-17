@@ -87,9 +87,11 @@ const { destinations = [], activityTypes = [] } = Astro.props;
   }
 </style>
 
+<script define:vars={{ envDirectusUrl: import.meta.env.PUBLIC_DIRECTUS_URL || import.meta.env.DIRECTUS_URL || 'http://localhost:8055' }}>
+  window.__DIRECTUS_URL__ = window.__DIRECTUS_URL__ || envDirectusUrl;
+</script>
 <script>
 import { initAutocomplete, logSearch } from "../lib/search";
-window.__DIRECTUS_URL__ = window.__DIRECTUS_URL__ || "{import.meta.env.DIRECTUS_URL || 'http://localhost:8055'}";
 
 document.addEventListener("DOMContentLoaded", function () {
   // Init autocomplete
