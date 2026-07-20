@@ -88,13 +88,25 @@ Berikut collection yang **harus dibuat manual** di admin panel Directus.
 | slug | string (unique) | Auto dari title |
 | content | text | Konten artikel (Rich text) |
 | image | string (URL) | Featured image |
+| ads | alias (O2M) | Relasi ke tabel `ads` |
 | seo | JSON | Data SEO via custom-seo-analyzer |
 | status | string | published / draft |
+
+### `ads`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | uuid (PK) | UUID auto-generated |
+| image | uuid (FK) | Relasi ke directus_files |
+| description | string | Teks atau judul iklan |
+| url | string | Link eksternal iklan |
+| articles_id | uuid (FK) | Relasi balik ke articles |
 
 ## Relasi
 
 ```
 regions (1) ----< destinations (M) ----< packages (M)
+articles (1) ---< ads (M)
 ```
 
 ## Cara Buat Collection
@@ -103,7 +115,7 @@ regions (1) ----< destinations (M) ----< packages (M)
 2. Kiri: Settings -> Data Model
 3. Klik "Create Collection"
 4. Pilih mode: **Table** (bukan singleton)
-5. Isi Collection Name: `regions` / `destinations` / `packages` / `articles` / `settings`
+5. Isi Collection Name: `regions` / `destinations` / `packages` / `articles` / `settings` / `ads`
 6. Tambah field sesuai tabel di atas
-7. Untuk field relasi (region_id, destination_id), pilih tipe **Many-to-One**
+7. Untuk field relasi (region_id, destination_id, articles_id), pilih tipe **Many-to-One** (M2O) atau **One-to-Many** (O2M) dari sisi tabel induk
 8. Set permission: Public -> Read (biar API bisa diakses tanpa auth)

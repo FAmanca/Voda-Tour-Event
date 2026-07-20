@@ -5,6 +5,30 @@ import type { Article } from "../../types/directus";
 
 const { slug } = Astro.params;
 
+function calculateReadTime(content: any): number {
+  if (!content) return 1;
+  let text = "";
+  if (typeof content === 'string') {
+    text = content.replace(/<[^>]*>?/gm, '');
+  } else if (content.blocks) {
+    text = content.blocks.map((b: any) => b.data?.text || '').join(' ').replace(/<[^>]*>?/gm, '');
+  }
+  const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
+function getExcerpt(content: any, maxLen = 70): string {
+  if (!content) return "";
+  let text = "";
+  if (typeof content === 'string') {
+    text = content.replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim();
+  } else if (content.blocks) {
+    text = content.blocks.map((b: any) => b.data?.text || '').join(' ').replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim();
+  }
+  if (text.length <= maxLen) return text;
+  return text.slice(0, maxLen).trimEnd() + "…";
+}
+
 let article: Article | null = slug ? await getArticleBySlug(slug).catch(() => null) : null;
 
 let imgUrl = null;
@@ -64,7 +88,7 @@ const jsonldData = article ? JSON.stringify({
   "publisher": { "@type": "Organization", "name": "Voda Tour & Event" }
 }) : "";
 ---
-<Layout title={`${metaTitle} | Voda Tour & Event`} description={metaDesc} canonical={canonicalUrl} jsonld={jsonldData} active="beranda" image={imgUrl || undefined}>
+<Layout title={`${metaTitle} | Voda Tour & Event`} description={metaDesc} canonical={canonicalUrl} jsonld={jsonldData} active="artikel" image={imgUrl || undefined}>
   <main class="bg-navy-50 py-[60px] max-lg:py-[40px]">
     {!article ? (
       <div class="wrap py-[120px] text-center">
@@ -80,9 +104,22 @@ const jsonldData = article ? JSON.stringify({
         
         <!-- Kolom Utama: Konten Artikel -->
         <article class="lg:col-span-8 bg-white p-[40px] max-lg:p-[20px] rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] h-fit">
+          <nav aria-label="Breadcrumb" class="mb-[24px]">
+            <ol class="flex items-center gap-[8px] text-[13px] text-navy-400 font-medium whitespace-nowrap overflow-hidden text-ellipsis">
+              <li><a href="/" class="hover:text-orange-600 transition-colors">Beranda</a></li>
+              <li><i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i></li>
+              <li><a href="/artikel" class="hover:text-orange-600 transition-colors">Artikel</a></li>
+              <li><i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i></li>
+              <li class="text-navy-800 truncate" aria-current="page">{article.title}</li>
+            </ol>
+          </nav>
+          
           <div class="mb-[30px]">
             <h1 class="font-[family-name:var(--font-display)] text-navy-800 text-[36px] max-lg:text-[28px] font-bold leading-tight mb-[12px]">{article.title}</h1>
-            <p class="text-navy-400 text-[13px] font-medium"><i class="fa-regular fa-calendar mr-[6px]"></i>{date}</p>
+            <div class="flex items-center gap-[16px] text-navy-400 text-[13px] font-medium">
+              {date && <p class="flex items-center gap-[6px]"><i class="fa-regular fa-calendar"></i>{date}</p>}
+              <p class="flex items-center gap-[6px]"><i class="fa-regular fa-clock"></i>{calculateReadTime(article.content)} mnt baca</p>
+            </div>
           </div>
 
           {imgUrl && (
@@ -105,48 +142,81 @@ const jsonldData = article ? JSON.stringify({
         <aside class="lg:col-span-4 space-y-[30px]">
           
           <!-- Artikel Lainnya -->
-          <div class="bg-white p-[24px] rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)]">
-            <h3 class="font-[family-name:var(--font-display)] text-[18px] font-bold text-navy-800 mb-[20px] pb-[12px] border-b border-gray-100">
+          <div class="bg-white p-[32px] rounded-[var(--radius-xl)] shadow-[var(--shadow-soft)] border border-navy-50 relative overflow-hidden">
+            <!-- Decorative Background Blob -->
+            <div class="absolute -top-[50px] -right-[50px] w-[150px] h-[150px] bg-orange-500/10 rounded-full blur-[40px] pointer-events-none"></div>
+
+            <h3 class="font-[family-name:var(--font-display)] text-[20px] font-bold text-navy-800 mb-[24px] flex items-center gap-[12px] relative z-10">
+              <span class="w-[6px] h-[24px] bg-gradient-to-b from-orange-500 to-orange-400 rounded-full inline-block"></span>
               Artikel Terkait
             </h3>
+            
             {relatedArticles.length > 0 ? (
-              <div class="space-y-[16px]">
+              <div class="flex flex-col gap-[8px] relative z-10">
                 {relatedArticles.map((rel) => {
-                  const relImg = rel.featured_image ? getAssetUrl(rel.featured_image, { width: 120, height: 120, format: "webp", quality: 80 }) : null;
+                  const relImg = rel.featured_image ? getAssetUrl(rel.featured_image, { width: 160, height: 160, format: "webp", quality: 80 }) : null;
+                  const relDate = rel.publish_date ? new Date(rel.publish_date).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' }) : "";
+                  
                   return (
-                    <a href={`/artikel/${rel.slug}`} class="group flex gap-[12px] items-center no-underline">
-                      <div class="w-[70px] h-[70px] shrink-0 rounded-[var(--radius-sm)] overflow-hidden bg-navy-50">
-                        {relImg ? <img src={relImg} alt={rel.title} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" /> : <div class="w-full h-full flex justify-center items-center text-navy-300"><i class="fa-regular fa-image text-[20px]"></i></div>}
+                    <a href={`/artikel/${rel.slug}`} class="group flex gap-[16px] items-start p-[12px] -mx-[12px] rounded-[var(--radius-lg)] hover:bg-navy-50/50 transition-all duration-300">
+                      <div class="w-[84px] h-[84px] shrink-0 rounded-[var(--radius-md)] overflow-hidden bg-navy-50 relative shadow-sm">
+                        {relImg ? (
+                           <img src={relImg} alt={rel.title} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out" loading="lazy" />
+                        ) : (
+                           <div class="w-full h-full flex justify-center items-center text-navy-300">
+                             <i class="fa-regular fa-image text-[24px]"></i>
+                           </div>
+                        )}
+                        <div class="absolute inset-0 bg-navy-900/0 group-hover:bg-navy-900/5 transition-colors duration-300"></div>
                       </div>
-                      <h4 class="text-[14px] font-bold text-navy-800 leading-snug group-hover:text-orange-600 transition-colors line-clamp-2">
-                        {rel.title}
-                      </h4>
+                      <div class="flex flex-col justify-center min-h-[84px] py-[4px]">
+                        <h4 class="text-[15px] font-bold text-navy-800 leading-[1.4] group-hover:text-orange-600 transition-colors line-clamp-2 mb-[4px]">
+                          {rel.title}
+                        </h4>
+                        <p class="text-[13px] text-navy-500 leading-snug line-clamp-2 mb-[8px]">
+                          {getExcerpt(rel.content, 65)}
+                        </p>
+                        <div class="flex items-center gap-[12px] text-[12px] text-navy-400 font-medium mt-auto">
+                          {relDate && (
+                            <span class="flex items-center gap-[4px]">
+                              <i class="fa-regular fa-calendar text-[11px]"></i>
+                              {relDate}
+                            </span>
+                          )}
+                          <span class="flex items-center gap-[4px]">
+                            <i class="fa-regular fa-clock text-[11px]"></i>
+                            {calculateReadTime(rel.content)} mnt
+                          </span>
+                        </div>
+                      </div>
                     </a>
                   );
                 })}
               </div>
             ) : (
-              <p class="text-navy-400 text-[13px]">Belum ada artikel terkait.</p>
+              <div class="p-[24px] bg-navy-50/50 rounded-[var(--radius-lg)] border border-dashed border-navy-200 text-center relative z-10">
+                <p class="text-navy-400 text-[14px] font-medium">Belum ada artikel terkait.</p>
+              </div>
             )}
           </div>
 
           <!-- Slot Iklan -->
           {ads.length > 0 && (
             <div class="space-y-[20px]">
-              <span class="text-[11px] font-bold text-navy-300 uppercase tracking-wider block text-center">Sponsored</span>
+              {/* <span class="text-[11px] font-bold text-navy-300 uppercase tracking-wider block text-center">Sponsored</span> */}
               {ads.map((ad) => (
                 ad.url ? (
-                  <a href={ad.url} target="_blank" rel="noopener noreferrer" class="block rounded-[var(--radius-md)] overflow-hidden shadow-[var(--shadow-soft)] hover:shadow-lg transition-shadow bg-white">
-                    <img src={getAssetUrl(ad.image, { width: 600, format: "webp", quality: 85 })} alt={ad.title || "Iklan Sponsor"} class="w-full h-auto object-cover" />
-                    {ad.title && (
-                      <p class="text-[12px] text-navy-500 text-center py-[8px] px-[12px] font-medium leading-snug">{ad.title}</p>
+                  <a href={ad.url.startsWith('http') ? ad.url : `https://${ad.url}`} target="_blank" rel="noopener noreferrer" class="block rounded-[var(--radius-md)] overflow-hidden shadow-[var(--shadow-soft)] hover:shadow-lg transition-shadow bg-white">
+                    <img src={getAssetUrl(ad.image, { width: 600, format: "webp", quality: 85 })} alt={ad.description || "Iklan Sponsor"} class="w-full h-auto object-cover" />
+                    {ad.description && (
+                      <p class="text-[12px] text-navy-500 text-center py-[8px] px-[12px] font-medium leading-snug">{ad.description}</p>
                     )}
                   </a>
                 ) : (
                   <div class="block rounded-[var(--radius-md)] overflow-hidden shadow-[var(--shadow-soft)] bg-white">
-                    <img src={getAssetUrl(ad.image, { width: 600, format: "webp", quality: 85 })} alt={ad.title || "Iklan Sponsor"} class="w-full h-auto object-cover" />
-                    {ad.title && (
-                      <p class="text-[12px] text-navy-500 text-center py-[8px] px-[12px] font-medium leading-snug">{ad.title}</p>
+                    <img src={getAssetUrl(ad.image, { width: 600, format: "webp", quality: 85 })} alt={ad.description || "Iklan Sponsor"} class="w-full h-auto object-cover" />
+                    {ad.description && (
+                      <p class="text-[12px] text-navy-500 text-center py-[8px] px-[12px] font-medium leading-snug">{ad.description}</p>
                     )}
                   </div>
                 )
