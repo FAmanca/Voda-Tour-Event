@@ -40,7 +40,7 @@ function formatDate(dateStr: string | null): string {
 <Layout
   title="Artikel & Blog | Voda Tour & Event"
   description="Kumpulan artikel perjalanan, tips liburan, dan berita terbaru dari Voda Tour & Event."
-  active="beranda"
+  active="artikel"
 >
   <main>
     <!-- ================================================================== -->
@@ -98,6 +98,16 @@ function formatDate(dateStr: string | null): string {
           </div>
         )}
 
+        {/* ------- Search Bar ------- */}
+        {!fetchError && articles.length > 0 && (
+          <div class="mb-[48px] max-w-[600px] mx-auto relative z-20">
+            <div class="relative">
+              <input type="text" id="article-search" placeholder="Cari judul atau isi artikel..." class="w-full bg-white border border-navy-100 rounded-[var(--radius-full)] py-[16px] pl-[56px] pr-[24px] text-[15px] text-navy-800 font-medium focus:outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 shadow-sm transition-all" />
+              <i class="fa-solid fa-search absolute left-[24px] top-1/2 -translate-y-1/2 text-navy-300 text-[16px]"></i>
+            </div>
+          </div>
+        )}
+
         {/* ------- Featured article ------- */}
         {!fetchError && featured && (() => {
           const imgUrl = featured.featured_image
@@ -108,7 +118,9 @@ function formatDate(dateStr: string | null): string {
           return (
             <a
               href={"/artikel/" + featured.slug}
-              class="group relative block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden no-underline mb-[48px] hover:shadow-[0_16px_48px_rgba(0,0,0,0.12)] transition-all duration-300"
+              data-title={featured.title}
+              data-excerpt={excerpt}
+              class="article-card group relative block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden no-underline mb-[48px] hover:shadow-[0_16px_48px_rgba(0,0,0,0.12)] transition-all duration-300"
             >
               <div class="grid lg:grid-cols-2">
                 {/* Image */}
@@ -126,9 +138,9 @@ function formatDate(dateStr: string | null): string {
                     </div>
                   )}
                   {/* Featured badge */}
-                  <div class="absolute top-[16px] left-[16px] flex items-center gap-[6px] bg-orange-600 text-white text-[11px] font-bold uppercase tracking-wider px-[12px] py-[5px] rounded-full shadow-md">
+                  {/* <div class="absolute top-[16px] left-[16px] flex items-center gap-[6px] bg-orange-600 text-white text-[11px] font-bold uppercase tracking-wider px-[12px] py-[5px] rounded-full shadow-md">
                     <i class="fa-solid fa-star text-[9px]"></i>Artikel Pilihan
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Content */}
@@ -155,7 +167,7 @@ function formatDate(dateStr: string | null): string {
 
         {/* ------- Grid: section header ------- */}
         {!fetchError && gridArticles.length > 0 && (
-          <div class="mb-[32px]">
+          <div id="grid-header" class="mb-[32px]">
             <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[24px] font-bold">Artikel Lainnya</h2>
             <div class="w-[40px] h-[3px] bg-orange-500 rounded-full mt-[10px]"></div>
           </div>
@@ -173,7 +185,9 @@ function formatDate(dateStr: string | null): string {
               return (
                 <a
                   href={"/artikel/" + article.slug}
-                  class="group flex flex-col bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden no-underline hover:shadow-[0_12px_36px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-[6px]"
+                  data-title={article.title}
+                  data-excerpt={excerpt}
+                  class="article-card group flex flex-col bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden no-underline hover:shadow-[0_12px_36px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-[6px]"
                 >
                   {/* Image */}
                   <div class="relative aspect-[16/9] overflow-hidden bg-navy-100">
@@ -243,4 +257,36 @@ function formatDate(dateStr: string | null): string {
       </section>
     )}
   </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('article-search') as HTMLInputElement | null;
+      const articleCards = document.querySelectorAll('.article-card');
+      const sectionHeader = document.getElementById('grid-header');
+      
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const query = (e.target as HTMLInputElement).value.toLowerCase().trim();
+          let visibleCount = 0;
+          
+          articleCards.forEach(card => {
+            const title = card.getAttribute('data-title')?.toLowerCase() || '';
+            const excerpt = card.getAttribute('data-excerpt')?.toLowerCase() || '';
+            
+            if (title.includes(query) || excerpt.includes(query)) {
+              (card as HTMLElement).style.display = '';
+              visibleCount++;
+            } else {
+              (card as HTMLElement).style.display = 'none';
+            }
+          });
+
+          // Optional: hide section headers if filtering
+          if (sectionHeader) {
+            sectionHeader.style.display = query.length > 0 ? 'none' : '';
+          }
+        });
+      }
+    });
+  </script>
 </Layout>

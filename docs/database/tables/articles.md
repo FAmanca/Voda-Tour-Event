@@ -9,10 +9,11 @@ Tabel `articles` menyimpan data blog/artikel untuk konten website, panduan wisat
 | id             | uuid          | gen_random_uuid() | Primary key                  |
 | title          | varchar(255)  | —                 | Judul artikel                |
 | slug           | varchar(255)  | —                 | URL slug (unique)            |
-| content        | text/html     | null              | Isi artikel (Tiptap/WYSIWYG) |
-| image          | uuid (files)  | null              | Featured image artikel       |
-| seo            | json          | null              | Data SEO (custom-seo-analyzer)|
-| status         | varchar(20)   | 'draft'           | draft / published / archived |
+| publish_date   | timestamptz       | now()             | Tanggal publikasi            |
+| content        | text              | null              | Konten artikel (Rich text)   |
+| ads            | alias (O2M)       | null              | Relasi One-to-Many ke `ads`  |
+| seo            | json              | null              | Data SEO (custom-seo-analyzer)|
+| status         | varchar(20)       | 'draft'           | draft / published / archived |
 | created_at     | timestamptz   | now()             | Audit                        |
 | updated_at     | timestamptz   | now()             | Audit                        |
 | deleted_at     | timestamptz   | null              | Soft delete                  |

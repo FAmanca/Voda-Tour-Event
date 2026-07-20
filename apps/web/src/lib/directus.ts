@@ -219,6 +219,7 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
       status: { _eq: "published" },
       slug: { _eq: slug },
     }),
+    fields: "*,ads.*",
   });
   return items.length > 0 ? items[0] : null;
 }
