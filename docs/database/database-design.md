@@ -79,6 +79,18 @@ Berikut collection yang **harus dibuat manual** di admin panel Directus.
 | key | string (unique) | site_name, whatsapp, email, address, ig, etc |
 | value | text | Nilai setting |
 
+### `articles`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | integer (PK) | auto-increment |
+| title | string | Judul artikel |
+| slug | string (unique) | Auto dari title |
+| content | text | Konten artikel (Rich text) |
+| image | string (URL) | Featured image |
+| seo | JSON | Data SEO via custom-seo-analyzer |
+| status | string | published / draft |
+
 ## Relasi
 
 ```
@@ -91,7 +103,7 @@ regions (1) ----< destinations (M) ----< packages (M)
 2. Kiri: Settings -> Data Model
 3. Klik "Create Collection"
 4. Pilih mode: **Table** (bukan singleton)
-5. Isi Collection Name: `regions` / `destinations` / `packages` / `settings`
+5. Isi Collection Name: `regions` / `destinations` / `packages` / `articles` / `settings`
 6. Tambah field sesuai tabel di atas
 7. Untuk field relasi (region_id, destination_id), pilih tipe **Many-to-One**
 8. Set permission: Public -> Read (biar API bisa diakses tanpa auth)

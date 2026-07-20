@@ -1,0 +1,168 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getArticleBySlug, getRelatedArticles, getAssetUrl } from "../../lib/directus";
+import type { Article } from "../../types/directus";
+
+const { slug } = Astro.params;
+
+let article: Article | null = slug ? await getArticleBySlug(slug).catch(() => null) : null;
+
+let imgUrl = null;
+let date = "";
+let relatedArticles: Article[] = [];
+if (article) {
+  if (article.featured_image) {
+    imgUrl = getAssetUrl(article.featured_image, { width: 1200, height: 600, format: "webp", quality: 85 });
+  }
+  if (article.publish_date) {
+    date = new Date(article.publish_date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+  if (article.title && slug) {
+    relatedArticles = await getRelatedArticles(article.title, slug, 3).catch(() => []);
+  }
+}
+
+const ads = article && article.ads ? article.ads.slice(0, 10) : [];
+
+// Render content (Assuming HTML for TipTap or simple block parser)
+let contentHtml = "";
+if (article && article.content) {
+  const content = article.content as any;
+  if (typeof content === 'string') {
+    contentHtml = content;
+  } else if (content.blocks) {
+    contentHtml = content.blocks.map((b: any) => {
+      if (b.type === 'paragraph') return "<p>" + b.data.text + "</p>";
+      if (b.type === 'header') return "<h" + b.data.level + ">" + b.data.text + "</h" + b.data.level + ">";
+      if (b.type === 'list') return "<ul>" + b.data.items.map((i: string) => "<li>" + i + "</li>").join('') + "</ul>";
+      if (b.type === 'image') return "<img src=\"" + b.data.url + "\" alt=\"" + (b.data.caption || '') + "\" />";
+      return "";
+    }).join('');
+  }
+}
+
+// Handle SEO Data
+let metaTitle = article ? article.title : "Artikel Tidak Ditemukan";
+let metaDesc = article ? "Baca selengkapnya di Voda Tour & Event." : "";
+let canonicalUrl = article && slug ? "https://vodatrip.id/artikel/" + slug : "";
+
+if (article && article.seo && typeof article.seo === 'object') {
+  const seo = article.seo as any;
+  if (seo.title) metaTitle = seo.title;
+  if (seo.metaDescription) metaDesc = seo.metaDescription;
+  if (seo.canonical) canonicalUrl = seo.canonical;
+}
+
+const jsonldData = article ? JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": metaTitle,
+  "description": metaDesc,
+  "image": imgUrl ? [imgUrl] : [],
+  "datePublished": article.publish_date || new Date().toISOString(),
+  "author": { "@type": "Organization", "name": "Voda Tour & Event" },
+  "publisher": { "@type": "Organization", "name": "Voda Tour & Event" }
+}) : "";
+---
+<Layout title={`${metaTitle} | Voda Tour & Event`} description={metaDesc} canonical={canonicalUrl} jsonld={jsonldData} active="beranda" image={imgUrl || undefined}>
+  <main class="bg-navy-50 py-[60px] max-lg:py-[40px]">
+    {!article ? (
+      <div class="wrap py-[120px] text-center">
+        <i class="fa-regular fa-face-frown text-[56px] text-navy-200 block mb-[20px]"></i>
+        <h1 class="font-[family-name:var(--font-display)] text-navy-800 text-[28px] font-bold">Artikel Tidak Ditemukan</h1>
+        <p class="text-navy-500 mt-[10px]">Maaf, artikel yang Anda cari tidak tersedia atau telah dihapus.</p>
+        <a href="/artikel" class="inline-flex items-center gap-[8px] mt-[20px] text-orange-600 font-semibold text-[14px] hover:underline">
+          <i class="fa-solid fa-arrow-left"></i> Kembali ke Artikel
+        </a>
+      </div>
+    ) : (
+      <div class="wrap grid grid-cols-1 lg:grid-cols-12 gap-[40px]">
+        
+        <!-- Kolom Utama: Konten Artikel -->
+        <article class="lg:col-span-8 bg-white p-[40px] max-lg:p-[20px] rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] h-fit">
+          <div class="mb-[30px]">
+            <h1 class="font-[family-name:var(--font-display)] text-navy-800 text-[36px] max-lg:text-[28px] font-bold leading-tight mb-[12px]">{article.title}</h1>
+            <p class="text-navy-400 text-[13px] font-medium"><i class="fa-regular fa-calendar mr-[6px]"></i>{date}</p>
+          </div>
+
+          {imgUrl && (
+            <div class="rounded-[var(--radius-md)] overflow-hidden mb-[40px]">
+              <img src={imgUrl} alt={article.title} class="w-full h-auto object-cover" />
+            </div>
+          )}
+
+          <!-- Prose styling for rich text -->
+          <div class="prose prose-navy max-w-none 
+                      prose-headings:font-[family-name:var(--font-display)] prose-headings:text-navy-800 
+                      prose-p:text-navy-600 prose-p:leading-relaxed
+                      prose-a:text-orange-500 prose-a:no-underline hover:prose-a:underline
+                      prose-img:rounded-[var(--radius-md)]" 
+               set:html={contentHtml}>
+          </div>
+        </article>
+
+        <!-- Sidebar Kanan -->
+        <aside class="lg:col-span-4 space-y-[30px]">
+          
+          <!-- Artikel Lainnya -->
+          <div class="bg-white p-[24px] rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)]">
+            <h3 class="font-[family-name:var(--font-display)] text-[18px] font-bold text-navy-800 mb-[20px] pb-[12px] border-b border-gray-100">
+              Artikel Terkait
+            </h3>
+            {relatedArticles.length > 0 ? (
+              <div class="space-y-[16px]">
+                {relatedArticles.map((rel) => {
+                  const relImg = rel.featured_image ? getAssetUrl(rel.featured_image, { width: 120, height: 120, format: "webp", quality: 80 }) : null;
+                  return (
+                    <a href={`/artikel/${rel.slug}`} class="group flex gap-[12px] items-center no-underline">
+                      <div class="w-[70px] h-[70px] shrink-0 rounded-[var(--radius-sm)] overflow-hidden bg-navy-50">
+                        {relImg ? <img src={relImg} alt={rel.title} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" /> : <div class="w-full h-full flex justify-center items-center text-navy-300"><i class="fa-regular fa-image text-[20px]"></i></div>}
+                      </div>
+                      <h4 class="text-[14px] font-bold text-navy-800 leading-snug group-hover:text-orange-600 transition-colors line-clamp-2">
+                        {rel.title}
+                      </h4>
+                    </a>
+                  );
+                })}
+              </div>
+            ) : (
+              <p class="text-navy-400 text-[13px]">Belum ada artikel terkait.</p>
+            )}
+          </div>
+
+          <!-- Slot Iklan -->
+          {ads.length > 0 && (
+            <div class="space-y-[20px]">
+              <span class="text-[11px] font-bold text-navy-300 uppercase tracking-wider block text-center">Sponsored</span>
+              {ads.map((ad) => (
+                ad.url ? (
+                  <a href={ad.url} target="_blank" rel="noopener noreferrer" class="block rounded-[var(--radius-md)] overflow-hidden shadow-[var(--shadow-soft)] hover:shadow-lg transition-shadow bg-white">
+                    <img src={getAssetUrl(ad.image, { width: 600, format: "webp", quality: 85 })} alt={ad.title || "Iklan Sponsor"} class="w-full h-auto object-cover" />
+                    {ad.title && (
+                      <p class="text-[12px] text-navy-500 text-center py-[8px] px-[12px] font-medium leading-snug">{ad.title}</p>
+                    )}
+                  </a>
+                ) : (
+                  <div class="block rounded-[var(--radius-md)] overflow-hidden shadow-[var(--shadow-soft)] bg-white">
+                    <img src={getAssetUrl(ad.image, { width: 600, format: "webp", quality: 85 })} alt={ad.title || "Iklan Sponsor"} class="w-full h-auto object-cover" />
+                    {ad.title && (
+                      <p class="text-[12px] text-navy-500 text-center py-[8px] px-[12px] font-medium leading-snug">{ad.title}</p>
+                    )}
+                  </div>
+                )
+              ))}
+            </div>
+          )}
+
+        </aside>
+
+      </div>
+    )}
+    
+    <div class="wrap max-w-[800px] mx-auto mt-[40px] text-center">
+      <a href="/artikel" class="inline-flex items-center gap-[8px] text-navy-600 hover:text-orange-500 font-semibold transition-colors">
+        <i class="fa-solid fa-arrow-left"></i>Kembali ke Semua Artikel
+      </a>
+    </div>
+  </main>
+</Layout>
