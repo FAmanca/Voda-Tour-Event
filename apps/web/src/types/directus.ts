@@ -134,6 +134,30 @@ export interface PackageActivityType {
   updated_at: string;
 }
 
+export interface ArticleAd {
+  image: string; // File UUID
+  url?: string;
+  title?: string;
+}
+
+export interface Article {
+  id: string;
+  title: string;
+  slug: string;
+  content: Record<string, any> | string | null;
+  featured_image: FileUuid | null;
+  ads: ArticleAd[] | null;
+  publish_date: string | null;
+  seo: Record<string, any> | null;
+  
+  status: Status;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  created_by: UserUuid | null;
+  updated_by: UserUuid | null;
+}
+
 export interface Setting {
   id: string;
   key: string;        // "site_name", "whatsapp", "email", etc.

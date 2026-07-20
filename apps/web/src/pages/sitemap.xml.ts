@@ -6,14 +6,17 @@ const SITE_URL = import.meta.env.SITE_URL || "https://vodatrip.id";
 export const GET: APIRoute = async () => {
   let destinations: { slug: string; updated_at: string }[] = [];
   let packages: { slug: string; updated_at: string }[] = [];
+  let articles: { slug: string; updated_at: string }[] = [];
 
   try {
-    const [destRes, pkgRes] = await Promise.all([
+    const [destRes, pkgRes, articleRes] = await Promise.all([
       fetch(DIRECTUS_URL + "/items/destinations?fields=slug,updated_at&filter[status][_eq]=published"),
       fetch(DIRECTUS_URL + "/items/packages?fields=slug,updated_at&filter[status][_eq]=published"),
+      fetch(DIRECTUS_URL + "/items/articles?fields=slug,updated_at&filter[status][_eq]=published"),
     ]);
     if (destRes.ok) { const data = await destRes.json(); destinations = data.data || []; }
     if (pkgRes.ok) { const data = await pkgRes.json(); packages = data.data || []; }
+    if (articleRes.ok) { const data = await articleRes.json(); articles = data.data || []; }
   } catch {}
 
   const staticPages = [
@@ -24,6 +27,7 @@ export const GET: APIRoute = async () => {
     { loc: "/galeri", priority: "0.6", changefreq: "monthly" },
     { loc: "/tentang", priority: "0.7", changefreq: "monthly" },
     { loc: "/kontak", priority: "0.7", changefreq: "monthly" },
+    { loc: "/artikel", priority: "0.9", changefreq: "daily" },
   ];
 
   const NL = "\n";
@@ -56,6 +60,16 @@ export const GET: APIRoute = async () => {
     <lastmod>${pkg.updated_at}</lastmod>
     <priority>0.6</priority>
     <changefreq>weekly</changefreq>
+  </url>`
+    )
+    .join(NL)}
+  ${articles
+    .map(
+      (art) => `  <url>
+    <loc>${SITE_URL}/artikel/${art.slug}</loc>
+    <lastmod>${art.updated_at}</lastmod>
+    <priority>0.8</priority>
+    <changefreq>daily</changefreq>
   </url>`
     )
     .join(NL)}

@@ -10,6 +10,7 @@ import type {
   ActivityType,
   Setting,
   Status,
+  Article,
 } from "../types/directus";
 
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
@@ -198,6 +199,62 @@ export async function getActivityTypes(): Promise<ActivityType[]> {
     filter: JSON.stringify({ status: { _eq: "published" } }),
     sort: "name",
   });
+}
+
+// ---------------------------------------------------------------------------
+// Articles
+// ---------------------------------------------------------------------------
+
+export async function getArticles(limit = 12): Promise<Article[]> {
+  return fetchApi<Article>("articles", {
+    filter: JSON.stringify({ status: { _eq: "published" } }),
+    sort: "-publish_date",
+    limit: String(limit),
+  });
+}
+
+export async function getArticleBySlug(slug: string): Promise<Article | null> {
+  const items = await fetchApi<Article>("articles", {
+    filter: JSON.stringify({
+      status: { _eq: "published" },
+      slug: { _eq: slug },
+    }),
+  });
+  return items.length > 0 ? items[0] : null;
+}
+
+export async function getRelatedArticles(title: string, excludeSlug: string, limit = 3): Promise<Article[]> {
+  const stopWords = new Set(["di", "ke", "dari", "dan", "atau", "untuk", "dengan", "yang", "ini", "itu", "pada", "dalam", "sebuah", "adalah", "tips", "cara"]);
+  const words = title.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
+  
+  let filter: any = {
+    status: { _eq: "published" },
+    slug: { _neq: excludeSlug },
+  };
+
+  if (words.length > 0) {
+    filter._or = words.map(w => ({ title: { _icontains: w } }));
+  }
+
+  const items = await fetchApi<Article>("articles", {
+    filter: JSON.stringify(filter),
+    sort: "-publish_date",
+    limit: String(limit),
+  });
+  
+  // Jika hasil pencarian keyword kosong (atau kurang dari limit), ambil fallback artikel terbaru
+  if (items.length === 0) {
+    return fetchApi<Article>("articles", {
+      filter: JSON.stringify({
+        status: { _eq: "published" },
+        slug: { _neq: excludeSlug },
+      }),
+      sort: "-publish_date",
+      limit: String(limit),
+    });
+  }
+
+  return items;
 }
 
 // ---------------------------------------------------------------------------
