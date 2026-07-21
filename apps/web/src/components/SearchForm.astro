@@ -21,146 +21,107 @@ const { destinations, activityTypes, initialValues } = Astro.props;
 const iv = initialValues || {};
 ---
 
-<div class="relative">
-  <form id="search-form" method="GET" action="/cari">
-    <!-- Text Search with Autocomplete -->
-    <div class="relative mb-[16px]">
-      <label for="search-input" class="block text-[12px] font-semibold text-white/80 mb-[6px] uppercase tracking-[0.08em]">Cari Destinasi atau Paket</label>
-      <div class="relative">
-        <i class="fa-solid fa-search absolute left-[18px] top-1/2 -translate-y-1/2 text-white/30 text-[16px] pointer-events-none"></i>
+<div class="relative w-full max-w-5xl mx-auto">
+  <form id="search-form" method="GET" action="/cari" class="relative z-10 flex flex-col md:flex-row items-center bg-white/10 backdrop-blur-xl border border-white/20 rounded-[32px] md:rounded-[60px] p-2 md:p-3 shadow-2xl transition-all duration-300 hover:shadow-orange-500/10 hover:border-white/30">
+    
+    <!-- Text Search -->
+    <div class="relative w-full md:w-auto md:flex-1 group">
+      <div class="px-5 py-2 md:py-1">
+        <label for="search-input" class="block text-[10px] font-bold text-orange-400 uppercase tracking-widest mb-1">Tujuan</label>
         <input
           id="search-input"
           type="text"
           name="q"
-          placeholder="Ketik nama destinasi atau paket..."
+          placeholder="Cari destinasi / paket"
           value={iv.q || ""}
           autocomplete="off"
-          class="w-full h-[52px] pl-[48px] pr-[100px] text-[15px] rounded-[var(--radius-lg)] bg-white/10 border-2 border-white/15 text-white placeholder:text-white/50 outline-none focus:border-orange-500 transition-all"
+          class="w-full bg-transparent text-[15px] font-medium text-white placeholder:text-white/40 outline-none truncate"
         />
-        <button type="submit" class="absolute right-[6px] top-1/2 -translate-y-1/2 h-[40px] px-[18px] bg-orange-600 hover:bg-orange-500 text-white font-semibold text-[13px] rounded-[var(--radius-sm)] transition-colors flex items-center gap-[6px] max-sm:hidden">
-          Cari <i class="fa-solid fa-arrow-right text-[12px]"></i>
-        </button>
       </div>
       <!-- Autocomplete Dropdown -->
-      <div id="search-dropdown" role="listbox" class="hidden absolute left-0 right-0 top-full mt-[4px] bg-white rounded-[var(--radius-lg)] shadow-[0_12px_40px_rgba(0,0,0,0.15)] border border-navy-100 z-[999] overflow-hidden max-h-[320px] overflow-y-auto"></div>
+      <div id="search-dropdown" role="listbox" class="hidden absolute left-0 right-0 top-[120%] bg-white rounded-2xl shadow-2xl border border-navy-100 z-[999] overflow-hidden max-h-[320px] overflow-y-auto"></div>
     </div>
 
-    <!-- Filters: tanggal + kegiatan + pax -->
-    <div class="bg-white/5 backdrop-blur-sm rounded-[var(--radius-lg)] p-[20px] border border-white/10">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-[14px] items-end">
-        <!-- Tanggal -->
-        <div>
-          <label for="search-form-date" class="block text-[11px] font-semibold text-white/80 uppercase tracking-[0.08em] mb-[5px]">Tanggal Berangkat</label>
-          <div class="relative">
-            <input type="date" name="tanggal" id="search-form-date" value={iv.travelDate || ""}
-              class="w-full h-[44px] px-[12px] text-[13px] rounded-[var(--radius-sm)] bg-white/10 border border-white/15 text-white outline-none focus:border-orange-500 transition-colors [color-scheme:dark]" />
-            <i class="fa-regular fa-calendar absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
-          </div>
-        </div>
+    <div class="hidden md:block w-[1px] h-10 bg-white/10"></div>
 
-        <!-- Kegiatan -->
-        <div>
-          <label for="search-form-kegiatan" class="block text-[11px] font-semibold text-white/80 uppercase tracking-[0.08em] mb-[5px]">Kegiatan</label>
-          <div class="relative">
-            <select name="kegiatan" id="search-form-kegiatan" class="w-full h-[44px] px-[12px] text-[13px] rounded-[var(--radius-sm)] bg-white/10 border border-white/15 text-white/90 outline-none focus:border-orange-500 transition-colors appearance-none">
-              <option value="" class="text-navy-800">Semua Kegiatan</option>
-              {activityTypes.map((a) => (
-                <option value={a.slug} selected={iv.activityType === a.slug} class="text-navy-800">{a.name}</option>
-              ))}
-            </select>
-            <i class="fa-solid fa-chevron-down absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[10px] pointer-events-none"></i>
-          </div>
-        </div>
-
-        <!-- Pax -->
-        <div>
-          <label for="search-form-pax" class="block text-[11px] font-semibold text-white/80 uppercase tracking-[0.08em] mb-[5px]">Jumlah Peserta</label>
-          <div class="relative">
-            <input type="number" name="pax" id="search-form-pax" min="1" placeholder="Mis: 10" value={iv.paxCount || ""}
-              class="w-full h-[44px] px-[12px] text-[13px] rounded-[var(--radius-sm)] bg-white/10 border border-white/15 text-white placeholder:text-white/50 outline-none focus:border-orange-500 transition-colors" />
-            <i class="fa-solid fa-user absolute right-[12px] top-1/2 -translate-y-1/2 text-white/30 text-[12px] pointer-events-none"></i>
-          </div>
-        </div>
-      </div>
+    <!-- Tanggal -->
+    <div class="relative w-full md:w-auto md:flex-[0.8] px-5 py-3 md:py-1 border-t border-white/5 md:border-t-0">
+      <label for="search-form-date" class="block text-[10px] font-bold text-orange-400 uppercase tracking-widest mb-1">Tanggal</label>
+      <input type="date" name="tanggal" id="search-form-date" value={iv.travelDate || ""}
+        class="w-full bg-transparent text-[15px] font-medium text-white outline-none cursor-pointer [color-scheme:dark]" />
     </div>
 
-    <!-- Submit -->
-    <button type="submit" class="w-full mt-[16px] py-[13px] bg-orange-600 hover:bg-orange-500 text-white font-semibold text-[14px] rounded-[var(--radius-sm)] transition-colors flex items-center justify-center gap-[8px]">
-      <i class="fa-solid fa-search"></i>
-      Cari Paket
-    </button>
+    <div class="hidden md:block w-[1px] h-10 bg-white/10"></div>
+
+    <!-- Kegiatan -->
+    <div class="relative w-full md:w-auto md:flex-[0.8] px-5 py-3 md:py-1 border-t border-white/5 md:border-t-0">
+      <label for="search-form-kegiatan" class="block text-[10px] font-bold text-orange-400 uppercase tracking-widest mb-1">Kegiatan</label>
+      <select name="kegiatan" id="search-form-kegiatan" class="w-full bg-transparent text-[15px] font-medium text-white outline-none cursor-pointer appearance-none">
+        <option value="" class="text-navy-800">Semua</option>
+        {activityTypes.map((a) => (
+          <option value={a.slug} selected={iv.activityType === a.slug} class="text-navy-800">{a.name}</option>
+        ))}
+      </select>
+      <i class="fa-solid fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-white/40 text-[10px] pointer-events-none md:hidden"></i>
+    </div>
+
+    <div class="hidden md:block w-[1px] h-10 bg-white/10"></div>
+
+    <!-- Pax -->
+    <div class="relative w-full md:w-auto md:flex-[0.6] px-5 py-3 md:py-1 border-t border-white/5 md:border-t-0">
+      <label for="search-form-pax" class="block text-[10px] font-bold text-orange-400 uppercase tracking-widest mb-1">Peserta</label>
+      <input type="number" name="pax" id="search-form-pax" min="1" placeholder="Berapa orang?" value={iv.paxCount || ""}
+        class="w-full bg-transparent text-[15px] font-medium text-white placeholder:text-white/40 outline-none" />
+    </div>
+
+    <!-- Submit Button -->
+    <div class="w-full md:w-auto mt-2 md:mt-0 p-2 md:p-0">
+      <button type="submit" class="w-full md:w-[56px] h-[56px] bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white rounded-[24px] md:rounded-full flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_8px_20px_rgba(238,125,15,0.4)]">
+        <i class="fa-solid fa-search text-[18px]"></i>
+        <span class="md:hidden font-semibold">Cari Paket</span>
+      </button>
+    </div>
   </form>
 </div>
 
-<script define:vars={{ envDirectusUrl: import.meta.env.DIRECTUS_URL }}>
-  window.__DIRECTUS_URL__ = envDirectusUrl || 'http://localhost:8055';
+<style>
+  /* Sembunyikan default calender icon di webkit jika mau UI bersih, tapi biarkan saja agar clickable */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.5;
+    cursor: pointer;
+  }
+</style>
+
+<script define:vars={{ envDirectusUrl: import.meta.env.PUBLIC_DIRECTUS_URL || import.meta.env.DIRECTUS_URL || 'http://localhost:8055' }}>
+  window.__DIRECTUS_URL__ = envDirectusUrl;
 </script>
 <script>
 import { initAutocomplete, logSearch } from "../lib/search";
 document.addEventListener("DOMContentLoaded", function () {
   initAutocomplete("search-input", "search-dropdown");
 
-  // Auto-fill form dari URL params (karena Astro static, initialValues cuma build-time)
   var searchParams = new URLSearchParams(window.location.search);
   var qInput = document.querySelector("input[name='q']");
-  if (searchParams.get("q")) { qInput.value = searchParams.get("q"); qInput.dataset.searchValid = 'true'; qInput.dataset.searchLabel = searchParams.get("q"); }
+  if (searchParams.get("q")) { 
+    qInput.value = searchParams.get("q"); 
+    qInput.dataset.searchValid = 'true'; 
+    qInput.dataset.searchLabel = searchParams.get("q"); 
+  }
   if (searchParams.get("tanggal")) document.querySelector("input[name='tanggal']").value = searchParams.get("tanggal");
   if (searchParams.get("kegiatan")) document.querySelector("select[name='kegiatan']").value = searchParams.get("kegiatan");
   if (searchParams.get("pax")) document.querySelector("input[name='pax']").value = searchParams.get("pax");
 
-  // Validation helper
-  function showFieldError(inputEl, msg) {
-    var key = (inputEl.id || inputEl.name || 'field') + '-error';
-    var err = document.getElementById(key);
-    if (!err) {
-      err = document.createElement('p');
-      err.id = key;
-      err.className = 'text-[11px] text-red-400 mt-[4px]';
-      inputEl.parentNode.appendChild(err);
-    }
-    err.textContent = msg;
-    inputEl.style.borderColor = 'rgba(248,113,113,0.5)';
-  }
-
-  function clearFieldError(inputEl) {
-    var key = (inputEl.id || inputEl.name || 'field') + '-error';
-    var err = document.getElementById(key);
-    if (err) err.remove();
-    inputEl.style.borderColor = '';
-  }
-
   var form = document.getElementById("search-form");
   if (form) {
     form.addEventListener("submit", function (e) {
-      // === VALIDATION ===
-      var valid = true;
-
-      // 1. Search input — must be selected from dropdown
-      if (qInput.dataset.searchValid !== 'true') {
-        showFieldError(qInput, 'Harap pilih destinasi atau paket dari daftar yang muncul');
-        valid = false;
-      } else {
-        clearFieldError(qInput);
-      }
-
-      // 2. Kegiatan — must be selected
-      var kegSelect = document.querySelector("select[name='kegiatan']");
-      if (!kegSelect.value) {
-        showFieldError(kegSelect, 'Harap pilih jenis kegiatan');
-        valid = false;
-      } else {
-        clearFieldError(kegSelect);
-      }
-
-      if (!valid) { e.preventDefault(); return; }
-
-      // === PROCEED ===
       e.preventDefault();
       var fd = new FormData(form);
       var q = fd.get("q") || "";
       var kegiatanVal = fd.get("kegiatan") || "";
       var travelDate = fd.get("tanggal") || "";
       var paxVal = fd.get("pax") || "";
+      
       logSearch({
         query: q,
         activity_type_name: kegiatanVal,
