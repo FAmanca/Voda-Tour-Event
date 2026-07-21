@@ -36,13 +36,16 @@ async function fetchAllPackages(): Promise<(PackageWithDestination & { activity_
     const json = await res.json() as DirectusResponse<PackageWithDestination[]>;
     const packages = json.data || [];
 
-    const actsUrl = `${DIRECTUS_URL}/items/packages_activity_types?fields=package_id,activity_type_id.slug,activity_type_id.name&limit=200`;
+    const actsUrl = `${DIRECTUS_URL}/items/packages_activity_types?fields=packages_id,activity_types_id.slug,activity_types_id.name&limit=300&access_token=super-secret-admin-token`;
     const actsRes = await fetch(actsUrl);
     if (actsRes.ok) {
       const actsJson = await actsRes.json() as DirectusResponse<PackageActivityType[]>;
       const allActs = actsJson.data || [];
       packages.forEach((pkg) => {
-        (pkg as PackageWithDestination & { activity_types?: PackageActivityType[] }).activity_types = allActs.filter((act) => act.package_id === pkg.id);
+        (pkg as PackageWithDestination & { activity_types?: PackageActivityType[] }).activity_types = allActs.filter((act) => {
+          const actPkgId = typeof act.packages_id === 'object' && act.packages_id !== null ? (act.packages_id as any).id : act.packages_id;
+          return actPkgId === pkg.id;
+        });
       });
     }
 
@@ -102,7 +105,7 @@ export async function searchApi(params?: SearchParams): Promise<PackageWithDesti
     packages = packages.filter((pkg) => {
       const acts = pkg.activity_types || [];
       for (const act of acts) {
-        const type = act.activity_type_id as unknown as ActivityType;
+        const type = act.activity_types_id as unknown as ActivityType;
         if (type && type.slug === kegiatan) return true;
       }
       return false;
