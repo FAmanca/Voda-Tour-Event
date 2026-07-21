@@ -77,10 +77,14 @@ services:
       CORS_ORIGIN: ${CORS_ORIGIN:-https://vodatrip.id,https://www.vodatrip.id}
       RATE_LIMITER_ENABLED: "true"
       RATE_LIMITER_STORE: "memory"
+      
+      # Allow local extensions
+      MARKETPLACE_TRUST: "all"
 
     volumes:
       - directus_uploads:/directus/uploads
       - directus_database_prod:/directus/database
+      - ./extensions:/directus/extensions
     ports:
       - "8055:8055"
     networks:
