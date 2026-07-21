@@ -26,7 +26,21 @@ try {
 } catch { fetchError = true; }
 ---
 
-<Layout title={destination ? destination.name + " | Destinasi Voda Tour & Event" : "Destinasi Tidak Ditemukan"} description={destination?.description || ""} active="destinasi">
+<Layout 
+  title={destination ? destination.name + " | Destinasi Voda Tour & Event" : "Destinasi Tidak Ditemukan"} 
+  description={destination?.description || ""} 
+  image={destination?.image ? (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + destination.image + "?width=1200&height=630&format=webp" : ""}
+  canonical={destination ? "https://vodatrip.id/destinasi/" + destination.slug : ""}
+  jsonld={destination ? JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Place",
+    "name": destination.name,
+    "description": destination.description,
+    "image": destination.image ? (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + destination.image + "?width=800&format=webp" : "",
+    "url": "https://vodatrip.id/destinasi/" + destination.slug
+  }) : ""}
+  active="destinasi"
+>
   <main>
     {fetchError && (
       <section class="bg-navy-900"><div class="wrap py-[120px] text-center text-white/80"><i class="fa-solid fa-triangle-exclamation text-[40px] text-orange-500 block mb-[16px]"></i><p>Gagal memuat halaman.</p></div></section>
