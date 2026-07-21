@@ -20,7 +20,7 @@
 ### 0.3 Docker Infra
 - [x] Fix `infrastructure/docker-compose.yml` — env var references + hapus version warning
 - [x] Setup PostgreSQL 16 container
-- [x] Setup Directus 11 container
+- [x] Setup Directus 12 container
 - [x] Pastiin volume mounting bener
 - [x] `docker compose up -d` — verifikasi kedua container jalan
 - [x] Akses Directus admin `http://localhost:8055` — login success

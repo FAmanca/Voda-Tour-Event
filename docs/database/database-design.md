@@ -71,6 +71,28 @@ Berikut collection yang **harus dibuat manual** di admin panel Directus.
 | sort_order | integer | Urutan tampilan |
 | status | string | published / draft |
 
+### `activity_types`
+
+Master data jenis kegiatan (Private Trip, Corporate Gathering, Team Building, dll).
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | uuid (PK) | gen_random_uuid() |
+| name | string | Nama kegiatan (Private Trip, Corporate Gathering) |
+| slug | string (unique) | Auto dari name (private-trip, corporate-gathering) |
+| description | text | Deskripsi kegiatan |
+| status | string | published / draft |
+
+### `packages_activity_types` (Junction Table M2M)
+
+Tabel penghubung Many-to-Many antara `packages` dan `activity_types`.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | uuid (PK) | gen_random_uuid() |
+| packages_id | uuid (FK) | Relasi M2O ke `packages.id` |
+| activity_types_id | uuid (FK) | Relasi M2O ke `activity_types.id` |
+
 ### `settings`
 
 | Field | Type | Notes |
@@ -105,7 +127,7 @@ Berikut collection yang **harus dibuat manual** di admin panel Directus.
 ## Relasi
 
 ```
-regions (1) ----< destinations (M) ----< packages (M)
+regions (1) ----< destinations (M) ----< packages (M) >----< packages_activity_types >----< activity_types (M)
 articles (1) ---< ads (M)
 ```
 

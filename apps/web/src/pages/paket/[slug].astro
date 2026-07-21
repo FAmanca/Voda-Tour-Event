@@ -10,7 +10,7 @@ import PackageHero from "../../components/PackageHero.astro";
 import PackageFacilities from "../../components/PackageFacilities.astro";
 import PackageSimilar from "../../components/PackageSimilar.astro";
 import { getAssetUrl, getSettings } from "../../lib/directus";
-import { getStartingPrice, formatPrice } from "../../lib/utils";
+import { getStartingPrice, formatPrice, getPriceRange } from "../../lib/utils";
 
 import type { Package, ActivityType } from "../../types/directus";
 
@@ -56,6 +56,7 @@ if (pkg) {
   } catch (err) { if (import.meta.env.DEV) console.error("Error fetching activity types:", err); }
 }
 const startingPrice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
+const priceRange = pkg?.price_tiers ? getPriceRange(pkg.price_tiers) : null;
 ---
 
 
@@ -74,8 +75,8 @@ const startingPrice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : nul
     "offers": {
       "@type": "AggregateOffer",
       "priceCurrency": "IDR",
-      "lowPrice": pkg.price_tiers ? Math.min(...pkg.price_tiers.flatMap(g => g.tiers ? g.tiers : [g]).map(t => t.price_per_pax || t.price).filter(p => p !== null && p > 0)) : 0,
-      "highPrice": pkg.price_tiers ? Math.max(...pkg.price_tiers.flatMap(g => g.tiers ? g.tiers : [g]).map(t => t.price_per_pax || t.price).filter(p => p !== null && p > 0)) : 0,
+      "lowPrice": priceRange?.min ?? 0,
+      "highPrice": priceRange?.max ?? 0,
       "offerCount": pkg.price_tiers ? pkg.price_tiers.length : 0,
       "availability": "https://schema.org/InStock"
     }
