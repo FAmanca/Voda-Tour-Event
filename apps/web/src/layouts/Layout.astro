@@ -47,9 +47,9 @@ const ogImage = image || defaultImage;
     <meta name="theme-color" content="#0B2340" />
 
     <!-- LCP Preload -->
-    <link rel="preload" as="image" href="/images/beach-1920.avif" type="image/avif" media="(min-width: 769px)" />
-    <link rel="preload" as="image" href="/images/beach-768.avif" type="image/avif" media="(min-width: 481px) and (max-width: 768px)" />
-    <link rel="preload" as="image" href="/images/beach-480.avif" type="image/avif" media="(max-width: 480px)" />
+    <link rel="preload" as="image" href="/images/beach-1920.avif" type="image/avif" media="(min-width: 769px)" fetchpriority="high" />
+    <link rel="preload" as="image" href="/images/beach-768.avif" type="image/avif" media="(min-width: 481px) and (max-width: 768px)" fetchpriority="high" />
+    <link rel="preload" as="image" href="/images/beach-480.avif" type="image/avif" media="(max-width: 480px)" fetchpriority="high" />
 
   <!-- Open Graph -->
   <meta property="og:title" content={title} />

@@ -102,7 +102,7 @@ try {
               <p class="text-navy-500 text-[13px]"><strong class="text-navy-800">{totalPackages}</strong> paket ditemukan</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">
-              {packages.map((pkg) => <PackageCard package={pkg} showDestination />)}
+              {packages.map((pkg, index) => <PackageCard package={pkg} showDestination lcp={index === 0} />)}
             </div>
 
             {/* Pagination UI */}
