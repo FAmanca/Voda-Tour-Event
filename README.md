@@ -17,7 +17,7 @@ Platform dirancang sebagai brosur online interaktif yang terhubung langsung ke W
 | Layer         | Teknologi                         |
 | ------------- | --------------------------------- |
 | Frontend      | Astro 7, Tailwind CSS 4, TypeScript |
-| Backend (CMS) | Directus 11 (Headless CMS)        |
+| Backend (CMS) | Directus 12 (Headless CMS)        |
 | Database      | PostgreSQL 16                     |
 | Cache         | Redis 7 (Optional/Idle)           |
 | Storage       | Cloudflare R2 (Optional) / Local  |
@@ -97,7 +97,7 @@ docker compose up -d
 
 Ini akan menginisialisasi:
 - **PostgreSQL 16** (Database relasional utama)
-- **Directus 11** (Headless CMS pada port `8055`)
+- **Directus 12** (Headless CMS pada port `8055`)
 
 *Akses Directus di `http://localhost:8055`. Default login:*
 * Email: `admin@vodatrip.id`

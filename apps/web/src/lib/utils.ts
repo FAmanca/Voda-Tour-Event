@@ -33,25 +33,70 @@ export function formatPriceDisplay(
   return `${prefix}${formatted}${suffix}`;
 }
 
+/** Helper to normalize any price_tiers input into a flat array of PriceTier objects */
+function normalizePriceTiers(input: unknown): PriceTier[] {
+  if (!input) return [];
+
+  let parsed = input;
+
+  // Handle stringified JSON from Directus
+  if (typeof input === "string") {
+    try {
+      parsed = JSON.parse(input);
+    } catch {
+      return [];
+    }
+  }
+
+  // If parsed is a single object (not an array)
+  if (!Array.isArray(parsed)) {
+    if (typeof parsed === "object" && parsed !== null) {
+      if ("tiers" in parsed && Array.isArray((parsed as PriceTierGroup).tiers)) {
+        parsed = (parsed as PriceTierGroup).tiers;
+      } else {
+        parsed = [parsed];
+      }
+    } else {
+      return [];
+    }
+  }
+
+  // Flatten array of tiers or tier groups
+  const flat: PriceTier[] = [];
+  for (const item of parsed as unknown[]) {
+    if (!item || typeof item !== "object") continue;
+    if ("tiers" in item && Array.isArray((item as PriceTierGroup).tiers)) {
+      flat.push(...(item as PriceTierGroup).tiers);
+    } else {
+      flat.push(item as PriceTier);
+    }
+  }
+
+  return flat;
+}
+
 /** Dapatkan harga termurah dari price_tiers atau groups of price_tiers */
 export function getStartingPrice(
-  input: (PriceTierGroup | PriceTier)[]
+  input: unknown
 ): number | null {
-  if (!input || input.length === 0) return null;
-  const flatTiers = input.flatMap(group => 'tiers' in group ? group.tiers : [group as PriceTier]);
-  // Harga termurah -- filter null (kaya "Hubungi CS")
-  const prices = flatTiers.map(tier => tier.price_per_pax || (tier as PriceTier & {price?: number}).price).filter((price): price is number => price !== null && price !== undefined && price > 0);
+  const flatTiers = normalizePriceTiers(input);
+  if (flatTiers.length === 0) return null;
+  const prices = flatTiers
+    .map(tier => tier.price_per_pax ?? (tier as PriceTier & { price?: number }).price)
+    .filter((price): price is number => typeof price === "number" && !isNaN(price) && price > 0);
   if (prices.length === 0) return null;
   return Math.min(...prices);
 }
 
 /** Dapatkan range harga (termurah — termahal) */
 export function getPriceRange(
-  input: (PriceTierGroup | PriceTier)[]
+  input: unknown
 ): { min: number; max: number } | null {
-  if (!input || input.length === 0) return null;
-  const flatTiers = input.flatMap(group => 'tiers' in group ? group.tiers : [group as PriceTier]);
-  const prices = flatTiers.map(tier => tier.price_per_pax || (tier as PriceTier & {price?: number}).price).filter((price): price is number => price !== null && price !== undefined && price > 0);
+  const flatTiers = normalizePriceTiers(input);
+  if (flatTiers.length === 0) return null;
+  const prices = flatTiers
+    .map(tier => tier.price_per_pax ?? (tier as PriceTier & { price?: number }).price)
+    .filter((price): price is number => typeof price === "number" && !isNaN(price) && price > 0);
   if (prices.length === 0) return null;
   return { min: Math.min(...prices), max: Math.max(...prices) };
 }

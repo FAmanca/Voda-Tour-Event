@@ -41,7 +41,7 @@ docker compose up -d
 
 Container akan jalan:
 - **PostgreSQL 16** — database
-- **Directus 11** — headless CMS + admin panel
+- **Directus 12** — headless CMS + admin panel
 
 Tunggu sampai kedua container healthy:
 ```bash
@@ -80,7 +80,7 @@ Akses website di `http://localhost:4321`
 | `destinations` | M2O → regions | — |
 | `packages` | M2O → destinations | — |
 | `activity_types` | Standalone | — |
-| `packages_activity_types` | M2M junction | package_id M2O + activity_type_id M2O |
+| `packages_activity_types` | M2M junction | packages_id M2O + activity_types_id M2O |
 | `settings` | Standalone | Key-value |
 | `searches` | Standalone | Log pencarian, no status field |
 

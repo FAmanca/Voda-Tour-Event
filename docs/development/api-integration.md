@@ -22,6 +22,7 @@ Directus memiliki fitur **Public Role** — role anonim yang dapat membaca data 
 Dengan ini, Astro bisa fetch data langsung tanpa API key.
 
 > **⚠️ Jangan pernah set permission Create/Update/Delete untuk collections bisnis di Public Role.**
+> **⚠️ Catatan:** Beberapa tabel *junction* (seperti `packages_activity_types`) secara default mungkin di-block dari Public. Jika tidak ingin membuka akses Public untuk tabel junction, gunakan parameter `access_token={DIRECTUS_ADMIN_TOKEN}` saat melakukan *fetch* di server-side (SSR) untuk mem-bypass error 403 Forbidden.
 
 ## Fetch Pattern di Astro
 
