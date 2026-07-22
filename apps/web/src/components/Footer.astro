@@ -32,6 +32,19 @@ const navLinks = [
   { label: 'Tentang Kami', url: '/tentang' },
   { label: 'Kontak', url: '/kontak' },
 ];
+
+function formatPhoneNumber(phone: string): string {
+  if (!phone) return "";
+  let cleaned = phone.replace(/[\s-]/g, "");
+  if (cleaned.startsWith("62")) {
+    cleaned = "0" + cleaned.substring(2);
+  }
+  if (cleaned.startsWith("+62")) {
+    cleaned = "0" + cleaned.substring(3);
+  }
+  const chunks = cleaned.match(/.{1,4}/g);
+  return chunks ? chunks.join("-") : cleaned;
+}
 ---
 
 <footer aria-label="Footer" class="bg-navy-900 text-white border-t border-white/5 py-5">
@@ -98,15 +111,7 @@ const navLinks = [
               <div class="w-[32px] h-[32px] rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 shrink-0 text-[15px] group-hover:bg-orange-500 group-hover:text-white transition-colors duration-[0.2s]">
                 <i class="fa-brands fa-whatsapp"></i>
               </div>
-              <span class="truncate">{settingsData.wa_number}</span>
-            </a>
-          </li>
-          <li>
-            <a href={`mailto:${settingsData.email}`} class="flex items-center gap-[12px] text-white/70 text-[13.5px] no-underline transition-colors hover:text-orange-400 group">
-              <div class="w-[32px] h-[32px] rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 shrink-0 text-[14px] group-hover:bg-orange-500 group-hover:text-white transition-colors duration-[0.2s]">
-                <i class="fa-solid fa-envelope"></i>
-              </div>
-              <span class="truncate">{settingsData.email}</span>
+              <span class="truncate">{formatPhoneNumber(settingsData.wa_number)}</span>
             </a>
           </li>
         </ul>
