@@ -37,3 +37,4 @@ Thumbs.db
 
 # Allow custom extension build outputs
 !/extensions/*/dist/
+!/extensions/.registry/**/dist/
