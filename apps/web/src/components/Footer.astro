@@ -46,7 +46,8 @@ const navLinks = [
           </a>
         </div>
         <p class="text-white/60 text-[13.5px] leading-relaxed max-w-[280px] m-0">
-          Perjalanan berkesan, momen tak terlupakan. Spesialis private tour &amp; corporate event terpercaya sejak 2024.
+          <strong>PT Voda Tour Event</strong><br />
+          Perjalanan berkesan, momen tak terlupakan. Spesialis private tour &amp; corporate event terpercaya sejak 2013.
         </p>
         <!-- Social Icons Row -->
         <!-- <div class="flex flex-wrap gap-[10px]">
@@ -114,14 +115,16 @@ const navLinks = [
       <!-- Col 4: Kantor & Alamat -->
       <div>
         <p class="font-[family-name:var(--font-body)] font-semibold text-white text-[13px] tracking-[0.15em] uppercase pb-[8px] border-b border-orange-500/30 inline-block mb-[20px]">Kantor Kami</p>
-        <div class="flex items-start gap-[12px] text-white/70 text-[13.5px]">
-          <div class="w-[32px] h-[32px] rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 shrink-0 text-[14px]">
-            <i class="fa-solid fa-location-dot"></i>
-          </div>
-          <p class="m-0 leading-relaxed max-w-[200px] whitespace-pre-line">
-            {settingsData.address}
-          </p>
-        </div>
+        <ul class="space-y-[14px] list-none p-0 m-0">
+          {settingsData.address.split('\n').map(line => line.trim()).filter(Boolean).map((office) => (
+            <li class="flex items-start gap-[12px] text-white/70 text-[13.5px]">
+              <div class="w-[32px] h-[32px] rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 shrink-0 text-[14px] mt-[2px]">
+                <i class="fa-solid fa-location-dot"></i>
+              </div>
+              <span class="leading-relaxed max-w-[200px]">{office}</span>
+            </li>
+          ))}
+        </ul>
       </div>
 
     </div>
@@ -131,7 +134,7 @@ const navLinks = [
   <div class="border-t border-white/5">
     <div class="wrap py-[20px] flex flex-col sm:flex-row items-center justify-between gap-[10px]">
       <p class="text-white/60 text-[12px] m-0">
-        &copy; {new Date().getFullYear()} {settingsData.site_name}. All rights reserved.
+        &copy; {new Date().getFullYear()} PT Voda Tour Event. All rights reserved.
       </p>
       <!-- <p class="text-white/30 text-[11px] m-0">
         Designed with <i class="fa-solid fa-heart text-orange-500 text-[10px]"></i> for unforgettable moments

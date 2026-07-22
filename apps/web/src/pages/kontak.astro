@@ -60,12 +60,18 @@ const x = settings.x || "voda_event";
               </div>
             )}
             {address && (
-              <div class="flex items-start gap-[16px] group">
-                <div class="w-[48px] h-[48px] rounded-full bg-navy-50 flex items-center justify-center text-navy-600 text-[20px] shrink-0 group-hover:bg-navy-100"><i class="fa-solid fa-location-dot"></i></div>
-                <div class="pt-[4px]">
-                  <p class="text-navy-700 font-semibold text-[13px]">Alamat</p>
-                  <p class="text-navy-500 text-[13px] leading-relaxed whitespace-pre-line">{address}</p>
-                </div>
+              <div class="space-y-[20px] !mt-[20px]">
+                {address.split('\n').map(line => line.trim()).filter(Boolean).map((office, idx) => (
+                  <div class="flex items-start gap-[16px] group">
+                    <div class="w-[48px] h-[48px] rounded-full bg-navy-50 flex items-center justify-center text-navy-600 text-[20px] shrink-0 group-hover:bg-navy-100">
+                      <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <div class="pt-[4px]">
+                      <p class="text-navy-700 font-semibold text-[13px]">{office.includes(':') ? office.split(':')[0].trim() : `Alamat ${idx + 1}`}</p>
+                      <p class="text-navy-500 text-[13px] leading-relaxed">{office.includes(':') ? office.substring(office.indexOf(':') + 1).trim() : office}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
