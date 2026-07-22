@@ -103,9 +103,9 @@ jobs:
           echo "Checking application health via Nginx..."
           DEPLOY_SUCCESS=false
           for i in \$(seq 1 15); do
-            # Check Astro Web and Directus through Nginx on port 80 using Host headers
-            WEB_STATUS=\$(curl -o /dev/null -s -w "%{http_code}" -H "Host: vodatrip.id" http://localhost || echo "failed")
-            CMS_STATUS=\$(curl -o /dev/null -s -w "%{http_code}" -H "Host: api.vodatrip.id" http://localhost/server/ping || echo "failed")
+            # Check Astro Web and Directus through Nginx on port 443 using Host headers (with -k for SSL)
+            WEB_STATUS=\$(curl -k -o /dev/null -s -w "%{http_code}" -H "Host: vodatrip.id" https://localhost || echo "failed")
+            CMS_STATUS=\$(curl -k -o /dev/null -s -w "%{http_code}" -H "Host: api.vodatrip.id" https://localhost/server/ping || echo "failed")
             
             echo "   Web status: \$WEB_STATUS | CMS status: \$CMS_STATUS"
             
