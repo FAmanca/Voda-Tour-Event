@@ -460,17 +460,8 @@ export function initAutocomplete(inputId: string, dropdownId: string, opts?: Aut
         clearInputError();
         if (opts?.onSelect) opts.onSelect(selName);
       } else {
-        // Auto-pilih item pertama dari dropdown
-        const first = dropdown.querySelector('[data-index]') as HTMLElement | null;
-        if (first) {
-          e.preventDefault();
-          const firstName = first.dataset.name || '';
-          input.value = firstName;
-          markValid(firstName);
-          dropdown.classList.add('hidden');
-          clearInputError();
-          if (opts?.onSelect) opts.onSelect(firstName);
-        }
+        // Disable auto-select first item to allow free search
+        dropdown.classList.add('hidden');
       }
     }
   });
