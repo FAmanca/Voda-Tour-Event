@@ -14,7 +14,8 @@ Tabel `packages` menyimpan data paket wisata yang ditawarkan untuk setiap destin
 | duration        | varchar(50)           | —                 | Durasi ("2D1N", "3D2N", "Half Day") |
 | itinerary       | json                  | null              | Array jadwal per hari             |
 | facilities      | json                  | null              | Array fasilitas                   |
-| price_tiers     | json                  | null              | Array tier harga                  |
+| price_tiers     | json                  | null              | Array multi-tabel tier harga (max 3) |
+| addons          | json                  | null              | Array fitur tambahan (opsional)   |
 | gallery         | json                  | null              | Array UUID file gambar            |
 | status          | varchar(20)           | 'draft'           | draft / published / archived      |
 | created_at      | timestamptz           | now()             | Audit                             |
@@ -39,11 +40,42 @@ Tabel `packages` menyimpan data paket wisata yang ditawarkan untuk setiap destin
 
 ## price_tiers Format
 
+Mendukung maksimal 3 tabel harga mandiri (misal: Domestik WNI, Internasional WNA, dll) dengan struktur bertingkat (*nested JSON*):
+
 ```json
 [
-  { "min_pax": 5, "max_pax": 10, "price": 850000, "note": "Minimal 5 orang" },
-  { "min_pax": 11, "max_pax": 20, "price": 750000, "note": null },
-  { "min_pax": 21, "max_pax": 50, "price": 650000, "note": "Termasuk akomodasi" }
+  {
+    "table_title": "Harga Domestik (WNI)",
+    "tiers": [
+      { "min_pax": 2, "max_pax": 4, "price_per_pax": 850000, "description": "Hotel Bintang 3" },
+      { "min_pax": 5, "max_pax": 10, "price_per_pax": 750000, "description": "Hotel Bintang 3" }
+    ]
+  },
+  {
+    "table_title": "Harga Internasional (WNA)",
+    "tiers": [
+      { "min_pax": 2, "max_pax": 4, "price_per_pax": 1200000, "description": "Hotel + Guide Inggris" }
+    ]
+  }
+]
+```
+
+## addons Format
+
+Menyimpan daftar pilihan opsional/layanan tambahan (*add-ons*) paket:
+
+```json
+[
+  {
+    "addon_name": "Banana Boat",
+    "price": 300000,
+    "description": "Tambahan wahana air Banana Boat selama 15 menit"
+  },
+  {
+    "addon_name": "Dokumentasi Drone",
+    "price": 1500000,
+    "description": "Dokumentasi foto & video udara menggunakan DJI Drone"
+  }
 ]
 ```
 

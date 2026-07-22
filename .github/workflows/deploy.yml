@@ -95,17 +95,17 @@ jobs:
             exit 1
           fi
 
-          echo "Building and launching Web App & Directus CMS..."
-          # Deploying only postgres, directus, and web services (bypassing compose nginx and certbot)
-          docker compose -f docker-compose.prod.yml \$COMPOSE_ENV_FILE up -d postgres directus web --build
+          echo "Building and launching all Docker services..."
+          # Deploy all services including nginx and certbot for a standalone Docker-only VPS setup
+          docker compose -f docker-compose.prod.yml \$COMPOSE_ENV_FILE up -d --build
 
           # ── Health check ──────────────────────────────────────────
-          echo "Checking application health..."
+          echo "Checking application health via Nginx..."
           DEPLOY_SUCCESS=false
           for i in \$(seq 1 15); do
-            # Check Astro Web (port 4322) and Directus (port 8055)
-            WEB_STATUS=\$(curl -o /dev/null -s -w "%{http_code}" http://localhost:4322 || echo "failed")
-            CMS_STATUS=\$(curl -o /dev/null -s -w "%{http_code}" http://localhost:8055/server/ping || echo "failed")
+            # Check Astro Web and Directus through Nginx on port 80 using Host headers
+            WEB_STATUS=\$(curl -o /dev/null -s -w "%{http_code}" -H "Host: vodatrip.id" http://localhost || echo "failed")
+            CMS_STATUS=\$(curl -o /dev/null -s -w "%{http_code}" -H "Host: api.vodatrip.id" http://localhost/server/ping || echo "failed")
             
             echo "   Web status: \$WEB_STATUS | CMS status: \$CMS_STATUS"
             
@@ -144,9 +144,9 @@ jobs:
         run: |
           sleep 10
           echo "→ Checking external Web URL..."
-          curl -sSf "http://${{ secrets.VPS_HOST }}:4322/" -o /dev/null -w "   HTTP %{http_code}\n" || \
+          curl -sSf -H "Host: vodatrip.id" "http://${{ secrets.VPS_HOST }}/" -o /dev/null -w "   HTTP %{http_code}\n" || \
             echo "⚠ External Web check failed (port might be blocked by firewall or loading)"
 
           echo "→ Checking external Directus URL..."
-          curl -sSf "http://${{ secrets.VPS_HOST }}:8055/server/ping" -o /dev/null -w "   HTTP %{http_code}\n" || \
+          curl -sSf -H "Host: api.vodatrip.id" "http://${{ secrets.VPS_HOST }}/server/ping" -o /dev/null -w "   HTTP %{http_code}\n" || \
             echo "⚠ External Directus check failed"

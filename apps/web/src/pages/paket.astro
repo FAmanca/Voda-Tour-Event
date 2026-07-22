@@ -2,23 +2,46 @@
 import Layout from "../layouts/Layout.astro";
 import PackageCard from "../components/PackageCard.astro";
 import Eyebrow from "../components/Eyebrow.astro";
+import { getPackages, getActivityTypes } from "../lib/directus";
+import type { PackageWithDestination, ActivityType } from "../types/directus";
 
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let packages = [];
-let activityTypes = [];
-let destCount = 0;
+
+let packages: PackageWithDestination[] = [];
+let activityTypes: ActivityType[] = [];
+let destinationCount = 0;
 let fetchError = false;
 
+const pageParam = Astro.url.searchParams.get("page") || "1";
+let currentPage = parseInt(pageParam, 10);
+if (isNaN(currentPage) || currentPage < 1) currentPage = 1;
+const limit = 9;
+let totalPackages = 0;
+let totalPages = 1;
+
 try {
-  const [pkgRes, actRes, dstRes] = await Promise.all([
-    fetch(DIRECTUS_URL + "/items/packages?fields=*,destination_id.*&limit=50&filter[status][_eq]=published&sort=-id"),
-    fetch(DIRECTUS_URL + "/items/activity_types?filter[status][_eq]=published&sort=name"),
-    fetch(DIRECTUS_URL + "/items/destinations?fields=id&filter[status][_eq]=published&limit=1&meta=total_count"),
+  const [destCountRes, pkgRes, activities] = await Promise.all([
+    fetch(`${DIRECTUS_URL}/items/destinations?fields=id&filter[status][_eq]=published&limit=1&meta=total_count`),
+    fetch(`${DIRECTUS_URL}/items/packages?fields=*,destination_id.*&filter[status][_eq]=published&sort=-id&limit=${limit}&page=${currentPage}&meta=filter_count`),
+    getActivityTypes()
   ]);
-  if (pkgRes.ok) { const json = await pkgRes.json(); packages = json.data || []; }
-  if (actRes.ok) { const json = await actRes.json(); activityTypes = json.data || []; }
-  if (dstRes.ok) { const json = await dstRes.json(); destCount = json.meta?.total_count || 0; }
-} catch { fetchError = true; }
+
+  if (destCountRes.ok) {
+    const json = await destCountRes.json();
+    destinationCount = json.meta?.total_count ?? 0;
+  }
+
+  if (pkgRes.ok) {
+    const pkgJson = await pkgRes.json();
+    packages = (pkgJson.data || []) as PackageWithDestination[];
+    totalPackages = pkgJson.meta?.filter_count || 0;
+    totalPages = Math.ceil(totalPackages / limit);
+  }
+
+  activityTypes = activities;
+} catch {
+  fetchError = true;
+}
 ---
 
 <Layout title="Paket Wisata | Voda Tour & Event" description="Jelajahi semua paket wisata, gathering, dan outbound." active="paket">
@@ -34,11 +57,11 @@ try {
         <p class="text-white/65 text-[16px] max-lg:text-[14px] mt-[10px] max-w-[520px] mx-auto leading-relaxed">
           Dari private trip santai sampai corporate gathering seru &mdash; pilih pengalaman yang cocok buat Anda.
         </p>
-        {!fetchError && (packages.length > 0 || destCount > 0) && (
+        {!fetchError && (packages.length > 0 || destinationCount > 0) && (
           <div class="flex flex-wrap justify-center gap-[32px] mt-[36px]">
-            <div class="text-center"><span class="block text-white text-[28px] font-bold font-[family-name:var(--font-display)]">{packages.length}</span><span class="text-white/50 text-[12px] uppercase tracking-wider">Paket</span></div>
+            <div class="text-center"><span class="block text-white text-[28px] font-bold font-[family-name:var(--font-display)]">{totalPackages}</span><span class="text-white/50 text-[12px] uppercase tracking-wider">Paket</span></div>
             <div class="w-[1px] bg-white/15 self-stretch max-sm:hidden"></div>
-            <div class="text-center"><span class="block text-white text-[28px] font-bold font-[family-name:var(--font-display)]">{destCount}</span><span class="text-white/50 text-[12px] uppercase tracking-wider">Destinasi</span></div>
+            <div class="text-center"><span class="block text-white text-[28px] font-bold font-[family-name:var(--font-display)]">{destinationCount}</span><span class="text-white/50 text-[12px] uppercase tracking-wider">Destinasi</span></div>
             <div class="w-[1px] bg-white/15 self-stretch max-sm:hidden"></div>
             <div class="text-center"><span class="block text-white text-[28px] font-bold font-[family-name:var(--font-display)]">{activityTypes.length}</span><span class="text-white/50 text-[12px] uppercase tracking-wider">Kategori</span></div>
           </div>
@@ -76,11 +99,55 @@ try {
         {packages.length > 0 ? (
           <>
             <div class="flex items-center justify-between mb-[28px]">
-              <p class="text-navy-500 text-[13px]"><strong class="text-navy-800">{packages.length}</strong> paket ditemukan</p>
+              <p class="text-navy-500 text-[13px]"><strong class="text-navy-800">{totalPackages}</strong> paket ditemukan</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">
-              {packages.map((pkg) => <PackageCard package={pkg} showDestination />)}
+              {packages.map((pkg, index) => <PackageCard package={pkg} showDestination lcp={index === 0} />)}
             </div>
+
+            {/* Pagination UI */}
+            {totalPages > 1 && (
+              <div class="flex justify-center items-center gap-[8px] mt-[40px]">
+                {currentPage > 1 ? (
+                  <a href={`?page=${currentPage - 1}`} class="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-white border border-navy-200 text-navy-600 hover:border-orange-500 hover:text-orange-500 hover:bg-orange-50 transition-all">
+                    <i class="fa-solid fa-chevron-left text-[12px]"></i>
+                  </a>
+                ) : (
+                  <span class="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-slate-50 border border-slate-200 text-slate-300 cursor-not-allowed">
+                    <i class="fa-solid fa-chevron-left text-[12px]"></i>
+                  </span>
+                )}
+                
+                {Array.from({ length: totalPages }).map((_, i) => {
+                  const p = i + 1;
+                  // Tampilkan max 5 halaman, atau halaman yang berdekatan
+                  if (
+                    totalPages <= 5 || 
+                    p === 1 || p === totalPages || 
+                    (p >= currentPage - 1 && p <= currentPage + 1)
+                  ) {
+                    return (
+                      <a href={`?page=${p}`} class={`w-[40px] h-[40px] rounded-full flex items-center justify-center text-[14px] font-semibold transition-all ${p === currentPage ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30' : 'bg-white border border-navy-200 text-navy-600 hover:border-orange-500 hover:text-orange-500 hover:bg-orange-50'}`}>
+                        {p}
+                      </a>
+                    );
+                  } else if (p === currentPage - 2 || p === currentPage + 2) {
+                    return <span class="text-navy-300">...</span>;
+                  }
+                  return null;
+                })}
+
+                {currentPage < totalPages ? (
+                  <a href={`?page=${currentPage + 1}`} class="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-white border border-navy-200 text-navy-600 hover:border-orange-500 hover:text-orange-500 hover:bg-orange-50 transition-all">
+                    <i class="fa-solid fa-chevron-right text-[12px]"></i>
+                  </a>
+                ) : (
+                  <span class="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-slate-50 border border-slate-200 text-slate-300 cursor-not-allowed">
+                    <i class="fa-solid fa-chevron-right text-[12px]"></i>
+                  </span>
+                )}
+              </div>
+            )}
           </>
         ) : (
           <div class="text-center py-[80px]">

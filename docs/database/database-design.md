@@ -65,10 +65,33 @@ Berikut collection yang **harus dibuat manual** di admin panel Directus.
 | duration | string | "2D1N", "3D2N", "Half Day" |
 | itinerary | JSON | Array: day -> list kegiatan |
 | facilities | JSON | Array: list fasilitas |
-| price_tiers | JSON | Array: { min_pax, max_pax, price, note } |
+| price_tiers | JSON | Array multi-tabel: { table_title, tiers: [{ min_pax, max_pax, price_per_pax, description }] } |
+| addons | JSON | Array: { addon_name, price, description } (fitur tambahan opsional) |
 | gallery | JSON | Array URL gambar |
 | sort_order | integer | Urutan tampilan |
 | status | string | published / draft |
+
+### `activity_types`
+
+Master data jenis kegiatan (Private Trip, Corporate Gathering, Team Building, dll).
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | uuid (PK) | gen_random_uuid() |
+| name | string | Nama kegiatan (Private Trip, Corporate Gathering) |
+| slug | string (unique) | Auto dari name (private-trip, corporate-gathering) |
+| description | text | Deskripsi kegiatan |
+| status | string | published / draft |
+
+### `packages_activity_types` (Junction Table M2M)
+
+Tabel penghubung Many-to-Many antara `packages` dan `activity_types`.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | uuid (PK) | gen_random_uuid() |
+| packages_id | uuid (FK) | Relasi M2O ke `packages.id` |
+| activity_types_id | uuid (FK) | Relasi M2O ke `activity_types.id` |
 
 ### `settings`
 
@@ -78,10 +101,34 @@ Berikut collection yang **harus dibuat manual** di admin panel Directus.
 | key | string (unique) | site_name, whatsapp, email, address, ig, etc |
 | value | text | Nilai setting |
 
+### `articles`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | integer (PK) | auto-increment |
+| title | string | Judul artikel |
+| slug | string (unique) | Auto dari title |
+| content | text | Konten artikel (Rich text) |
+| image | string (URL) | Featured image |
+| ads | alias (O2M) | Relasi ke tabel `ads` |
+| seo | JSON | Data SEO via custom-seo-analyzer |
+| status | string | published / draft |
+
+### `ads`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | uuid (PK) | UUID auto-generated |
+| image | uuid (FK) | Relasi ke directus_files |
+| description | string | Teks atau judul iklan |
+| url | string | Link eksternal iklan |
+| articles_id | uuid (FK) | Relasi balik ke articles |
+
 ## Relasi
 
 ```
-regions (1) ----< destinations (M) ----< packages (M)
+regions (1) ----< destinations (M) ----< packages (M) >----< packages_activity_types >----< activity_types (M)
+articles (1) ---< ads (M)
 ```
 
 ## Cara Buat Collection
@@ -90,7 +137,7 @@ regions (1) ----< destinations (M) ----< packages (M)
 2. Kiri: Settings -> Data Model
 3. Klik "Create Collection"
 4. Pilih mode: **Table** (bukan singleton)
-5. Isi Collection Name: `regions` / `destinations` / `packages` / `settings`
+5. Isi Collection Name: `regions` / `destinations` / `packages` / `articles` / `settings` / `ads`
 6. Tambah field sesuai tabel di atas
-7. Untuk field relasi (region_id, destination_id), pilih tipe **Many-to-One**
+7. Untuk field relasi (region_id, destination_id, articles_id), pilih tipe **Many-to-One** (M2O) atau **One-to-Many** (O2M) dari sisi tabel induk
 8. Set permission: Public -> Read (biar API bisa diakses tanpa auth)

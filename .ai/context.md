@@ -15,7 +15,7 @@
 
 | Layer | Teknologi | Catatan |
 |-------|-----------|---------|
-| Backend & Admin | Directus 11 (Headless CMS) | REST API, PostgreSQL, file management |
+| Backend & Admin | Directus 12 (Headless CMS) | REST API, PostgreSQL, file management |
 | Frontend | Astro 7 (SSR) | Static + SSR hybrid |
 | Database | PostgreSQL 16 | Via Docker |
 | Image Storage | Cloudflare R2 | S3-compatible, zero egress fee |
@@ -30,9 +30,9 @@
 ```
 Regions (1) ──→ Destinations (M) ──→ Packages (M)
                                             │
-                                     many-to-many
+                                  many-to-many (junction: packages_activity_types)
                                             │
-                                     Activity Types
+                                     Activity Types (activity_types)
 ```
 
 ### Contoh Data Real

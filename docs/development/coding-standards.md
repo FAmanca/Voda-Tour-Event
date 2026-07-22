@@ -11,7 +11,7 @@
 | Layer | Teknologi | Catatan |
 |-------|-----------|---------|
 | Frontend | **Astro 7** (SSR) | — |
-| Backend & Admin | **Directus 11** (Headless CMS) | REST API langsung, gak ada backend layer tambahan |
+| Backend & Admin | **Directus 12** (Headless CMS) | REST API langsung, gak ada backend layer tambahan |
 | Database | **PostgreSQL 16** | Via Docker |
 | CSS | **Tailwind CSS 4** | Utility-first, custom theme |
 | Client JS | **Vanilla JavaScript** | Gak pake React/Vue/Svelte. Zero JS on page load (kecuali Search) |

@@ -19,8 +19,19 @@ export type Status = "published" | "draft" | "archived";
 export interface PriceTier {
   min_pax: number;
   max_pax: number;
-  price: number;       // Rupiah, per pax
-  note: string | null; // e.g. "Minimal 5 orang"
+  price_per_pax: number;       // Rupiah, per pax
+  description: string | null; // e.g. "Minimal 5 orang"
+}
+
+export interface PriceTierGroup {
+  table_title: string;
+  tiers: PriceTier[];
+}
+
+export interface Addon {
+  addon_name: string;
+  price: number;
+  description: string | null;
 }
 
 export interface DayActivity {
@@ -89,7 +100,8 @@ export interface Package {
   duration: string;                 // "2D1N", "3D2N", "Half Day", "1D"
   itinerary: DayActivity[] | null;  // JSON
   facilities: string[] | null;      // JSON array of strings
-  price_tiers: PriceTier[] | null;  // JSON
+  price_tiers: PriceTierGroup[] | null;  // JSON
+  addons: Addon[] | null;           // JSON
   gallery: FileUuid[] | null;
 
   status: Status;
@@ -120,6 +132,33 @@ export interface PackageActivityType {
   activity_type_id: string | ActivityType;
   created_at: string;
   updated_at: string;
+}
+
+export interface ArticleAd {
+  image: string; // File UUID
+  url?: string;
+  title?: string;
+}
+
+export interface Article {
+  id: string;
+  title: string;
+  slug: string;
+  content: Record<string, any> | string | null;
+  featured_image: FileUuid | null;
+  ads: ArticleAd[] | null;
+  publish_date: string | null;
+  seo: Record<string, any> | null;
+  
+  is_pillar?: boolean;
+  pillar_parent?: Record<string, any> | string | null;
+
+  status: Status;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  created_by: UserUuid | null;
+  updated_by: UserUuid | null;
 }
 
 export interface Setting {
@@ -192,6 +231,7 @@ export interface HeroProps {
   secondaryCta?: { text: string; href: string };
   destinations: DestinationWithRegion[];
   activityTypes: ActivityType[];
+  settings: Record<string, string>;
   gradientClass?: string;
 }
 
@@ -229,9 +269,10 @@ export interface StatsBarProps {
 }
 
 export interface CTABandProps {
-  title: string;
-  description: string;
-  cta: { text: string; href: string };
+  heading?: string;
+  description?: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
   features?: { icon: string; label: string }[];
 }
 
@@ -247,7 +288,7 @@ export interface ItineraryTimelineProps {
 }
 
 export interface PriceTableProps {
-  tiers: PriceTier[];
+  priceTiers: PriceTierGroup[];
   activePax?: number | null;
 }
 
@@ -263,7 +304,7 @@ export interface SearchFormProps {
   destinations: DestinationWithRegion[];
   activityTypes: ActivityType[];
   initialValues?: {
-    destination?: string;
+    q?: string;
     activityType?: string;
     paxCount?: number;
     travelDate?: string;
@@ -304,7 +345,7 @@ export interface WaButtonProps {
 }
 
 export interface SkeletonCardProps {
-  type?: "package" | "destinasi" | "feature";
+  variant?: "package" | "destinasi" | "feature";
 }
 
 // ---------------------------------------------------------------------------

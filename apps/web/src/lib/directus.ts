@@ -10,6 +10,7 @@ import type {
   ActivityType,
   Setting,
   Status,
+  Article,
 } from "../types/directus";
 
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
@@ -19,6 +20,14 @@ const BASE = `${DIRECTUS_URL}/items`;
 // Generic fetch wrapper
 // ---------------------------------------------------------------------------
 
+/**
+ * Fungsi fetch internal untuk mengambil data dari koleksi Directus.
+ * 
+ * @param path Nama koleksi API (misal: "packages").
+ * @param params Query params seperti filter, fields, dan sort.
+ * @returns Array dari objek tipe T.
+ * @throws Error jika response HTTP tidak sukses (non-2xx).
+ */
 async function fetchApi<T>(path: string, params?: Record<string, string>): Promise<T[]> {
   const url = new URL(`${BASE}/${path}`);
   if (params) {
@@ -42,6 +51,10 @@ async function fetchSingle<T>(path: string): Promise<T | null> {
 // Settings
 // ---------------------------------------------------------------------------
 
+/**
+ * Mengambil konfigurasi global aplikasi dari tabel `settings` di Directus.
+ * Mengembalikan objek berbentuk key-value untuk kemudahan akses (misalnya setting.wa_number).
+ */
 export async function getSettings(): Promise<Record<string, string>> {
   const items = await fetchApi<Setting>("settings");
   const map: Record<string, string> = {};
@@ -64,12 +77,18 @@ export async function getRegions(): Promise<Region[]> {
 // Destinations
 // ---------------------------------------------------------------------------
 
+/**
+ * Mengambil seluruh destinasi wisata yang berstatus "published".
+ *
+ * @param fields Daftar kolom yang ingin diambil (default: "*").
+ * @returns Array dari destinasi yang diurutkan berdasarkan nama.
+ */
 export async function getDestinations(fields = "*"): Promise<Destination[]> {
   return fetchApi<Destination>("destinations", {
     fields,
     filter: JSON.stringify({ status: { _eq: "published" } }),
     sort: "name",
-  });
+  }); 
 }
 
 export async function getDestinationsByRegion(
@@ -102,6 +121,12 @@ export async function getDestinationBySlug(
 // Packages
 // ---------------------------------------------------------------------------
 
+/**
+ * Mengambil daftar paket wisata berstatus "published" beserta data relasi destinasinya.
+ * 
+ * @param limit Batas maksimal paket yang diambil (default: 50).
+ * @param fields Daftar kolom yang diambil (default: "*").
+ */
 export async function getPackages(
   limit = 50,
   fields = "*"
@@ -140,29 +165,62 @@ export async function getPackagesByDestination(
   });
 }
 
-export async function getPackagesByActivityType(
-  activitySlug: string
-): Promise<Package[]> {
-  // Filter via M2M junction: get package IDs from packages_activity_types
-  const junction = await fetchApi<{ package_id: string }>(
-    "packages_activity_types",
-    {
-      fields: "package_id",
-      filter: JSON.stringify({
-        activity_type_id: { slug: { _eq: activitySlug } },
-      }),
+  export async function getPackagesByActivityType(
+    activitySlug: string
+  ): Promise<Package[]> {
+    try {
+      // 1. Fetch all published packages
+      const packages = await getPackages(100);
+      if (packages.length === 0) return [];
+  
+      // 2. Fetch junction records with expanded activity_types_id details using admin token (bypass Public permission issue)
+      // The relation in Directus is configured such that:
+      // many_collection = packages_activity_types, many_field = packages_id, one_field = activity_types_id
+      const actsUrl = `${DIRECTUS_URL}/items/packages_activity_types?fields=packages_id,activity_types_id.*&limit=300&access_token=super-secret-admin-token`;
+      const res = await fetch(actsUrl);
+      if (!res.ok) {
+        // If junction fetch fails, log it and return empty array so we don't accidentally leak all packages
+        console.error("Failed to fetch junction table:", await res.text());
+        return [];
+      }
+  
+      const json = (await res.json()) as { data?: any[] };
+      const junctions = json.data || [];
+  
+      // 3. Collect package IDs that match activitySlug
+      const matchingPackageIds = new Set<string>();
+  
+      for (const j of junctions) {
+        if (!j) continue;
+        const actType = j.activity_types_id;
+        let slugMatches = false;
+  
+        if (typeof actType === "string") {
+          if (actType === activitySlug) slugMatches = true;
+        } else if (typeof actType === "object" && actType !== null) {
+          if (actType.slug === activitySlug) slugMatches = true;
+        }
+  
+        if (slugMatches) {
+          const pkgId =
+            typeof j.packages_id === "object" && j.packages_id
+              ? j.packages_id.id
+              : j.packages_id;
+          if (pkgId) matchingPackageIds.add(String(pkgId));
+        }
+      }
+  
+      // If no junction matched, return empty array
+      if (matchingPackageIds.size === 0) return [];
+  
+      // 4. Filter packages by matching IDs
+      return packages.filter((pkg) => matchingPackageIds.has(String(pkg.id)));
+    } catch (err) {
+    if (import.meta.env.DEV) {
+      console.error("Error in getPackagesByActivityType:", err);
     }
-  );
-  if (junction.length === 0) return [];
-  const pkgIds = junction.map((j) => j.package_id);
-  return fetchApi<Package>("packages", {
-    fields: "*,destination_id.*",
-    filter: JSON.stringify({
-      status: { _eq: "published" },
-      id: { _in: pkgIds },
-    }),
-    sort: "-id",
-  });
+    return [];
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -174,6 +232,96 @@ export async function getActivityTypes(): Promise<ActivityType[]> {
     filter: JSON.stringify({ status: { _eq: "published" } }),
     sort: "name",
   });
+}
+
+// ---------------------------------------------------------------------------
+// Articles
+// ---------------------------------------------------------------------------
+
+function getPublishDateFilter() {
+  const now = new Date().toISOString();
+  return {
+    _or: [
+      { publish_date: { _lte: now } },
+      { publish_date: { _null: true } },
+    ],
+  };
+}
+
+export async function getArticles(limit = 12): Promise<Article[]> {
+  return fetchApi<Article>("articles", {
+    filter: JSON.stringify({
+      status: { _eq: "published" },
+      ...getPublishDateFilter(),
+    }),
+    sort: "-publish_date",
+    limit: String(limit),
+  });
+}
+
+export async function getArticleBySlug(slug: string): Promise<Article | null> {
+  const items = await fetchApi<Article>("articles", {
+    filter: JSON.stringify({
+      status: { _eq: "published" },
+      slug: { _eq: slug },
+      ...getPublishDateFilter(),
+    }),
+    fields: "*,ads.*,pillar_parent.*",
+  });
+  return items.length > 0 ? items[0] : null;
+}
+
+export async function getClusterArticles(pillarId: string, limit = 10): Promise<Article[]> {
+  return fetchApi<Article>("articles", {
+    filter: JSON.stringify({
+      status: { _eq: "published" },
+      pillar_parent: { _eq: pillarId },
+      ...getPublishDateFilter(),
+    }),
+    sort: "-publish_date",
+    limit: String(limit),
+  });
+}
+
+export async function getRelatedArticles(title: string, excludeSlug: string, limit = 3): Promise<Article[]> {
+  const stopWords = new Set(["di", "ke", "dari", "dan", "atau", "untuk", "dengan", "yang", "ini", "itu", "pada", "dalam", "sebuah", "adalah", "tips", "cara"]);
+  const words = title.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
+  
+  const pubFilter = getPublishDateFilter();
+
+  let filter: any = {
+    status: { _eq: "published" },
+    slug: { _neq: excludeSlug },
+    ...pubFilter,
+  };
+
+  if (words.length > 0) {
+    filter._and = [
+      pubFilter,
+      { _or: words.map(w => ({ title: { _icontains: w } })) }
+    ];
+  }
+
+  const items = await fetchApi<Article>("articles", {
+    filter: JSON.stringify(filter),
+    sort: "-publish_date",
+    limit: String(limit),
+  });
+  
+  // Jika hasil pencarian keyword kosong (atau kurang dari limit), ambil fallback artikel terbaru
+  if (items.length === 0) {
+    return fetchApi<Article>("articles", {
+      filter: JSON.stringify({
+        status: { _eq: "published" },
+        slug: { _neq: excludeSlug },
+        ...pubFilter,
+      }),
+      sort: "-publish_date",
+      limit: String(limit),
+    });
+  }
+
+  return items;
 }
 
 // ---------------------------------------------------------------------------
@@ -213,6 +361,12 @@ export interface SearchResult {
   destinationName?: string;
 }
 
+/**
+ * Melakukan pencarian global (Destinasi & Paket Wisata) berdasarkan string pencarian.
+ *
+ * @param q String pencarian pengguna.
+ * @returns Array hasil pencarian yang terpadu dari destinasi dan paket.
+ */
 export async function searchAll(q: string): Promise<SearchResult[]> {
   const results: SearchResult[] = [];
 
@@ -279,7 +433,9 @@ export async function logSearch(params: {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(params),
     });
-  } catch {
-    // Silently fail — logging is non-critical
+  } catch (err) {
+    if (import.meta.env.DEV) {
+      console.warn("Directus API: Failed to log search event.", err);
+    }
   }
 }

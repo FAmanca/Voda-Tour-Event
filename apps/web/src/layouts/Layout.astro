@@ -3,6 +3,8 @@
 import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import { getSettings } from "../lib/directus";
+import { DEFAULT_WA_NUMBER } from "../lib/constants";
 
 interface Props {
   title?: string;
@@ -22,20 +24,18 @@ const {
   active,
 } = Astro.props;
 
-const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let settings = {};
+let settings: Record<string, string> = {};
 try {
-  const r = await fetch(U + "/items/settings");
-  if (r.ok) {
-    const j = await r.json();
-    if (j.data) j.data.forEach((s) => { settings[s.key] = s.value; });
-  }
+  settings = await getSettings();
 } catch {}
 
 const siteUrl = "https://vodatrip.id";
-const waNum = settings.wa_number || settings.whatsapp || "6282112345678";
+const waNum = settings.wa_number || settings.whatsapp || DEFAULT_WA_NUMBER;
 const defaultImage = siteUrl + "/images/VodaTravelIcon.webp";
 const ogImage = image || defaultImage;
+
+const currentPath = Astro.url.pathname === '/' ? '' : Astro.url.pathname.replace(/\/$/, '');
+const autoCanonical = canonical || (siteUrl + currentPath);
 ---
 
 <!doctype html>
@@ -50,15 +50,15 @@ const ogImage = image || defaultImage;
     <meta name="theme-color" content="#0B2340" />
 
     <!-- LCP Preload -->
-    <link rel="preload" as="image" href="/images/beach-1920.avif" type="image/avif" media="(min-width: 769px)" />
-    <link rel="preload" as="image" href="/images/beach-768.avif" type="image/avif" media="(min-width: 481px) and (max-width: 768px)" />
-    <link rel="preload" as="image" href="/images/beach-480.avif" type="image/avif" media="(max-width: 480px)" />
+    <link rel="preload" as="image" href="/images/beach-1920.avif" type="image/avif" media="(min-width: 769px)" fetchpriority="high" />
+    <link rel="preload" as="image" href="/images/beach-768.avif" type="image/avif" media="(min-width: 481px) and (max-width: 768px)" fetchpriority="high" />
+    <link rel="preload" as="image" href="/images/beach-480.avif" type="image/avif" media="(max-width: 480px)" fetchpriority="high" />
 
   <!-- Open Graph -->
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:image" content={ogImage} />
-  <meta property="og:url" content={canonical || siteUrl} />
+  <meta property="og:url" content={autoCanonical} />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="id_ID" />
   <meta property="og:site_name" content="Voda Tour & Event" />
@@ -70,7 +70,7 @@ const ogImage = image || defaultImage;
   <meta name="twitter:image" content={ogImage} />
 
   <!-- Canonical -->
-  {canonical && <link rel="canonical" href={canonical} />}
+  <link rel="canonical" href={autoCanonical} />
 
 
     <!-- Google Fonts (Optimized Async) -->

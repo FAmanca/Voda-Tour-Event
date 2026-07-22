@@ -1,20 +1,48 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Eyebrow from "../components/Eyebrow.astro";
+import { getDestinations, getRegions, getAssetUrl } from "../lib/directus";
+import type { DestinationWithRegion, Region } from "../types/directus";
 
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let destinations = [];
-let regions = [];
+
+let destinations: DestinationWithRegion[] = [];
+let regions: Region[] = [];
 let fetchError = false;
 
+const pageParam = Astro.url.searchParams.get("page") || "1";
+let currentPage = parseInt(pageParam, 10);
+if (isNaN(currentPage) || currentPage < 1) currentPage = 1;
+const limit = 9;
+let totalDestinations = 0;
+let totalPages = 1;
+
+// Grab region from URL for optional filtering
+const regionFilter = Astro.url.searchParams.get("region") || "";
+
 try {
-  const [dstRes, regRes] = await Promise.all([
-    fetch(DIRECTUS_URL + "/items/destinations?fields=*,region_id.*&filter[status][_eq]=published&sort=name"),
-    fetch(DIRECTUS_URL + "/items/regions?fields=id,name,slug&filter[status][_eq]=published&sort=name"),
+  let destUrl = `${DIRECTUS_URL}/items/destinations?fields=*,region_id.*&filter[status][_eq]=published&sort=name&limit=${limit}&page=${currentPage}&meta=filter_count`;
+  if (regionFilter) {
+    // Note: URL encoding filter json is important for Directus
+    destUrl += `&filter[region_id][slug][_eq]=${encodeURIComponent(regionFilter)}`;
+  }
+
+  const [destRes, regionsList] = await Promise.all([
+    fetch(destUrl),
+    getRegions()
   ]);
-  if (dstRes.ok) { const json = await dstRes.json(); destinations = json.data || []; }
-  if (regRes.ok) { const json = await regRes.json(); regions = json.data || []; }
-} catch { fetchError = true; }
+
+  if (destRes.ok) {
+    const json = await destRes.json();
+    destinations = (json.data || []) as DestinationWithRegion[];
+    totalDestinations = json.meta?.filter_count || 0;
+    totalPages = Math.ceil(totalDestinations / limit);
+  }
+
+  regions = regionsList;
+} catch {
+  fetchError = true;
+}
 ---
 
 <Layout title="Destinasi Wisata | Voda Tour & Event" description="Jelajahi destinasi wisata terbaik." active="destinasi">
@@ -32,9 +60,9 @@ try {
             Temukan pengalaman tak terlupakan di berbagai destinasi terbaik.
           </p>
           <div class="flex flex-wrap gap-[12px] mt-[28px]">
-            {regions.map((r) => (
-              <a href={"?region=" + r.slug} class="inline-flex items-center gap-[5px] bg-white/10 hover:bg-white/20 text-white text-[12.5px] font-medium px-[14px] py-[6px] rounded-full no-underline transition-all backdrop-blur-sm border border-white/10">
-                <i class="fa-solid fa-location-dot text-orange-400 text-[9px]"></i>{r.name}
+            {regions.map((region) => (
+              <a href={"?region=" + region.slug} class="inline-flex items-center gap-[5px] bg-white/10 hover:bg-white/20 text-white text-[12.5px] font-medium px-[14px] py-[6px] rounded-full no-underline transition-all backdrop-blur-sm border border-white/10">
+                <i class="fa-solid fa-location-dot text-orange-400 text-[9px]"></i>{region.name}
               </a>
             ))}
           </div>
@@ -56,17 +84,20 @@ try {
         {destinations.length > 0 ? (
           <>
             <div class="flex items-center justify-between mb-[28px]">
-              <p class="text-navy-500 text-[13px]"><strong class="text-navy-800">{destinations.length}</strong> destinasi tersedia</p>
+              <p class="text-navy-500 text-[13px]"><strong class="text-navy-800">{totalDestinations}</strong> destinasi tersedia</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">
-              {destinations.map((d) => {
-                const regionName = d.region_id?.name || "";
-                const imgUrl = d.image ? (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + d.image + "?width=600&height=400&fit=cover&format=webp&quality=85" : null;
+              {destinations.map((destination, index) => {
+                const regionName = destination.region_id?.name || "";
+                const imgUrl = destination.image
+                  ? getAssetUrl(destination.image, { width: 600, height: 400, format: "webp", quality: 80 })
+                  : null;
+                const isLcp = index === 0;
                 return (
-                  <a href={"/destinasi/" + d.slug} class="group block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden no-underline hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-[6px]">
+                  <a href={"/destinasi/" + destination.slug} class="group block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden no-underline hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-[6px]">
                     <div class="relative aspect-[4/3] overflow-hidden bg-navy-100">
                       {imgUrl ? (
-                        <img src={imgUrl} alt={d.name} class="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-110" loading="lazy" />
+                        <img src={imgUrl} alt={destination.name} class="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-110" loading={isLcp ? "eager" : "lazy"} fetchpriority={isLcp ? "high" : "auto"} />
                       ) : (
                         <div class="absolute inset-0 flex flex-col items-center justify-center text-navy-300">
                           <i class="fa-regular fa-image text-[36px]"></i>
@@ -80,8 +111,8 @@ try {
                       )}
                     </div>
                     <div class="p-[20px]">
-                      <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[16px] font-semibold group-hover:text-orange-600 transition-colors">{d.name}</h3>
-                      {d.description && <p class="text-navy-500 text-[13px] leading-relaxed mt-[4px] line-clamp-2">{d.description}</p>}
+                      <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[16px] font-semibold group-hover:text-orange-600 transition-colors">{destination.name}</h3>
+                      {destination.description && <p class="text-navy-500 text-[13px] leading-relaxed mt-[4px] line-clamp-2">{destination.description}</p>}
                       <div class="flex items-center gap-[8px] mt-[14px] text-[12px] text-orange-600 font-medium">
                         <span>Lihat Paket</span>
                         <i class="fa-solid fa-arrow-right text-[10px]"></i>
@@ -91,6 +122,49 @@ try {
                 );
               })}
             </div>
+
+            {/* Pagination UI */}
+            {totalPages > 1 && (
+              <div class="flex justify-center items-center gap-[8px] mt-[40px]">
+                {currentPage > 1 ? (
+                  <a href={`?page=${currentPage - 1}${regionFilter ? '&region=' + regionFilter : ''}`} class="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-white border border-navy-200 text-navy-600 hover:border-orange-500 hover:text-orange-500 hover:bg-orange-50 transition-all">
+                    <i class="fa-solid fa-chevron-left text-[12px]"></i>
+                  </a>
+                ) : (
+                  <span class="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-slate-50 border border-slate-200 text-slate-300 cursor-not-allowed">
+                    <i class="fa-solid fa-chevron-left text-[12px]"></i>
+                  </span>
+                )}
+                
+                {Array.from({ length: totalPages }).map((_, i) => {
+                  const p = i + 1;
+                  if (
+                    totalPages <= 5 || 
+                    p === 1 || p === totalPages || 
+                    (p >= currentPage - 1 && p <= currentPage + 1)
+                  ) {
+                    return (
+                      <a href={`?page=${p}${regionFilter ? '&region=' + regionFilter : ''}`} class={`w-[40px] h-[40px] rounded-full flex items-center justify-center text-[14px] font-semibold transition-all ${p === currentPage ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30' : 'bg-white border border-navy-200 text-navy-600 hover:border-orange-500 hover:text-orange-500 hover:bg-orange-50'}`}>
+                        {p}
+                      </a>
+                    );
+                  } else if (p === currentPage - 2 || p === currentPage + 2) {
+                    return <span class="text-navy-300">...</span>;
+                  }
+                  return null;
+                })}
+
+                {currentPage < totalPages ? (
+                  <a href={`?page=${currentPage + 1}${regionFilter ? '&region=' + regionFilter : ''}`} class="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-white border border-navy-200 text-navy-600 hover:border-orange-500 hover:text-orange-500 hover:bg-orange-50 transition-all">
+                    <i class="fa-solid fa-chevron-right text-[12px]"></i>
+                  </a>
+                ) : (
+                  <span class="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-slate-50 border border-slate-200 text-slate-300 cursor-not-allowed">
+                    <i class="fa-solid fa-chevron-right text-[12px]"></i>
+                  </span>
+                )}
+              </div>
+            )}
           </>
         ) : (
           <div class="text-center py-[80px]">

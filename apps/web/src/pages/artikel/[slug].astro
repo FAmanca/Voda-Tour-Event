@@ -1,0 +1,281 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getArticleBySlug, getRelatedArticles, getClusterArticles, getAssetUrl } from "../../lib/directus";
+import type { Article } from "../../types/directus";
+
+const { slug } = Astro.params;
+
+function calculateReadTime(content: any): number {
+  if (!content) return 1;
+  let text = "";
+  if (typeof content === 'string') {
+    text = content.replace(/<[^>]*>?/gm, '');
+  } else if (content.blocks) {
+    text = content.blocks.map((b: any) => b.data?.text || '').join(' ').replace(/<[^>]*>?/gm, '');
+  }
+  const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
+function getExcerpt(content: any, maxLen = 70): string {
+  if (!content) return "";
+  let text = "";
+  if (typeof content === 'string') {
+    text = content.replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim();
+  } else if (content.blocks) {
+    text = content.blocks.map((b: any) => b.data?.text || '').join(' ').replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim();
+  }
+  if (text.length <= maxLen) return text;
+  return text.slice(0, maxLen).trimEnd() + "…";
+}
+
+let article: Article | null = slug ? await getArticleBySlug(slug).catch(() => null) : null;
+if (!article) {
+  Astro.response.status = 404;
+}
+
+let imgUrl = null;
+let date = "";
+let relatedArticles: Article[] = [];
+let clusterArticles: Article[] = [];
+const parentPillar = article && typeof (article as Article).pillar_parent === 'object' ? (article as Article).pillar_parent : null;
+
+if (article) {
+  if (article.featured_image) {
+    imgUrl = getAssetUrl(article.featured_image, { width: 1200, height: 600, format: "webp", quality: 85 });
+  }
+  if (article.publish_date) {
+    date = new Date(article.publish_date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+  if (article.is_pillar) {
+    clusterArticles = await getClusterArticles(article.id, 10).catch(() => []);
+  }
+  if (article.title && slug) {
+    relatedArticles = await getRelatedArticles(article.title, slug, 3).catch(() => []);
+  }
+}
+
+const ads = article && article.ads ? article.ads.slice(0, 10) : [];
+
+// Render content (Assuming HTML for TipTap or simple block parser)
+let contentHtml = "";
+if (article && article.content) {
+  const content = article.content as any;
+  if (typeof content === 'string') {
+    contentHtml = content;
+  } else if (content.blocks) {
+    contentHtml = content.blocks.map((b: any) => {
+      if (b.type === 'paragraph') return "<p>" + b.data.text + "</p>";
+      if (b.type === 'header') return "<h" + b.data.level + ">" + b.data.text + "</h" + b.data.level + ">";
+      if (b.type === 'list') {
+        const tag = b.data.style === 'ordered' ? 'ol' : 'ul';
+        const items = b.data.items.map((i: string) => "<li>" + i + "</li>").join('');
+        return "<" + tag + ">" + items + "</" + tag + ">";
+      }
+      if (b.type === 'image') return "<img src=\"" + b.data.url + "\" alt=\"" + (b.data.caption || '') + "\" />";
+      return "";
+    }).join('');
+  }
+}
+
+// Handle SEO Data
+let metaTitle = article ? article.title : "Artikel Tidak Ditemukan";
+let metaDesc = article ? "Baca selengkapnya di Voda Tour & Event." : "";
+let canonicalUrl = article && slug ? "https://vodatrip.id/artikel/" + slug : "";
+
+if (article && article.seo && typeof article.seo === 'object') {
+  const seo = article.seo as any;
+  if (seo.title) metaTitle = seo.title;
+  if (seo.metaDescription) metaDesc = seo.metaDescription;
+  if (seo.canonical) canonicalUrl = seo.canonical;
+}
+
+const jsonldData = article ? JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": metaTitle,
+  "description": metaDesc,
+  "image": imgUrl ? [imgUrl] : [],
+  "datePublished": article.publish_date || new Date().toISOString(),
+  "author": { "@type": "Organization", "name": "Voda Tour & Event" },
+  "publisher": { "@type": "Organization", "name": "Voda Tour & Event" }
+}) : "";
+---
+<Layout title={`${metaTitle} | Voda Tour & Event`} description={metaDesc} canonical={canonicalUrl} jsonld={jsonldData} active="artikel" image={imgUrl || undefined}>
+  <main class="bg-navy-50 py-[60px] max-lg:py-[40px]">
+    {!article ? (
+      <div class="wrap py-[120px] text-center">
+        <i class="fa-regular fa-face-frown text-[56px] text-navy-200 block mb-[20px]"></i>
+        <h1 class="font-[family-name:var(--font-display)] text-navy-800 text-[28px] font-bold">Artikel Tidak Ditemukan</h1>
+        <p class="text-navy-500 mt-[10px]">Maaf, artikel yang Anda cari tidak tersedia atau telah dihapus.</p>
+        <a href="/artikel" class="inline-flex items-center gap-[8px] mt-[20px] text-orange-600 font-semibold text-[14px] hover:underline">
+          <i class="fa-solid fa-arrow-left"></i> Kembali ke Artikel
+        </a>
+      </div>
+    ) : (
+      <div class="wrap grid grid-cols-1 lg:grid-cols-12 gap-[40px]">
+        
+        <!-- Kolom Utama: Konten Artikel -->
+        <article class="lg:col-span-8 bg-white p-[40px] max-lg:p-[20px] rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] h-fit">
+          <nav aria-label="Breadcrumb" class="mb-[24px]">
+            <ol class="flex items-center gap-[8px] text-[13px] text-navy-400 font-medium whitespace-nowrap overflow-hidden text-ellipsis">
+              <li><a href="/" class="hover:text-orange-600 transition-colors">Beranda</a></li>
+              <li><i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i></li>
+              <li><a href="/artikel" class="hover:text-orange-600 transition-colors">Artikel</a></li>
+              {parentPillar && (
+                <>
+                  <li><i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i></li>
+                  <li><a href={`/artikel/${parentPillar.slug}`} class="hover:text-orange-600 transition-colors">{parentPillar.title}</a></li>
+                </>
+              )}
+              <li><i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i></li>
+              <li class="text-navy-800 truncate" aria-current="page">{article.title}</li>
+            </ol>
+          </nav>
+          
+          <div class="mb-[30px]">
+            {article.is_pillar && (
+              <span class="inline-flex items-center gap-1.5 bg-orange-100 text-orange-700 text-xs font-semibold px-3 py-1 rounded-full mb-3">
+                <i class="fa-solid fa-crown text-[10px]"></i> Panduan Utama (Pillar)
+              </span>
+            )}
+            <h1 class="font-[family-name:var(--font-display)] text-navy-800 text-[36px] max-lg:text-[28px] font-bold leading-tight mb-[12px]">{article.title}</h1>
+            <div class="flex items-center gap-[16px] text-navy-400 text-[13px] font-medium">
+              {date && <p class="flex items-center gap-[6px]"><i class="fa-regular fa-calendar"></i>{date}</p>}
+              <p class="flex items-center gap-[6px]"><i class="fa-regular fa-clock"></i>{calculateReadTime(article.content)} mnt baca</p>
+            </div>
+          </div>
+
+          {imgUrl && (
+            <div class="rounded-[var(--radius-md)] overflow-hidden mb-[40px]">
+              <img src={imgUrl} alt={article.title} class="w-full h-auto object-cover" />
+            </div>
+          )}
+
+          <!-- Prose styling for rich text -->
+          <div class="prose prose-navy max-w-none 
+                      prose-headings:font-[family-name:var(--font-display)] prose-headings:text-navy-800 
+                      prose-p:text-navy-600 prose-p:leading-relaxed
+                      prose-a:text-orange-500 prose-a:no-underline hover:prose-a:underline
+                      prose-img:rounded-[var(--radius-md)]" 
+               set:html={contentHtml}>
+          </div>
+
+          {article.is_pillar && clusterArticles.length > 0 && (
+            <div class="mt-[40px] p-[24px] bg-navy-50 rounded-[var(--radius-lg)] border border-navy-100">
+              <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[18px] font-bold mb-[14px] flex items-center gap-[8px]">
+                <i class="fa-solid fa-layer-group text-orange-500"></i>
+                Artikel Terkait dalam Panduan Ini:
+              </h3>
+              <ul class="space-y-[10px]">
+                {clusterArticles.map((cluster) => (
+                  <li>
+                    <a href={`/artikel/${cluster.slug}`} class="flex items-center gap-[8px] text-navy-700 text-[14px] font-medium hover:text-orange-600 transition-colors no-underline">
+                      <i class="fa-solid fa-chevron-right text-[10px] text-orange-400"></i>
+                      <span>{cluster.title}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </article>
+
+        <!-- Sidebar Kanan -->
+        <aside class="lg:col-span-4 space-y-[30px]">
+          
+          <!-- Artikel Lainnya -->
+          <div class="bg-white p-[32px] rounded-[var(--radius-xl)] shadow-[var(--shadow-soft)] border border-navy-50 relative overflow-hidden">
+            <!-- Decorative Background Blob -->
+            <div class="absolute -top-[50px] -right-[50px] w-[150px] h-[150px] bg-orange-500/10 rounded-full blur-[40px] pointer-events-none"></div>
+
+            <h3 class="font-[family-name:var(--font-display)] text-[20px] font-bold text-navy-800 mb-[24px] flex items-center gap-[12px] relative z-10">
+              <span class="w-[6px] h-[24px] bg-gradient-to-b from-orange-500 to-orange-400 rounded-full inline-block"></span>
+              Artikel Terkait
+            </h3>
+            
+            {relatedArticles.length > 0 ? (
+              <div class="flex flex-col gap-[8px] relative z-10">
+                {relatedArticles.map((rel) => {
+                  const relImg = rel.featured_image ? getAssetUrl(rel.featured_image, { width: 160, height: 160, format: "webp", quality: 80 }) : null;
+                  const relDate = rel.publish_date ? new Date(rel.publish_date).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' }) : "";
+                  
+                  return (
+                    <a href={`/artikel/${rel.slug}`} class="group flex gap-[16px] items-start p-[12px] -mx-[12px] rounded-[var(--radius-lg)] hover:bg-navy-50/50 transition-all duration-300">
+                      <div class="w-[84px] h-[84px] shrink-0 rounded-[var(--radius-md)] overflow-hidden bg-navy-50 relative shadow-sm">
+                        {relImg ? (
+                           <img src={relImg} alt={rel.title} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out" loading="lazy" />
+                        ) : (
+                           <div class="w-full h-full flex justify-center items-center text-navy-300">
+                             <i class="fa-regular fa-image text-[24px]"></i>
+                           </div>
+                        )}
+                        <div class="absolute inset-0 bg-navy-900/0 group-hover:bg-navy-900/5 transition-colors duration-300"></div>
+                      </div>
+                      <div class="flex flex-col justify-center min-h-[84px] py-[4px]">
+                        <h4 class="text-[15px] font-bold text-navy-800 leading-[1.4] group-hover:text-orange-600 transition-colors line-clamp-2 mb-[4px]">
+                          {rel.title}
+                        </h4>
+                        <p class="text-[13px] text-navy-500 leading-snug line-clamp-2 mb-[8px]">
+                          {getExcerpt(rel.content, 65)}
+                        </p>
+                        <div class="flex items-center gap-[12px] text-[12px] text-navy-400 font-medium mt-auto">
+                          {relDate && (
+                            <span class="flex items-center gap-[4px]">
+                              <i class="fa-regular fa-calendar text-[11px]"></i>
+                              {relDate}
+                            </span>
+                          )}
+                          <span class="flex items-center gap-[4px]">
+                            <i class="fa-regular fa-clock text-[11px]"></i>
+                            {calculateReadTime(rel.content)} mnt
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            ) : (
+              <div class="p-[24px] bg-navy-50/50 rounded-[var(--radius-lg)] border border-dashed border-navy-200 text-center relative z-10">
+                <p class="text-navy-400 text-[14px] font-medium">Belum ada artikel terkait.</p>
+              </div>
+            )}
+          </div>
+
+          <!-- Slot Iklan -->
+          {ads.length > 0 && (
+            <div class="space-y-[20px]">
+              {/* <span class="text-[11px] font-bold text-navy-300 uppercase tracking-wider block text-center">Sponsored</span> */}
+              {ads.map((ad) => (
+                ad.url ? (
+                  <a href={ad.url.startsWith('http') ? ad.url : `https://${ad.url}`} target="_blank" rel="noopener noreferrer" class="block rounded-[var(--radius-md)] overflow-hidden shadow-[var(--shadow-soft)] hover:shadow-lg transition-shadow bg-white">
+                    <img src={getAssetUrl(ad.image, { width: 600, format: "webp", quality: 85 })} alt={ad.description || "Iklan Sponsor"} class="w-full h-auto object-cover" />
+                    {ad.description && (
+                      <p class="text-[12px] text-navy-500 text-center py-[8px] px-[12px] font-medium leading-snug">{ad.description}</p>
+                    )}
+                  </a>
+                ) : (
+                  <div class="block rounded-[var(--radius-md)] overflow-hidden shadow-[var(--shadow-soft)] bg-white">
+                    <img src={getAssetUrl(ad.image, { width: 600, format: "webp", quality: 85 })} alt={ad.description || "Iklan Sponsor"} class="w-full h-auto object-cover" />
+                    {ad.description && (
+                      <p class="text-[12px] text-navy-500 text-center py-[8px] px-[12px] font-medium leading-snug">{ad.description}</p>
+                    )}
+                  </div>
+                )
+              ))}
+            </div>
+          )}
+
+        </aside>
+
+      </div>
+    )}
+    
+    <div class="wrap max-w-[800px] mx-auto mt-[40px] text-center">
+      <a href="/artikel" class="inline-flex items-center gap-[8px] text-navy-600 hover:text-orange-500 font-semibold transition-colors">
+        <i class="fa-solid fa-arrow-left"></i>Kembali ke Semua Artikel
+      </a>
+    </div>
+  </main>
+</Layout>

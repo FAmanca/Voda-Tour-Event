@@ -1,0 +1,46 @@
+---
+// Voda Tour & Event — AdditionalTable Component
+// Tabel untuk fitur tambahan (Add-ons)
+
+import type { Addon } from "../types/directus";
+import { formatPrice } from "../lib/utils";
+
+interface Props {
+  addons: Addon[];
+}
+
+const { addons } = Astro.props;
+---
+
+{addons && addons.length > 0 && (
+  <div class="flex flex-col gap-3">
+    <h4 class="text-[16px] font-semibold text-navy-800">Fasilitas Tambahan (Opsional)</h4>
+    <div class="overflow-hidden rounded-[var(--radius-md)] border border-navy-100">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="bg-navy-800 text-white text-[13px] font-semibold">
+            <th class="px-[18px] py-[12px]">Layanan / Fasilitas</th>
+            <th class="px-[18px] py-[12px]">Harga Tambahan</th>
+          </tr>
+        </thead>
+        <tbody>
+          {addons.map((addon) => (
+            <tr class="bg-white hover:bg-navy-50 border-t border-navy-100 text-[14px] transition-colors">
+              <td class="px-[18px] py-[12px]">
+                <div class="font-semibold text-navy-800">{addon.addon_name}</div>
+                {addon.description && (
+                  <div class="text-navy-500 text-[13px] mt-1 leading-relaxed">
+                    {addon.description}
+                  </div>
+                )}
+              </td>
+              <td class="px-[18px] py-[12px] whitespace-nowrap align-top">
+                <span class="font-bold text-orange-600">+{formatPrice(addon.price)}</span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}

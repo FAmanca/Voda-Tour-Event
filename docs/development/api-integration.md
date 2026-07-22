@@ -22,6 +22,7 @@ Directus memiliki fitur **Public Role** — role anonim yang dapat membaca data 
 Dengan ini, Astro bisa fetch data langsung tanpa API key.
 
 > **⚠️ Jangan pernah set permission Create/Update/Delete untuk collections bisnis di Public Role.**
+> **⚠️ Catatan:** Beberapa tabel *junction* (seperti `packages_activity_types`) secara default mungkin di-block dari Public. Jika tidak ingin membuka akses Public untuk tabel junction, gunakan parameter `access_token={DIRECTUS_ADMIN_TOKEN}` saat melakukan *fetch* di server-side (SSR) untuk mem-bypass error 403 Forbidden.
 
 ## Fetch Pattern di Astro
 
@@ -232,9 +233,20 @@ export async function POST({ request }) {
       "description": "Akomodasi hotel bintang 3, transportasi AC, makan 3x...",
       "duration": "2D1N",
       "price_tiers": [
-        { "min_pax": 5, "max_pax": 10, "price": 850000, "note": null },
-        { "min_pax": 11, "max_pax": 20, "price": 750000, "note": "Minimal 11 orang" },
-        { "min_pax": 21, "max_pax": 50, "price": 650000, "note": "Termasuk akomodasi" }
+        {
+          "table_title": "Harga Domestik (WNI)",
+          "tiers": [
+            { "min_pax": 2, "max_pax": 4, "price_per_pax": 850000, "description": "Hotel Bintang 3" },
+            { "min_pax": 5, "max_pax": 10, "price_per_pax": 750000, "description": "Hotel Bintang 3" }
+          ]
+        }
+      ],
+      "addons": [
+        {
+          "addon_name": "Banana Boat",
+          "price": 300000,
+          "description": "Tambahan wahana air Banana Boat selama 15 menit"
+        }
       ],
       "facilities": ["Hotel bintang 3", "Transportasi AC", "Guide lokal", "Dokumentasi"],
       "itinerary": [

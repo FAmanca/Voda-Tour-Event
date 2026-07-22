@@ -9,6 +9,7 @@ interface Props {
   variant?: 'primary' | 'outline' | 'pill';
   fullWidth?: boolean;
   icon?: boolean;
+  class?: string;
 }
 
 const {
@@ -18,6 +19,7 @@ const {
   variant = 'primary',
   fullWidth = false,
   icon = true,
+  class: className,
 } = Astro.props;
 
 const waUrl = `https://wa.me/${phone}?text=${message}`;
@@ -36,8 +38,8 @@ const widthClass = fullWidth ? 'w-full' : '';
   href={waUrl}
   target="_blank"
   rel="noopener noreferrer"
-  class:list={[baseClass, variantClass[variant] || variantClass.primary, widthClass]}
+  class:list={[baseClass, variantClass[variant] || variantClass.primary, widthClass, className]}
 >
   {icon && <i class="fa-brands fa-whatsapp text-[1.15em]"></i>}
-  {label}
+  <slot>{label}</slot>
 </a>

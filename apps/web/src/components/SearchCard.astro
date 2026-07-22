@@ -87,9 +87,11 @@ const { destinations = [], activityTypes = [] } = Astro.props;
   }
 </style>
 
+<script define:vars={{ envDirectusUrl: import.meta.env.PUBLIC_DIRECTUS_URL || import.meta.env.DIRECTUS_URL || 'http://localhost:8055' }}>
+  window.__DIRECTUS_URL__ = window.__DIRECTUS_URL__ || envDirectusUrl;
+</script>
 <script>
 import { initAutocomplete, logSearch } from "../lib/search";
-window.__DIRECTUS_URL__ = window.__DIRECTUS_URL__ || "{import.meta.env.DIRECTUS_URL || 'http://localhost:8055'}";
 
 document.addEventListener("DOMContentLoaded", function () {
   // Init autocomplete
@@ -131,26 +133,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (form) {
     form.addEventListener("submit", function (e) {
       // === VALIDATION ===
-      var valid = true;
-      var qInput = document.querySelector("#search-card-form input[name='q']");
-      var kegSelect = document.querySelector("#search-card-form select[name='kegiatan']");
-
-      if (qInput && qInput.dataset.searchValid !== 'true') {
-        showFieldError(qInput, 'Harap pilih destinasi atau paket dari daftar yang muncul');
-        valid = false;
-      } else if (qInput) {
-        clearFieldError(qInput);
-      }
-
-      if (kegSelect && !kegSelect.value) {
-        showFieldError(kegSelect, 'Harap pilih jenis kegiatan');
-        valid = false;
-      } else if (kegSelect) {
-        clearFieldError(kegSelect);
-      }
-
-      if (!valid) { e.preventDefault(); return; }
-
+      // Diubah sesuai request: Semua field bersifat opsional (tidak wajib)
       // === PROCEED ===
       e.preventDefault();
       var fd = new FormData(form);

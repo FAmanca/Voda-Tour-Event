@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   # =======================================================
   # POSTGRESQL DATABASE
@@ -14,6 +12,10 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-voda_travel}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 384M 
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-voda} -d ${POSTGRES_DB:-voda_travel}"]
       interval: 10s
@@ -29,6 +31,11 @@ services:
     image: redis:7-alpine
     container_name: voda-redis-prod
     restart: always
+    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru
+    deploy:
+      resources:
+        limits:
+          memory: 128M # Batasi RAM Redis
     volumes:
       - redis_data_prod:/data
     networks:
@@ -38,7 +45,7 @@ services:
   # DIRECTUS CMS
   # =======================================================
   directus:
-    image: directus/directus:11
+    image: directus/directus:12
     container_name: voda-directus-prod
     restart: always
     depends_on:
@@ -63,26 +70,34 @@ services:
       ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL:-admin@vodatrip.id}
       ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
 
-      # Redis Cache
+      # Cache
       CACHE_ENABLED: "true"
-      CACHE_STORE: "local"
-      
-      # Storage (Local for now, will be replaced with R2)
+      CACHE_STORE: "redis"
+      CACHE_REDIS: "redis://redis:6379"
+
+      # Storage
       STORAGE_LOCATIONS: ${STORAGE_LOCATIONS:-local}
       STORAGE_LOCAL_DRIVER: ${STORAGE_LOCAL_DRIVER:-local}
       STORAGE_LOCAL_ROOT: ${STORAGE_LOCAL_ROOT:-/directus/uploads}
 
-      # CORS & Rate Limit
+      # CORS & Security
       CORS_ENABLED: "true"
       CORS_ORIGIN: ${CORS_ORIGIN:-https://vodatrip.id,https://www.vodatrip.id}
       RATE_LIMITER_ENABLED: "true"
-      RATE_LIMITER_STORE: "memory"
+      RATE_LIMITER_STORE: "redis"
+      RATE_LIMITER_REDIS: "redis://redis:6379"
+
+      MARKETPLACE_TRUST: "all"
 
     volumes:
       - directus_uploads:/directus/uploads
       - directus_database_prod:/directus/database
-    ports:
-      - "8055:8055"
+      - ./extensions:/directus/extensions
+    # NOTE: Port 8055 di-hide dari publik, di-access via Nginx
+    deploy:
+      resources:
+        limits:
+          memory: 512M # Batasi RAM Directus
     networks:
       - voda_net
 
@@ -103,8 +118,11 @@ services:
     environment:
       - DIRECTUS_URL=http://directus:8055
       - PUBLIC_DIRECTUS_URL=${PUBLIC_DIRECTUS_URL:-http://api.vodatrip.id}
-    ports:
-      - "4322:4321"
+    # NOTE: Port 4321 di-hide dari publik, di-access via Nginx
+    deploy:
+      resources:
+        limits:
+          memory: 384M # Batasi RAM Node/Astro
     networks:
       - voda_net
 
@@ -122,6 +140,10 @@ services:
       - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - certbot_conf:/etc/letsencrypt
       - certbot_www:/var/www/certbot
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     depends_on:
       - web
       - directus
@@ -129,7 +151,7 @@ services:
       - voda_net
 
   # =======================================================
-  # CERTBOT (For SSL)
+  # CERTBOT (SSL Auto Renew)
   # =======================================================
   certbot:
     image: certbot/certbot
@@ -138,6 +160,8 @@ services:
       - certbot_conf:/etc/letsencrypt
       - certbot_www:/var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - voda_net
 
 networks:
   voda_net:
@@ -145,12 +169,8 @@ networks:
 
 volumes:
   postgres_data:
-    external: true
-    name: infrastructure_postgres_data
   redis_data_prod:
   directus_uploads:
-    external: true
-    name: infrastructure_directus_uploads
   directus_database_prod:
   certbot_conf:
   certbot_www:

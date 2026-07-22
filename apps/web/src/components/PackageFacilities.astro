@@ -1,0 +1,17 @@
+---
+interface Props {
+  facilities: string[];
+}
+const { facilities } = Astro.props;
+---
+<div class="bg-white rounded-[var(--radius-lg)] p-[24px] shadow-sm border border-[--color-line] sticky top-[100px]">
+  <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[20px] font-bold mb-[20px]">Fasilitas Termasuk</h3>
+  <ul class="space-y-[12px]">
+    {facilities.map((f) => (
+      <li class="flex items-start gap-[12px] text-navy-600 text-[14px] leading-relaxed">
+        <i class="fa-solid fa-check-circle text-orange-500 text-[15px] mt-[3px] shrink-0"></i>
+        <span>{f}</span>
+      </li>
+    ))}
+  </ul>
+</div>

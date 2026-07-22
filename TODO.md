@@ -20,7 +20,7 @@
 ### 0.3 Docker Infra
 - [x] Fix `infrastructure/docker-compose.yml` — env var references + hapus version warning
 - [x] Setup PostgreSQL 16 container
-- [x] Setup Directus 11 container
+- [x] Setup Directus 12 container
 - [x] Pastiin volume mounting bener
 - [x] `docker compose up -d` — verifikasi kedua container jalan
 - [x] Akses Directus admin `http://localhost:8055` — login success
@@ -502,62 +502,69 @@ Buat di Directus Admin Panel:
 
 ---
 
+### 🏷️ 2.3 Penyesuaian Dinamis Harga & Fitur Tambahan (Add-ons) pada Package
+- [x] **Refactor Code**
+  - [x] Check All file ganti variable yg ga jelas namanya biar memudahkan maintenance
+---
+
 ### 📰 2.2 Sistem Artikel & Blog (Directus CMS + Astro Frontend)
 
 #### A. Konfigurasi Directus CMS (Backend & Database)
-- [ ] **Setup Skema Collection `articles`:**
+- [x] **Setup Skema Collection `articles`:**
   - Buat tabel/collection baru bernama `articles` dengan field-field berikut:
-    - [ ] `id` (Tipe: UUID, Primary Key, Auto-generated)
-    - [ ] `status` (Tipe: String, Dropdown: `draft`, `published`, `archived`)
-    - [ ] `title` (Tipe: String, Text Input, Required)
-    - [ ] `slug` (Tipe: String, Unique, interface: `wpslug` agar auto-generate dari title ala WordPress)
-    - [ ] `content` (Tipe: JSON, interface: `Editor.js` untuk block-based editor ala Notion/Gutenberg agar bisa pick-and-choose gambar dari File Library secara visual)
-    - [ ] `featured_image` (Tipe: File, M2O ke directus_files)
-    - [ ] `publish_date` (Tipe: DateTime, default to current time)
-    - [ ] `seo` (Tipe: JSON, interface: `seo-plugin` untuk meta title, meta desc, SERP preview, dan social OG card preview)
-    - [ ] System fields: `created_at`, `updated_at`, `created_by`, `updated_by`
-- [ ] **Instalasi Ekstensi di Directus Studio:**
-  - [ ] Install **`@directus-labs/seo-plugin`** via Extensions Marketplace.
-  - [ ] Install **`directus-extension-wpslug-interface`** untuk interface generator slug yang ramah pengguna.
-  - [ ] Install **`directus-extension-editorjs`** (atau sejenisnya) untuk editor berbasis blok Notion-style.
-- [ ] **Custom SEO Content Analyzer (Yoast/Rank Math Clone):**
-  - [ ] Buat Custom Interface Extension menggunakan Directus SDK (`defineInterface`).
-  - [ ] Gunakan Vue 3 `inject('values')` untuk memantau perubahan pada field `content` (WYSIWYG/Editor.js JSON) dan `seo` secara real-time.
-  - [ ] Integrasikan library NPM **`yoastseo`** di dalam ekstensi untuk memproses kata kunci fokus, kepadatan kata kunci, sebaran heading, dan alt tag gambar, lalu tampilkan checklist skor lampu merah/kuning/hijau di panel editor Directus.
+    - [x] `id` (Tipe: UUID, Primary Key, Auto-generated)
+    - [x] `status` (Tipe: String, Dropdown: `draft`, `published`, `archived`)
+    - [x] `title` (Tipe: String, Text Input, Required)
+    - [x] `slug` (Tipe: String, Unique, interface: `wpslug` agar auto-generate dari title ala WordPress)
+    - [x] `content` (Tipe: JSON, interface: `Editor.js` atau WYSIWYG/TipTap untuk editor berbasis blok)
+    - [x] `featured_image` (Tipe: File, M2O ke directus_files, WAJIB diisi untuk thumbnail)
+    - [x] `publish_date` (Tipe: DateTime, default to current time)
+    - [x] `ads` (Tipe: JSON, menampung list maksimal 10 iklan spesifik per artikel. Format: `[{ "image": "uuid-gambar", "url": "link-tujuan" }]`)
+    - [x] `seo` (Tipe: JSON, interface: `seo-plugin` untuk meta title, meta desc, SERP preview, dan social OG card preview)
+    - [x] System fields: `created_at`, `updated_at`, `created_by`, `updated_by`
+- [x] **Instalasi Ekstensi di Directus Studio:**
+  - [x] Install **`@directus-labs/seo-plugin`** via Extensions Marketplace.
+  - [x] Install **`directus-extension-wpslug-interface`** untuk interface generator slug yang ramah pengguna.
+- [x] **Custom SEO Content Analyzer (Yoast/Rank Math Clone):**
+  - [x] Buat Custom Interface Extension menggunakan Directus SDK (`defineInterface`).
+  - [x] Gunakan Vue 3 `inject('values')` untuk memantau perubahan pada field `content` (WYSIWYG/Editor.js JSON) dan `seo` secara real-time.
+  - [x] Integrasikan library NPM **`yoastseo`** di dalam ekstensi untuk memproses kata kunci fokus, kepadatan kata kunci, sebaran heading, dan alt tag gambar, lalu tampilkan checklist skor lampu merah/kuning/hijau di panel editor Directus.
 - [ ] **Konfigurasi Flows (Otomatisasi Rebuild):**
   - [ ] Buat Flow baru bernama `Rebuild Web on Article Publish`.
   - [ ] Trigger: `Event Hook` ➡️ `items.create` dan `items.update` pada collection `articles`.
   - [ ] Condition: Pastikan payload memiliki `status` sama dengan `"published"`.
   - [ ] Action: `Webhook` ➡️ Kirim POST request ke Deploy Hook hosting produksi (Vercel/Netlify/GitHub Actions) untuk memicu rebuild otomatis website Astro agar artikel langsung live di internet.
-- [ ] **Aksesibilitas Perizinan (Roles & Permissions):**
-  - [ ] Buka perizinan baca (**Read**) secara publik (*Public Role*) untuk collection `articles` agar bisa di-fetch oleh Astro.
+- [x] **Aksesibilitas Perizinan (Roles & Permissions):**
+  - [x] Buka perizinan baca (**Read**) secara publik (*Public Role*) untuk collection `articles` agar bisa di-fetch oleh Astro.
 
 #### B. Implementasi di Frontend Astro
-- [ ] **Install Integrasi & SDK:**
-  - [ ] Jalankan `npx astro add sitemap` untuk menginstal `@astrojs/sitemap`.
-  - [ ] Pastikan `@directus/sdk` terinstal di `apps/web/package.json` untuk komunikasi API.
-- [ ] **Halaman Daftar Artikel (`src/pages/blog/index.astro`):**
-  - [ ] Buat halaman baru di `/blog` untuk menampilkan semua list artikel.
-  - [ ] Fetch data dari Directus menggunakan SDK, filter artikel dengan `status: "published"`, urutkan dari `publish_date` terbaru (`sort: "-publish_date"`).
-  - [ ] Gunakan tata letak grid kartu (*Card Grid*), tampilkan `featured_image` yang telah dioptimasi via query params Directus (`?format=webp&quality=80&width=600`).
-  - [ ] Berikan sistem penomoran halaman (*pagination*) sederhana jika jumlah artikel melebihi 12 item.
-- [ ] **Halaman Detail Artikel Dinamis (`src/pages/blog/[slug].astro`):**
-  - [ ] Buat halaman detail dinamis di `/blog/[slug]`.
-  - [ ] Lakukan fetch data artikel tunggal berdasarkan parameter `slug`.
-  - [ ] Jika slug tidak ditemukan, lempar ke halaman 404 (`Astro.redirect('/404')`).
-  - [ ] Parse data `content` (JSON Editor.js blocks) ke format HTML bersih menggunakan pustaka helper seperti `editorjs-html` atau buat parser custom di Astro.
-  - [ ] Ekstrak metadata dari field `seo` (Title, Description, OG Image) dan masukkan ke dalam tag `<head>` menggunakan komponen SEO Layout agar optimal.
-- [ ] **Integrasi Sitemap Dinamis (`astro.config.mjs`):**
-  - [ ] Daftarkan endpoint sitemap di config Astro.
-  - [ ] Tulis fungsi sitemap generator agar secara otomatis menarik seluruh `slug` artikel aktif dari Directus dan menambahkannya ke berkas `sitemap.xml` yang di-generate pas build.
+- [x] **Install Integrasi & SDK:**
+  - [x] Jalankan `npx astro add sitemap` untuk menginstal `@astrojs/sitemap`.
+  - [x] Pastikan `@directus/sdk` terinstal di `apps/web/package.json` untuk komunikasi API.
+- [x] **Halaman Daftar Artikel (`src/pages/artikel/index.astro`):**
+  - [x] Buat halaman baru di `/artikel` untuk menampilkan semua list artikel.
+  - [x] Fetch data dari Directus menggunakan SDK, filter artikel dengan `status: "published"`, urutkan dari `publish_date` terbaru (`sort: "-publish_date"`).
+  - [x] Gunakan tata letak grid kartu (*Card Grid*), tampilkan `featured_image` yang telah dioptimasi via query params Directus (`?format=webp&quality=80&width=600`).
+  - [x] Berikan sistem penomoran halaman (*pagination*) sederhana jika jumlah artikel melebihi 12 item.
+- [x] **Halaman Detail Artikel Dinamis (`src/pages/artikel/[slug].astro`):**
+  - [x] Buat halaman detail dinamis di `/artikel/[slug]`.
+  - [x] Lakukan fetch data artikel tunggal berdasarkan parameter `slug`.
+  - [x] Jika slug tidak ditemukan, lempar ke halaman 404 (`Astro.redirect('/404')`).
+  - [x] Layout halaman dengan sistem grid kolom: Kolom utama (kiri) untuk thumbnail + konten, dan kolom sidebar (kanan) untuk 'Artikel Lainnya' dan 'Slot Iklan'.
+  - [x] Tarik artikel lainnya secara otomatis dengan mencari kecocokan kata kunci dari judul artikel (tanpa field kategori manual).
+  - [x] Render maksimal 10 iklan spesifik artikel dari array field `ads` dalam bentuk banner vertikal di bawah 'Artikel Lainnya'.
+  - [x] Parse data `content` (JSON Editor.js blocks) ke format HTML bersih menggunakan pustaka helper seperti `editorjs-html` atau buat parser custom di Astro.
+  - [x] Ekstrak metadata dari field `seo` (Title, Description, OG Image) dan masukkan ke dalam tag `<head>` menggunakan komponen SEO Layout agar optimal.
+- [x] **Integrasi Sitemap Dinamis (`src/pages/sitemap.xml.ts`):**
+  - [x] Tulis fungsi sitemap generator agar secara otomatis menarik seluruh `slug` artikel aktif dari Directus dan menambahkannya ke berkas `sitemap.xml`.
 
 ---
 
 ### 🏷️ 2.3 Penyesuaian Dinamis Harga & Fitur Tambahan (Add-ons) pada Package
 
 #### A. Konfigurasi Directus CMS
-- [ ] **Modifikasi & Validasi Skema Collection `packages`:**
-  - [ ] **Struktur Nested JSON `price_tiers` (Repeater di dalam Repeater):**
+- [x] **Modifikasi & Validasi Skema Collection `packages`:**
+  - [x] **Struktur Nested JSON `price_tiers` (Repeater di dalam Repeater):**
     Ubah skema/dokumentasi pengisian agar mendukung **maksimal 3 tabel harga** mandiri di dalam satu paket (misalnya: Tabel Harga Domestik WNI, Tabel Harga Asing WNA, atau Durasi Paket berbeda).
     - Format struktur JSON bertingkat yang direncanakan:
       ```json
@@ -577,7 +584,7 @@ Buat di Directus Admin Panel:
         }
       ]
       ```
-  - [ ] **Tambah Field `addons` (Fitur Tambahan/Additional):**
+  - [x] **Tambah Field `addons` (Fitur Tambahan/Additional):**
     - Buat field baru di dalam collection `packages` bernama `addons` dengan tipe **JSON** (agar bisa menampung daftar pilihan opsional).
     - Format struktur JSON yang direncanakan:
       ```json
@@ -596,16 +603,18 @@ Buat di Directus Admin Panel:
       ```
 
 #### B. Implementasi di Frontend Astro
-- [ ] **Optimasi Komponen Tabel Harga (`src/components/PriceTable.astro`):**
-  - [ ] Ubah komponen agar dapat merender **hingga maksimal 3 tabel harga** yang berbeda secara berurutan sesuai data bertingkat di JSON `price_tiers`.
-  - [ ] Tampilkan `table_title` sebagai judul di atas masing-masing tabel harga.
-  - [ ] Ubah logika kolom di dalam masing-masing tabel agar mendeteksi jumlah objek dalam array `tiers` dan menyesuaikan lebarnya secara dinamis (1, 2, atau 3 kolom).
-- [ ] **Implementasi Tabel/List Add-ons pada Halaman Detail Paket (`src/pages/paket/[slug].astro`):**
-  - [ ] **Tata Letak Layout:** Posisikan seksi/tabel tambahan ini **tepat di bawah komponen `PriceTable` (tabel harga utama)** di halaman detail paket `src/pages/paket/[slug].astro`.
-  - [ ] Buat komponen atau seksi baru untuk merender daftar `addons` tersebut (jika data JSON `addons` terisi di Directus).
-  - [ ] **Penyelarasan Desain (Styling):** Samakan gaya desain (*styling*), border, warna latar, tipografi, dan padding tabel add-on agar senada (*cohesive*) dengan gaya visual komponen `PriceTable` (tabel harga utama).
-  - [ ] Tampilkan informasi add-on dalam bentuk baris tabel atau list kartu mini:
+- [x] **Optimasi Komponen Tabel Harga (`src/components/PriceTable.astro`):**
+  - [x] Ubah komponen agar dapat merender **hingga maksimal 3 tabel harga** yang berbeda secara berurutan sesuai data bertingkat di JSON `price_tiers`.
+  - [x] Tampilkan `table_title` sebagai judul di atas masing-masing tabel harga.
+  - [x] Ubah logika kolom di dalam masing-masing tabel agar mendeteksi jumlah objek dalam array `tiers` dan menyesuaikan lebarnya secara dinamis (1, 2, atau 3 kolom).
+- [x] **Implementasi Tabel/List Add-ons pada Halaman Detail Paket (`src/pages/paket/[slug].astro`):**
+  - [x] **Tata Letak Layout:** Posisikan seksi/tabel tambahan ini **tepat di bawah komponen `PriceTable` (tabel harga utama)** di halaman detail paket `src/pages/paket/[slug].astro`.
+  - [x] Buat komponen atau seksi baru untuk merender daftar `addons` tersebut (jika data JSON `addons` terisi di Directus).
+  - [x] **Penyelarasan Desain (Styling):** Samakan gaya desain (*styling*), border, warna latar, tipografi, dan padding tabel add-on agar senada (*cohesive*) dengan gaya visual komponen `PriceTable` (tabel harga utama).
+  - [x] Tampilkan informasi add-on dalam bentuk baris tabel atau list kartu mini:
     - Nama tambahan (misal: "Banana Boat")
     - Deskripsi singkat
     - Format harga tambahan yang terformat rapi (misal: "+Rp 300.000 / orang" atau "+Rp 1.500.000 / grup").
-  - [ ] Berikan penanganan fallback jika data `addons` kosong (sembunyikan seksi add-ons secara anggun).
+  - [x] Berikan penanganan fallback jika data `addons` kosong (sembunyikan seksi add-ons secara anggun).
+
+### 3. 📊 Analytics & Tracking

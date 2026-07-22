@@ -1,72 +1,69 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { getSettings } from "../lib/directus";
 
-const U = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let settings = {};
-try {
-  const r = await fetch(U + "/items/settings");
-  if (r.ok) { const j = await r.json(); if (j.data) j.data.forEach((s) => { settings[s.key] = s.value; }); }
-} catch {}
-const year = settings.established_year || "2024";
-const clients = settings.total_clients || "500+";
-const dest_count = settings.destinations_served || "15+";
-const waNum = settings.wa_number || settings.whatsapp || "6282112345678";
----
+const settings = await getSettings().catch(() => ({} as Record<string, string>));
+
+const establishedYear   = settings.established_year    || "2013";
+const totalClients      = settings.total_clients       || "500+";
+const destinationCount  = settings.destinations_served || "15+";
+const waNumber          = settings.wa_number || settings.whatsapp || "6282112345678";
+  ---
 
 <Layout title="Tentang Kami | Voda Tour & Event" description="Kenali Voda Tour & Event." active="tentang">
   <main>
-    <section class="relative overflow-hidden bg-gradient-to-br from-navy-900 via-[#0A2A3D] to-navy-800 py-[90px] max-lg:py-[60px]">
-      <div class="absolute top-[-100px] right-[-30px] w-[220px] h-[220px] rounded-full bg-orange-500/8 blur-[60px]" aria-hidden="true"></div>
-      <div class="absolute bottom-[-50px] left-[-50px] w-[180px] h-[180px] rounded-full bg-teal-400/8 blur-[50px]" aria-hidden="true"></div>
+    <section class="relative overflow-hidden bg-gradient-to-br from-navy-900 via-navy-950 to-navy-800 py-24 max-lg:py-16">
+      <div class="absolute -top-24 -right-8 w-56 h-56 rounded-full bg-orange-500/8 blur-[60px]" aria-hidden="true"></div>
+      <div class="absolute -bottom-12 -left-12 w-44 h-44 rounded-full bg-teal-400/8 blur-[50px]" aria-hidden="true"></div>
       <div class="wrap relative z-10 text-center">
-        <div class="inline-flex items-center gap-[8px] bg-white/10 backdrop-blur-sm text-orange-400 text-[12px] font-semibold px-[14px] py-[5px] rounded-full mb-[16px]">
+        <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-orange-400 text-xs font-semibold px-3.5 py-1.5 rounded-full mb-4">
           <i class="fa-solid fa-star text-[10px]"></i>TENTANG KAMI
         </div>
-        <h1 class="font-[family-name:var(--font-display)] text-white text-[42px] max-lg:text-[30px] font-bold mt-[12px] leading-tight">
+        <h1 class="font-[family-name:var(--font-display)] text-white text-4xl max-lg:text-3xl font-bold mt-3 leading-tight">
           Cerita <span class="text-orange-400">Voda</span> Tour &amp; Event
         </h1>
-        <p class="text-white/65 text-[16px] max-lg:text-[14px] mt-[10px] max-w-[500px] mx-auto">Perjalanan Berkesan, Momen Tak Terlupakan</p>
+        <p class="text-white/65 text-base max-lg:text-sm mt-2.5 max-w-lg mx-auto">Perjalanan Berkesan, Momen Tak Terlupakan</p>
       </div>
     </section>
 
-    <section class="py-[70px] max-lg:py-[50px]"><div class="wrap">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-[50px] items-center mb-[50px]">
+    <section class="py-16 max-lg:py-12"><div class="wrap">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-12">
         <div>
-          <span class="text-[11px] font-semibold text-orange-600 uppercase tracking-[0.15em]">Tentang Kami</span>
-          <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[28px] font-bold mt-[8px]">Mitra Perjalanan &amp; Event Terpercaya</h2>
-          <p class="text-navy-600 text-[15px] leading-relaxed mt-[16px]">Voda Tour &amp; Event adalah penyedia jasa perjalanan wisata, gathering, dan event organizer yang berkomitmen memberikan pengalaman terbaik bagi setiap pelanggan.</p>
-          <p class="text-navy-600 text-[15px] leading-relaxed mt-[12px]">Dengan jaringan luas di berbagai destinasi dan tim profesional, kami pastikan setiap momen bersama Voda menjadi kenangan yang tak terlupakan.</p>
+          <span class="text-xs font-semibold text-orange-600 uppercase tracking-widest">Tentang Kami</span>
+          <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-3xl font-bold mt-2">Mitra Perjalanan &amp; Event Terpercaya</h2>
+          <p class="text-navy-600 text-base leading-relaxed mt-4">Voda Tour &amp; Event adalah penyedia jasa perjalanan wisata, gathering, dan event organizer yang berkomitmen memberikan pengalaman terbaik bagi setiap pelanggan.</p>
+          <p class="text-navy-600 text-base leading-relaxed mt-3">Dengan jaringan luas di berbagai destinasi dan tim profesional, kami pastikan setiap momen bersama Voda menjadi kenangan yang tak terlupakan.</p>
         </div>
-        <div class="grid grid-cols-2 gap-[16px]">
-          <div class="bg-navy-50 rounded-[var(--radius-lg)] p-[28px] text-center"><span class="block text-[34px] font-bold font-[family-name:var(--font-display)] text-orange-600">{year}</span><span class="text-navy-500 text-[12px] font-medium">Berdiri Sejak</span></div>
-          <div class="bg-orange-50 rounded-[var(--radius-lg)] p-[28px] text-center"><span class="block text-[34px] font-bold font-[family-name:var(--font-display)] text-navy-800">{clients}</span><span class="text-navy-500 text-[12px] font-medium">Klien Puas</span></div>
-          <div class="bg-orange-50 rounded-[var(--radius-lg)] p-[28px] text-center"><span class="block text-[34px] font-bold font-[family-name:var(--font-display)] text-navy-800">{dest_count}</span><span class="text-navy-500 text-[12px] font-medium">Destinasi</span></div>
-          <div class="bg-navy-50 rounded-[var(--radius-lg)] p-[28px] text-center"><span class="block text-[34px] font-bold font-[family-name:var(--font-display)] text-orange-600">24/7</span><span class="text-navy-500 text-[12px] font-medium">Support</span></div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-navy-50 rounded-[var(--radius-lg)] p-7 text-center"><span class="block text-3xl font-bold font-[family-name:var(--font-display)] text-orange-600">{establishedYear}</span><span class="text-navy-500 text-xs font-medium">Berdiri Sejak</span></div>
+          <div class="bg-orange-50 rounded-[var(--radius-lg)] p-7 text-center"><span class="block text-3xl font-bold font-[family-name:var(--font-display)] text-navy-800">{totalClients}</span><span class="text-navy-500 text-xs font-medium">Klien Puas</span></div>
+          <div class="bg-orange-50 rounded-[var(--radius-lg)] p-7 text-center"><span class="block text-3xl font-bold font-[family-name:var(--font-display)] text-navy-800">{destinationCount}</span><span class="text-navy-500 text-xs font-medium">Destinasi</span></div>
+          <div class="bg-navy-50 rounded-[var(--radius-lg)] p-7 text-center"><span class="block text-3xl font-bold font-[family-name:var(--font-display)] text-orange-600">24/7</span><span class="text-navy-500 text-xs font-medium">Support</span></div>
         </div>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
-        <div class="bg-white border border-[--color-line] rounded-[var(--radius-lg)] p-[28px] hover:shadow-[var(--shadow-card)] transition-shadow">
-          <div class="w-[48px] h-[48px] rounded-full bg-orange-100 flex items-center justify-center text-orange-500 text-[20px]"><i class="fa-solid fa-handshake"></i></div>
-          <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[16px] font-semibold mt-[16px]">Komitmen &amp; Amanah</h3>
-          <p class="text-navy-500 text-[13px] mt-[6px]">Pelayanan terbaik dan menjaga kepercayaan.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white border border-[--color-line] rounded-[var(--radius-lg)] p-7 hover:shadow-[var(--shadow-card)] transition-shadow">
+          <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 text-xl"><i class="fa-solid fa-handshake"></i></div>
+          <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-base font-semibold mt-4">Komitmen &amp; Amanah</h3>
+          <p class="text-navy-500 text-sm mt-1.5">Pelayanan terbaik dan menjaga kepercayaan.</p>
         </div>
-        <div class="bg-white border border-[--color-line] rounded-[var(--radius-lg)] p-[28px] hover:shadow-[var(--shadow-card)] transition-shadow">
-          <div class="w-[48px] h-[48px] rounded-full bg-orange-100 flex items-center justify-center text-orange-500 text-[20px]"><i class="fa-solid fa-medal"></i></div>
-          <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[16px] font-semibold mt-[16px]">Kualitas Terbaik</h3>
-          <p class="text-navy-500 text-[13px] mt-[6px]">Setiap detail diperhatikan.</p>
+        <div class="bg-white border border-[--color-line] rounded-[var(--radius-lg)] p-7 hover:shadow-[var(--shadow-card)] transition-shadow">
+          <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 text-xl"><i class="fa-solid fa-medal"></i></div>
+          <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-base font-semibold mt-4">Kualitas Terbaik</h3>
+          <p class="text-navy-500 text-sm mt-1.5">Setiap detail diperhatikan.</p>
         </div>
-        <div class="bg-white border border-[--color-line] rounded-[var(--radius-lg)] p-[28px] hover:shadow-[var(--shadow-card)] transition-shadow">
-          <div class="w-[48px] h-[48px] rounded-full bg-orange-100 flex items-center justify-center text-orange-500 text-[20px]"><i class="fa-solid fa-face-smile"></i></div>
-          <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[16px] font-semibold mt-[16px]">Pelanggan #1</h3>
-          <p class="text-navy-500 text-[13px] mt-[6px]">Kepuasan pelanggan prioritas utama.</p>
+        <div class="bg-white border border-[--color-line] rounded-[var(--radius-lg)] p-7 hover:shadow-[var(--shadow-card)] transition-shadow">
+          <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 text-xl"><i class="fa-solid fa-face-smile"></i></div>
+          <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-base font-semibold mt-4">Pelanggan #1</h3>
+          <p class="text-navy-500 text-sm mt-1.5">Kepuasan pelanggan prioritas utama.</p>
         </div>
       </div>
     </div></section>
 
-    <section class="bg-gradient-to-r from-navy-900 via-navy-800 to-[#0F2C4C] py-[60px]"><div class="wrap text-center">
-      <h2 class="font-[family-name:var(--font-display)] text-white text-[24px] font-bold">Siap Berpetualang?</h2>
-      <p class="text-white/60 text-[14px] mt-[8px]">Hubungi kami dan rencanakan perjalanan impian Anda.</p>
-      <a href={`https://wa.me/${waNum}?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20tertarik%20untuk%20konsultasi%20mengenai%20trip%20perjalanan.`} target="_blank" class="inline-flex items-center gap-[8px] mt-[20px] bg-orange-500 text-white rounded-[999px] px-[28px] py-[12px] font-semibold text-[14px] no-underline shadow-[0_10px_20px_-8px_rgba(238,125,15,0.4)] transition-all hover:-translate-y-[2px]">
+    <section class="bg-gradient-to-r from-navy-900 via-navy-800 to-navy-950 py-16"><div class="wrap text-center">
+      <h2 class="font-[family-name:var(--font-display)] text-white text-2xl font-bold">Siap Berpetualang?</h2>
+      <p class="text-white/60 text-sm mt-2">Hubungi kami dan rencanakan perjalanan impian Anda.</p>
+      <a href={`https://wa.me/${waNumber}?text=Halo%20Voda%20Tour%20%26%20Event%2C%20saya%20tertarik%20untuk%20konsultasi%20mengenai%20trip%20perjalanan.`} target="_blank" class="inline-flex items-center gap-2 mt-5 bg-orange-500 text-white rounded-full px-7 py-3 font-semibold text-sm no-underline shadow-lg shadow-orange-500/40 transition-all hover:-translate-y-0.5">
         <i class="fa-brands fa-whatsapp"></i>Hubungi Kami
       </a>
     </div></section>

@@ -7,11 +7,12 @@ import PackageCard from "../../components/PackageCard.astro";
 import CTABand from "../../components/CTABand.astro";
 import GallerySection from "../../components/GallerySection.astro";
 
+import type { Destination } from "../../types/directus";
 // SSR — no getStaticPaths needed
 
 const { slug } = Astro.params;
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
-let destination = null;
+let destination: Destination | null = null;
 let packages = [];
 let fetchError = false;
 
@@ -25,7 +26,21 @@ try {
 } catch { fetchError = true; }
 ---
 
-<Layout title={destination ? destination.name + " | Destinasi Voda Tour & Event" : "Destinasi Tidak Ditemukan"} description={destination?.description || ""} active="destinasi">
+<Layout 
+  title={destination ? destination.name + " | Destinasi Voda Tour & Event" : "Destinasi Tidak Ditemukan"} 
+  description={destination?.description || ""} 
+  image={destination?.image ? (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + destination.image + "?width=1200&height=630&format=webp" : ""}
+  canonical={destination ? "https://vodatrip.id/destinasi/" + destination.slug : ""}
+  jsonld={destination ? JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Place",
+    "name": destination.name,
+    "description": destination.description,
+    "image": destination.image ? (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + destination.image + "?width=800&format=webp" : "",
+    "url": "https://vodatrip.id/destinasi/" + destination.slug
+  }) : ""}
+  active="destinasi"
+>
   <main>
     {fetchError && (
       <section class="bg-navy-900"><div class="wrap py-[120px] text-center text-white/80"><i class="fa-solid fa-triangle-exclamation text-[40px] text-orange-500 block mb-[16px]"></i><p>Gagal memuat halaman.</p></div></section>
@@ -37,7 +52,7 @@ try {
       <>
         <DestinasiHeader destination={destination} packageCount={packages.length} />
         <section><div class="wrap py-[70px] max-lg:py-[50px]">
-          <SectionHeader title="Paket Tersedia" subtitle={packages.length + " paket wisata di " + destination.name} layout="split" />
+          <SectionHeader title="Paket Tersedia" description={packages.length + " paket wisata di " + destination.name} layout="split" />
           {packages.length > 0 ? (
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px] mt-[34px]">{packages.map((pkg) => <PackageCard package={pkg} />)}</div>
           ) : (
@@ -46,7 +61,7 @@ try {
         </div></section>
         {destination.gallery && destination.gallery.length > 0 && (
           <section class="bg-navy-50"><div class="wrap py-[70px] max-lg:py-[50px]">
-            <SectionHeader title="Galeri Foto" subtitle={destination.gallery.length + " foto " + destination.name} layout="default" />
+            <SectionHeader title="Galeri Foto" description={destination.gallery.length + " foto " + destination.name} layout="default" />
             <div class="mt-[34px]"><GallerySection images={destination.gallery} columns={3} /></div>
           </div></section>
         )}
