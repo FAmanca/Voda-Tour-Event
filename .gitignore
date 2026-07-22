@@ -34,3 +34,11 @@ Thumbs.db
 # Git
 .git/
 .astro/
+
+# Allow custom extension build outputs
+!/extensions/*/dist/
+!/extensions/.registry/**/dist/
+
+# Database dumps & backups
+database/*.sql
+*.tar.gz

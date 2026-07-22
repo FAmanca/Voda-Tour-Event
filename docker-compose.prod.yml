@@ -70,6 +70,10 @@ services:
       ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL:-admin@vodatrip.id}
       ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
 
+      # Redis Connection (Global)
+      REDIS: "redis://redis:6379"
+      REDIS_HOST: "redis"
+
       # Cache
       CACHE_ENABLED: "true"
       CACHE_STORE: "redis"
