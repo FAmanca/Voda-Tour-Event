@@ -150,6 +150,9 @@ export interface Article {
   publish_date: string | null;
   seo: Record<string, any> | null;
   
+  is_pillar?: boolean;
+  pillar_parent?: Record<string, any> | string | null;
+
   status: Status;
   created_at: string;
   updated_at: string;

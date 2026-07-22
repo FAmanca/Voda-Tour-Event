@@ -23,12 +23,12 @@ let similarPackages: Package[] = [];
 let fetchError = false;
 
 try {
-  const packageRes = await fetch(DIRECTUS_URL + "/items/packages?fields=*,destination_id.*&filter[slug][_eq]=" + slug + "&filter[status][_eq]=published");
+  const packageRes = await fetch(DIRECTUS_URL + "/items/packages?fields=*,destination_id.*,image.*,gallery.*,gallery.directus_files_id.*&filter[slug][_eq]=" + slug + "&filter[status][_eq]=published");
   if (packageRes.ok) { const packageJson = await packageRes.json(); pkg = packageJson.data?.[0] || null; }
   if (pkg) {
     const destinationId = typeof pkg.destination_id === "object" ? pkg.destination_id?.id : pkg.destination_id;
     if (destinationId) {
-      const similarRes = await fetch(DIRECTUS_URL + "/items/packages?fields=*,destination_id.*&limit=3&filter[id][_neq]=" + pkg.id + "&filter[destination_id][_eq]=" + destinationId + "&filter[status][_eq]=published&sort=-id");
+      const similarRes = await fetch(DIRECTUS_URL + "/items/packages?fields=*,destination_id.*,image.*&limit=3&filter[id][_neq]=" + pkg.id + "&filter[destination_id][_eq]=" + destinationId + "&filter[status][_eq]=published&sort=-id");
       if (similarRes.ok) { const similarJson = await similarRes.json(); similarPackages = similarJson.data || []; }
     }
   }
@@ -55,6 +55,29 @@ if (pkg) {
     }
   } catch (err) { if (import.meta.env.DEV) console.error("Error fetching activity types:", err); }
 }
+
+let coverImageId: string | null = null;
+if (pkg?.image) {
+  coverImageId = typeof pkg.image === "object" ? (pkg.image as any).id : pkg.image;
+}
+
+const galleryImages: string[] = [];
+if (pkg?.gallery && Array.isArray(pkg.gallery)) {
+  pkg.gallery.forEach((item: any) => {
+    if (!item) return;
+    if (typeof item === "string") {
+      galleryImages.push(item);
+    } else if (typeof item === "object") {
+      const fileId = item.directus_files_id?.id || item.directus_files_id || item.id;
+      if (typeof fileId === "string") galleryImages.push(fileId);
+    }
+  });
+}
+
+if (!coverImageId && galleryImages.length > 0) {
+  coverImageId = galleryImages[0];
+}
+
 const startingPrice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
 const priceRange = pkg?.price_tiers ? getPriceRange(pkg.price_tiers) : null;
 ---
@@ -62,14 +85,14 @@ const priceRange = pkg?.price_tiers ? getPriceRange(pkg.price_tiers) : null;
 
 <Layout title={pkg ? pkg.name + " | Paket Voda Tour & Event" : "Paket Tidak Ditemukan"}
   description={pkg?.description || ""}
-  image={pkg?.gallery?.[0] ? (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + pkg.gallery[0] + "?width=1200&height=630&format=webp" : ""}
+  image={coverImageId ? (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + coverImageId + "?width=1200&height=630&format=webp" : ""}
   canonical={pkg ? "https://vodatrip.id/paket/" + pkg.slug : ""}
   jsonld={pkg ? JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Product",
     "name": pkg.name,
     "description": pkg.description,
-    "image": pkg.gallery?.length ? pkg.gallery.map(g => (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + g + "?width=800&format=webp") : [],
+    "image": galleryImages.length ? galleryImages.map(g => (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + g + "?width=800&format=webp") : (coverImageId ? [(import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + coverImageId + "?width=800&format=webp"] : []),
     "url": "https://vodatrip.id/paket/" + pkg.slug,
     "brand": { "@type": "Brand", "name": "Voda Tour & Event" },
     "offers": {
@@ -122,23 +145,30 @@ const priceRange = pkg?.price_tiers ? getPriceRange(pkg.price_tiers) : null;
         </div></section>
       )}
 
-      <!-- ===== ITINERARY ===== -->
-      {pkg.itinerary && pkg.itinerary.length > 0 && (
+      <!-- ===== ITINERARY & FACILITIES ===== -->
+      {( (pkg.itinerary && pkg.itinerary.length > 0) || (pkg.facilities && pkg.facilities.length > 0) ) && (
         <section class="bg-navy-50 py-[70px] max-lg:py-[50px]"><div class="wrap">
           <div class="text-center mb-[40px]">
-            <span class="text-[11px] font-semibold text-orange-600 uppercase tracking-[0.15em]">Itinerary</span>
-            <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] max-lg:text-[22px] font-bold mt-[8px]">Rencana Perjalanan</h2>
-            <p class="text-navy-500 text-[14px] mt-[6px]">Jadwal perjalanan selama {pkg.duration}.</p>
+            <span class="text-[11px] font-semibold text-orange-600 uppercase tracking-[0.15em]">Detail</span>
+            <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] max-lg:text-[22px] font-bold mt-[8px]">Fasilitas & Itinerary</h2>
+            {pkg.duration && <p class="text-navy-500 text-[14px] mt-[6px]">Jadwal perjalanan selama {pkg.duration}.</p>}
           </div>
-          <div class="max-w-[700px] mx-auto">
-            <ItineraryTimeline itinerary={pkg.itinerary} />
+
+          <div class={`max-w-[1000px] mx-auto grid grid-cols-1 gap-[30px] lg:gap-[40px] items-start ${(pkg.itinerary && pkg.itinerary.length > 0) && (pkg.facilities && pkg.facilities.length > 0) ? 'lg:grid-cols-[1.5fr_1fr]' : ''}`}>
+            {pkg.facilities && pkg.facilities.length > 0 && (
+              <div>
+                <PackageFacilities facilities={pkg.facilities} />
+              </div>
+            )}
+
+{pkg.itinerary && pkg.itinerary.length > 0 && (
+              <div class="bg-white rounded-[var(--radius-lg)] p-[24px] lg:p-[32px] shadow-sm border border-[--color-line]">
+                <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[20px] font-bold mb-[24px]">Rencana Perjalanan</h3>
+                <ItineraryTimeline itinerary={pkg.itinerary} />
+              </div>
+            )}
           </div>
         </div></section>
-      )}
-
-      <!-- ===== FACILITIES ===== -->
-      {pkg.facilities && pkg.facilities.length > 0 && (
-        <PackageFacilities facilities={pkg.facilities} />
       )}
 
       <!-- ===== PRICE & ADDONS ===== -->
@@ -162,21 +192,21 @@ const priceRange = pkg?.price_tiers ? getPriceRange(pkg.price_tiers) : null;
 
             <div class="max-w-[800px] mx-auto w-full mt-[16px] flex items-start gap-[8px] text-navy-400 text-[12px] bg-white rounded-[var(--radius-sm)] p-[12px] border border-[--color-line]">
               <i class="fa-solid fa-circle-info text-orange-400 mt-[2px] text-[12px]"></i>
-              <span>Harga dapat berubah sesuai musim dan ketersediaan. Hubungi kami untuk penawaran terbaik.</span>
+              <span>Harga dapat berubah sewaktu-waktu.</span>
             </div>
           </div>
         </div></section>
       )}
 
       <!-- ===== GALLERY ===== -->
-      {pkg.gallery && pkg.gallery.length > 1 && (
+      {galleryImages.length > 0 && (
         <section class="py-[70px] max-lg:py-[50px]"><div class="wrap">
           <div class="text-center mb-[36px]">
             <span class="text-[11px] font-semibold text-orange-600 uppercase tracking-[0.15em]">Galeri</span>
             <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[26px] max-lg:text-[22px] font-bold mt-[8px]">Foto {pkg.name}</h2>
-            <p class="text-navy-500 text-[14px] mt-[6px]">{pkg.gallery.length} foto tersedia</p>
+            <p class="text-navy-500 text-[14px] mt-[6px]">{galleryImages.length} foto tersedia</p>
           </div>
-          <GallerySection images={pkg.gallery} columns={3} />
+          <GallerySection images={galleryImages} columns={3} />
         </div></section>
       )}
 
