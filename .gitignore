@@ -34,3 +34,7 @@ Thumbs.db
 # Git
 .git/
 .astro/
+
+# Allow custom extension build outputs
+!/extensions/*/dist/
+!/extensions/.registry/**/dist/
