@@ -1,6 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { getArticleBySlug, getRelatedArticles, getAssetUrl } from "../../lib/directus";
+import { getArticleBySlug, getRelatedArticles, getClusterArticles, getAssetUrl } from "../../lib/directus";
 import type { Article } from "../../types/directus";
 
 const { slug } = Astro.params;
@@ -30,16 +30,25 @@ function getExcerpt(content: any, maxLen = 70): string {
 }
 
 let article: Article | null = slug ? await getArticleBySlug(slug).catch(() => null) : null;
+if (!article) {
+  Astro.response.status = 404;
+}
 
 let imgUrl = null;
 let date = "";
 let relatedArticles: Article[] = [];
+let clusterArticles: Article[] = [];
+const parentPillar = article && typeof (article as Article).pillar_parent === 'object' ? (article as Article).pillar_parent : null;
+
 if (article) {
   if (article.featured_image) {
     imgUrl = getAssetUrl(article.featured_image, { width: 1200, height: 600, format: "webp", quality: 85 });
   }
   if (article.publish_date) {
     date = new Date(article.publish_date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+  if (article.is_pillar) {
+    clusterArticles = await getClusterArticles(article.id, 10).catch(() => []);
   }
   if (article.title && slug) {
     relatedArticles = await getRelatedArticles(article.title, slug, 3).catch(() => []);
@@ -58,7 +67,11 @@ if (article && article.content) {
     contentHtml = content.blocks.map((b: any) => {
       if (b.type === 'paragraph') return "<p>" + b.data.text + "</p>";
       if (b.type === 'header') return "<h" + b.data.level + ">" + b.data.text + "</h" + b.data.level + ">";
-      if (b.type === 'list') return "<ul>" + b.data.items.map((i: string) => "<li>" + i + "</li>").join('') + "</ul>";
+      if (b.type === 'list') {
+        const tag = b.data.style === 'ordered' ? 'ol' : 'ul';
+        const items = b.data.items.map((i: string) => "<li>" + i + "</li>").join('');
+        return "<" + tag + ">" + items + "</" + tag + ">";
+      }
       if (b.type === 'image') return "<img src=\"" + b.data.url + "\" alt=\"" + (b.data.caption || '') + "\" />";
       return "";
     }).join('');
@@ -109,12 +122,23 @@ const jsonldData = article ? JSON.stringify({
               <li><a href="/" class="hover:text-orange-600 transition-colors">Beranda</a></li>
               <li><i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i></li>
               <li><a href="/artikel" class="hover:text-orange-600 transition-colors">Artikel</a></li>
+              {parentPillar && (
+                <>
+                  <li><i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i></li>
+                  <li><a href={`/artikel/${parentPillar.slug}`} class="hover:text-orange-600 transition-colors">{parentPillar.title}</a></li>
+                </>
+              )}
               <li><i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i></li>
               <li class="text-navy-800 truncate" aria-current="page">{article.title}</li>
             </ol>
           </nav>
           
           <div class="mb-[30px]">
+            {article.is_pillar && (
+              <span class="inline-flex items-center gap-1.5 bg-orange-100 text-orange-700 text-xs font-semibold px-3 py-1 rounded-full mb-3">
+                <i class="fa-solid fa-crown text-[10px]"></i> Panduan Utama (Pillar)
+              </span>
+            )}
             <h1 class="font-[family-name:var(--font-display)] text-navy-800 text-[36px] max-lg:text-[28px] font-bold leading-tight mb-[12px]">{article.title}</h1>
             <div class="flex items-center gap-[16px] text-navy-400 text-[13px] font-medium">
               {date && <p class="flex items-center gap-[6px]"><i class="fa-regular fa-calendar"></i>{date}</p>}
@@ -136,6 +160,25 @@ const jsonldData = article ? JSON.stringify({
                       prose-img:rounded-[var(--radius-md)]" 
                set:html={contentHtml}>
           </div>
+
+          {article.is_pillar && clusterArticles.length > 0 && (
+            <div class="mt-[40px] p-[24px] bg-navy-50 rounded-[var(--radius-lg)] border border-navy-100">
+              <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[18px] font-bold mb-[14px] flex items-center gap-[8px]">
+                <i class="fa-solid fa-layer-group text-orange-500"></i>
+                Artikel Terkait dalam Panduan Ini:
+              </h3>
+              <ul class="space-y-[10px]">
+                {clusterArticles.map((cluster) => (
+                  <li>
+                    <a href={`/artikel/${cluster.slug}`} class="flex items-center gap-[8px] text-navy-700 text-[14px] font-medium hover:text-orange-600 transition-colors no-underline">
+                      <i class="fa-solid fa-chevron-right text-[10px] text-orange-400"></i>
+                      <span>{cluster.title}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </article>
 
         <!-- Sidebar Kanan -->

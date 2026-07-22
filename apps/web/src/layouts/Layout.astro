@@ -33,6 +33,9 @@ const siteUrl = "https://vodatrip.id";
 const waNum = settings.wa_number || settings.whatsapp || DEFAULT_WA_NUMBER;
 const defaultImage = siteUrl + "/images/VodaTravelIcon.webp";
 const ogImage = image || defaultImage;
+
+const currentPath = Astro.url.pathname === '/' ? '' : Astro.url.pathname.replace(/\/$/, '');
+const autoCanonical = canonical || (siteUrl + currentPath);
 ---
 
 <!doctype html>
@@ -55,7 +58,7 @@ const ogImage = image || defaultImage;
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:image" content={ogImage} />
-  <meta property="og:url" content={canonical || siteUrl} />
+  <meta property="og:url" content={autoCanonical} />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="id_ID" />
   <meta property="og:site_name" content="Voda Tour & Event" />
@@ -67,7 +70,7 @@ const ogImage = image || defaultImage;
   <meta name="twitter:image" content={ogImage} />
 
   <!-- Canonical -->
-  {canonical && <link rel="canonical" href={canonical} />}
+  <link rel="canonical" href={autoCanonical} />
 
 
     <!-- Google Fonts (Optimized Async) -->
