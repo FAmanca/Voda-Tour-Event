@@ -18,11 +18,10 @@ Tabel `packages` menyimpan data paket wisata yang ditawarkan untuk setiap destin
 | addons          | json                  | null              | Array fitur tambahan (opsional)   |
 | gallery         | json                  | null              | Array UUID file gambar            |
 | status          | varchar(20)           | 'draft'           | draft / published / archived      |
-| created_at      | timestamptz           | now()             | Audit                             |
-| updated_at      | timestamptz           | now()             | Audit                             |
-| deleted_at      | timestamptz           | null              | Soft delete                       |
-| created_by      | uuid (users)          | null              | Pembuat                           |
-| updated_by      | uuid (users)          | null              | Pengubah terakhir                 |
+| user_created    | uuid (users)          | null              | Pembuat                           |
+| date_created    | timestamptz           | now()             | Tanggal dibuat                    |
+| user_updated    | uuid (users)          | null              | Pengubah terakhir                 |
+| date_updated    | timestamptz           | now()             | Tanggal diubah                    |
 
 ## Indexes
 
@@ -35,8 +34,8 @@ Tabel `packages` menyimpan data paket wisata yang ditawarkan untuk setiap destin
 
 - `destination_id` → `destinations.id`
 - `gallery` → JSON array of `directus_files.id`
-- `created_by` → `directus_users.id`
-- `updated_by` → `directus_users.id`
+- `user_created` → `directus_users.id`
+- `user_updated` → `directus_users.id`
 
 ## price_tiers Format
 

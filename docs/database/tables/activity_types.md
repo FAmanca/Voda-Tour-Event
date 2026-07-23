@@ -11,11 +11,10 @@ Tabel `activity_types` menyimpan master data jenis kegiatan yang tersedia.
 | slug           | varchar(255)  | —                 | URL slug (unique)            |
 | description    | text          | null              | Deskripsi                    |
 | status         | varchar(20)   | 'draft'           | draft / published / archived |
-| created_at     | timestamptz   | now()             | Audit                        |
-| updated_at     | timestamptz   | now()             | Audit                        |
-| deleted_at     | timestamptz   | null              | Soft delete                  |
-| created_by     | uuid (users)  | null              | Pembuat                      |
-| updated_by     | uuid (users)  | null              | Pengubah terakhir            |
+| user_created   | uuid (users)  | null              | Pembuat                      |
+| date_created   | timestamptz   | now()             | Tanggal dibuat               |
+| user_updated   | uuid (users)  | null              | Pengubah terakhir            |
+| date_updated   | timestamptz   | now()             | Tanggal diubah               |
 
 ## Indexes
 
@@ -25,8 +24,8 @@ Tabel `activity_types` menyimpan master data jenis kegiatan yang tersedia.
 
 ## Relations
 
-- `created_by` → `directus_users.id`
-- `updated_by` → `directus_users.id`
+- `user_created` → `directus_users.id`
+- `user_updated` → `directus_users.id`
 
 ## Notes
 

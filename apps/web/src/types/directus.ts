@@ -67,11 +67,10 @@ export interface Region {
 
   // Directus system fields (auto-managed)
   status: Status;
-  created_at: string;   // ISO 8601
-  updated_at: string;   // ISO 8601
-  deleted_at: string | null;
-  created_by: UserUuid | null;
-  updated_by: UserUuid | null;
+  date_created: string;   // ISO 8601
+  date_updated: string;   // ISO 8601
+  user_created: UserUuid | null;
+  user_updated: UserUuid | null;
 }
 
 export interface Destination {
@@ -84,11 +83,10 @@ export interface Destination {
   gallery: FileUuid[] | null;      // JSON array of UUIDs
 
   status: Status;
-  created_at: string;
-  updated_at: string;
-  deleted_at: string | null;
-  created_by: UserUuid | null;
-  updated_by: UserUuid | null;
+  date_created: string;
+  date_updated: string;
+  user_created: UserUuid | null;
+  user_updated: UserUuid | null;
 }
 
 export interface Package {
@@ -105,11 +103,10 @@ export interface Package {
   gallery: FileUuid[] | null;
 
   status: Status;
-  created_at: string;
-  updated_at: string;
-  deleted_at: string | null;
-  created_by: UserUuid | null;
-  updated_by: UserUuid | null;
+  date_created: string;
+  date_updated: string;
+  user_created: UserUuid | null;
+  user_updated: UserUuid | null;
 }
 
 export interface ActivityType {
@@ -118,20 +115,10 @@ export interface ActivityType {
   slug: string;
   description: string | null;
 
-  status: Status;
-  created_at: string;
-  updated_at: string;
-  deleted_at: string | null;
-  created_by: UserUuid | null;
-  updated_by: UserUuid | null;
-}
-
 export interface PackageActivityType {
   id: string;
   package_id: string | Package;
   activity_type_id: string | ActivityType;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface ArticleAd {
@@ -154,11 +141,10 @@ export interface Article {
   pillar_parent?: Record<string, any> | string | null;
 
   status: Status;
-  created_at: string;
-  updated_at: string;
-  deleted_at: string | null;
-  created_by: UserUuid | null;
-  updated_by: UserUuid | null;
+  date_created: string;
+  date_updated: string;
+  user_created: UserUuid | null;
+  user_updated: UserUuid | null;
 }
 
 export interface Setting {
@@ -166,11 +152,20 @@ export interface Setting {
   key: string;        // "site_name", "whatsapp", "email", etc.
   value: string | null;
 
-  created_at: string;
-  updated_at: string;
-  deleted_at: string | null;
-  created_by: UserUuid | null;
-  updated_by: UserUuid | null;
+  date_created: string;
+  date_updated: string;
+  user_created: UserUuid | null;
+  user_updated: UserUuid | null;
+}
+
+export interface PopupAd {
+  id: string;
+  status: boolean;
+  popup_image: FileUuid | null;
+  url: string | null;
+
+  date_created?: string;
+  date_updated?: string;
 }
 
 export interface Search {
