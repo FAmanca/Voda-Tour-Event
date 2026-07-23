@@ -1,48 +1,67 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Eyebrow from "../components/Eyebrow.astro";
-import GallerySection from "../components/GallerySection.astro";
 import type { Destination, Package } from "../types/directus";
 
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
+const PUBLIC_DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055";
+
 let imageIds: string[] = [];
 let fetchError = false;
 
 try {
   const [destResponse, pkgResponse] = await Promise.all([
-    fetch(`${DIRECTUS_URL}/items/destinations?fields=gallery,image&filter[status][_eq]=published&limit=100`),
-    fetch(`${DIRECTUS_URL}/items/packages?fields=gallery&filter[status][_eq]=published&limit=100`),
+    fetch(`${DIRECTUS_URL}/items/destinations?fields=gallery.*,gallery.directus_files_id.id&filter[status][_eq]=published&limit=100`),
+    fetch(`${DIRECTUS_URL}/items/packages?fields=gallery.*,gallery.directus_files_id.id&filter[status][_eq]=published&limit=100`),
   ]);
 
   if (destResponse.ok) {
     const destJson = await destResponse.json();
-    (destJson.data || []).forEach((dest: Destination) => {
-      if (dest.image) imageIds.push(dest.image);
-      if (dest.gallery) dest.gallery.forEach((galleryId: string) => imageIds.push(galleryId));
+    (destJson.data || []).forEach((dest: any) => {
+      if (dest.gallery && Array.isArray(dest.gallery)) {
+        dest.gallery.forEach((item: any) => {
+          const fileId = item.directus_files_id?.id || item.directus_files_id || item.id;
+          if (typeof fileId === "string") imageIds.push(fileId);
+        });
+      }
     });
   }
 
   if (pkgResponse.ok) {
     const pkgJson = await pkgResponse.json();
-    (pkgJson.data || []).forEach((pkg: Package) => {
-      if (pkg.gallery) pkg.gallery.forEach((galleryId: string) => imageIds.push(galleryId));
+    (pkgJson.data || []).forEach((pkg: any) => {
+      if (pkg.gallery && Array.isArray(pkg.gallery)) {
+        pkg.gallery.forEach((item: any) => {
+          const fileId = item.directus_files_id?.id || item.directus_files_id || item.id;
+          if (typeof fileId === "string") imageIds.push(fileId);
+        });
+      }
     });
   }
 
   // Deduplicate
   imageIds = [...new Set(imageIds)];
-} catch {
+} catch (e) {
   fetchError = true;
+  console.error("Gallery fetch error", e);
 }
 ---
 
-<Layout title="Galeri Foto | Voda Tour & Event" description="Galeri foto destinasi dan event." active="galeri">
+<Layout title="Galeri Foto | Voda Tour & Event" description="Koleksi foto terbaik dari perjalanan dan event kami." active="galeri">
   <main>
-    <section class="bg-navy-900 py-[80px] max-lg:py-[50px]">
-      <div class="wrap text-center">
-        <Eyebrow text="Galeri" />
-        <h1 class="font-[family-name:var(--font-display)] text-white text-[38px] max-lg:text-[28px] font-bold mt-[12px]">Galeri Foto</h1>
-        <p class="text-white/70 text-[16px] max-lg:text-[14px] mt-[10px] max-w-[500px] mx-auto">Momen-momen terbaik dari perjalanan dan event kami.</p>
+    <section class="relative bg-navy-900 py-[100px] max-lg:py-[70px] overflow-hidden">
+      <!-- Background Decorative Elements -->
+      <div class="absolute top-[-20%] left-[-10%] w-[50%] h-[150%] bg-orange-600/10 blur-[100px] rounded-full mix-blend-screen"></div>
+      <div class="absolute bottom-[-20%] right-[-10%] w-[40%] h-[120%] bg-blue-500/10 blur-[80px] rounded-full mix-blend-screen"></div>
+      
+      <div class="wrap text-center relative z-10">
+        <Eyebrow text="Eksplorasi Momen" />
+        <h1 class="font-[family-name:var(--font-display)] text-white text-[44px] max-lg:text-[32px] font-bold mt-[16px] leading-tight">
+          Galeri <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">Perjalanan</span>
+        </h1>
+        <p class="text-white/70 text-[18px] max-lg:text-[15px] mt-[16px] max-w-[540px] mx-auto leading-relaxed">
+          Lihat momen-momen tak terlupakan yang telah kami abadikan. Jadikan ini inspirasi untuk petualangan Anda selanjutnya bersama Voda Tour & Event.
+        </p>
       </div>
     </section>
 
@@ -57,18 +76,187 @@ try {
     )}
 
     {!fetchError && (
-      <section>
-        <div class="wrap py-[60px] max-lg:py-[40px]">
+      <section class="bg-navy-50 min-h-[500px]">
+        <div class="wrap pt-[120px] pb-[80px] max-lg:pt-[80px] max-lg:pb-[50px]">
           {imageIds.length > 0 ? (
-            <GallerySection images={imageIds} columns={4} />
+            <div class="max-w-[1400px] mx-auto">
+              <!-- Pinterest-like Masonry Grid using CSS Columns -->
+              <div id="masonry-grid" class="columns-2 sm:columns-3 md:columns-4 lg:columns-4 gap-[20px] space-y-[20px]">
+                <!-- Images will be injected here by JS -->
+              </div>
+              
+              <!-- Scroll Trigger -->
+              <div id="scroll-trigger" class="h-[100px] w-full flex items-center justify-center mt-[40px]">
+                <div id="loader" class="flex flex-col items-center gap-[12px]">
+                  <i class="fa-solid fa-circle-notch fa-spin text-orange-500 text-[32px]"></i>
+                  <span class="text-navy-500 text-[14px] font-medium tracking-wide animate-pulse">Memuat foto...</span>
+                </div>
+                <div id="end-message" class="hidden text-navy-400 text-[15px] font-medium items-center gap-[8px]">
+                  <i class="fa-solid fa-check-circle text-green-500"></i> Semua foto telah ditampilkan
+                </div>
+              </div>
+            </div>
           ) : (
-            <div class="text-center py-[60px]">
-              <i class="fa-regular fa-image text-[48px] text-navy-300 block mb-[16px]"></i>
-              <p class="text-navy-500 text-[16px]">Belum ada galeri tersedia.</p>
+            <div class="text-center py-[80px]">
+              <i class="fa-regular fa-images text-[64px] text-navy-300 block mb-[20px]"></i>
+              <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[24px] font-bold mb-[8px]">Belum Ada Foto</h3>
+              <p class="text-navy-500 text-[16px]">Galeri saat ini masih kosong.</p>
             </div>
           )}
         </div>
       </section>
     )}
+
+    <!-- Lightbox Modal for Galeri Umum -->
+    <div id="galeri-lightbox" class="fixed inset-0 z-[100] hidden items-center justify-center bg-navy-900/95 opacity-0 transition-opacity duration-300 backdrop-blur-sm">
+      <button id="galeri-lightbox-close" class="absolute top-[20px] right-[20px] w-[50px] h-[50px] flex items-center justify-center text-white/70 hover:text-white bg-white/10 hover:bg-orange-500 rounded-full transition-all duration-300 z-[101]">
+        <i class="fa-solid fa-xmark text-[24px]"></i>
+      </button>
+      <div class="relative max-w-[90vw] max-h-[90vh]">
+        <img id="galeri-lightbox-img" src="" alt="Diperbesar" class="max-w-[90vw] max-h-[90vh] object-contain rounded-[var(--radius-md)] shadow-2xl scale-95 transition-transform duration-300" />
+      </div>
+    </div>
   </main>
 </Layout>
+
+<script define:vars={{ imageIds, PUBLIC_DIRECTUS_URL }}>
+  // Shuffle array function (Fisher-Yates)
+  function shuffle(array) {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex > 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    if (!imageIds || imageIds.length === 0) return;
+
+    const grid = document.getElementById("masonry-grid");
+    const trigger = document.getElementById("scroll-trigger");
+    const loader = document.getElementById("loader");
+    const endMessage = document.getElementById("end-message");
+    const lightbox = document.getElementById("galeri-lightbox");
+    const lightboxImg = document.getElementById("galeri-lightbox-img");
+    const closeBtn = document.getElementById("galeri-lightbox-close");
+
+    // Lightbox handlers
+    function openLightbox(url) {
+      if (!lightbox || !lightboxImg) return;
+      lightboxImg.src = url;
+      lightbox.classList.remove('hidden');
+      lightbox.classList.add('flex');
+      setTimeout(() => {
+        lightbox.classList.remove('opacity-0');
+        lightbox.classList.add('opacity-100');
+        lightboxImg.classList.remove('scale-95');
+        lightboxImg.classList.add('scale-100');
+      }, 10);
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      if (!lightbox || !lightboxImg) return;
+      lightbox.classList.remove('opacity-100');
+      lightbox.classList.add('opacity-0');
+      lightboxImg.classList.remove('scale-100');
+      lightboxImg.classList.add('scale-95');
+      setTimeout(() => {
+        lightbox.classList.remove('flex');
+        lightbox.classList.add('hidden');
+        lightboxImg.src = '';
+        document.body.style.overflow = '';
+      }, 300);
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+    if (lightbox) {
+      lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+      });
+    }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox && !lightbox.classList.contains('hidden')) {
+        closeLightbox();
+      }
+    });
+
+    // Shuffle IDs on client to get random query effect on every visit
+    let shuffledIds = shuffle([...imageIds]);
+    const batchSize = 15;
+    let currentIndex = 0;
+
+    function renderBatch() {
+      const nextBatch = shuffledIds.slice(currentIndex, currentIndex + batchSize);
+      
+      nextBatch.forEach((id) => {
+        // Create button container
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.setAttribute('data-image', `${PUBLIC_DIRECTUS_URL}/assets/${id}?width=1200`);
+        btn.className = 'w-full break-inside-avoid block relative overflow-hidden rounded-[var(--radius-lg)] group cursor-pointer border border-[--color-line] shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white mb-[20px] text-left';
+        
+        btn.addEventListener('click', () => {
+          openLightbox(`${PUBLIC_DIRECTUS_URL}/assets/${id}?width=1200`);
+        });
+
+        // Create img
+        const img = document.createElement('img');
+        img.src = `${PUBLIC_DIRECTUS_URL}/assets/${id}?width=600&format=webp&quality=85`;
+        img.className = 'w-full h-auto block transition-transform duration-700 group-hover:scale-105';
+        img.loading = 'lazy';
+        img.alt = 'Galeri Voda Tour';
+
+        // Hover overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'absolute inset-0 bg-gradient-to-t from-navy-900/60 via-navy-900/0 to-navy-900/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-[20px] pointer-events-none';
+        
+        // Icon in overlay
+        const iconContainer = document.createElement('div');
+        iconContainer.className = 'absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-orange-500 text-white w-[48px] h-[48px] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110 shadow-lg';
+        iconContainer.innerHTML = '<i class="fa-solid fa-expand text-[18px]"></i>';
+        
+        overlay.appendChild(iconContainer);
+        btn.appendChild(img);
+        btn.appendChild(overlay);
+        grid.appendChild(btn);
+      });
+
+      currentIndex += batchSize;
+
+      if (currentIndex >= shuffledIds.length) {
+        // We've loaded all images
+        loader.classList.add('hidden');
+        endMessage.classList.remove('hidden');
+        endMessage.classList.add('flex');
+        if (observer) {
+          observer.disconnect();
+        }
+      }
+    }
+
+    // Initial load
+    renderBatch();
+
+    // Intersection Observer for Infinite Scroll
+    let observer;
+    if (currentIndex < shuffledIds.length && 'IntersectionObserver' in window) {
+      observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          // Add a small artificial delay to make the loading feel smoother
+          setTimeout(() => {
+            renderBatch();
+          }, 300);
+        }
+      }, { rootMargin: "0px 0px 400px 0px" }); // trigger 400px before reaching the bottom
+      
+      observer.observe(trigger);
+    } else if (currentIndex >= shuffledIds.length) {
+      loader.classList.add('hidden');
+      endMessage.classList.remove('hidden');
+      endMessage.classList.add('flex');
+    }
+  });
+</script>
