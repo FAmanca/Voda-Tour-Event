@@ -18,12 +18,25 @@ let fetchError = false;
 
 try {
   const [destRes, pkgRes] = await Promise.all([
-    fetch(DIRECTUS_URL + "/items/destinations?fields=*,region_id.*&filter[slug][_eq]=" + slug + "&filter[status][_eq]=published"),
+    fetch(DIRECTUS_URL + "/items/destinations?fields=*,region_id.*,gallery.*,gallery.directus_files_id.*&filter[slug][_eq]=" + slug + "&filter[status][_eq]=published"),
     fetch(DIRECTUS_URL + "/items/packages?fields=*,destination_id.*&filter[destination_id][slug][_eq]=" + slug + "&filter[status][_eq]=published&sort=id"),
   ]);
   if (destRes.ok) { const json = await destRes.json(); destination = json.data?.[0] || null; }
   if (pkgRes.ok) { const json = await pkgRes.json(); packages = json.data || []; }
 } catch { fetchError = true; }
+
+const galleryImages: string[] = [];
+if (destination?.gallery && Array.isArray(destination.gallery)) {
+  destination.gallery.forEach((item: any) => {
+    if (!item) return;
+    if (typeof item === "string") {
+      galleryImages.push(item);
+    } else if (typeof item === "object") {
+      const fileId = item.directus_files_id?.id || item.directus_files_id || item.id;
+      if (typeof fileId === "string") galleryImages.push(fileId);
+    }
+  });
+}
 ---
 
 <Layout 
@@ -59,10 +72,10 @@ try {
             <div class="text-center py-[40px] text-navy-400 text-[14px]"><i class="fa-regular fa-box-open text-[36px] block mb-[12px]"></i>Belum ada paket tersedia.</div>
           )}
         </div></section>
-        {destination.gallery && destination.gallery.length > 0 && (
+        {galleryImages.length > 0 && (
           <section class="bg-navy-50"><div class="wrap py-[70px] max-lg:py-[50px]">
-            <SectionHeader title="Galeri Foto" description={destination.gallery.length + " foto " + destination.name} layout="default" />
-            <div class="mt-[34px]"><GallerySection images={destination.gallery} columns={3} /></div>
+            <SectionHeader title="Galeri Foto" description={galleryImages.length + " foto " + destination.name} layout="default" />
+            <div class="mt-[34px]"><GallerySection images={galleryImages} columns={3} /></div>
           </div></section>
         )}
         <CTABand />
