@@ -16,7 +16,7 @@ Tabel `packages` menyimpan data paket wisata yang ditawarkan untuk setiap destin
 | facilities      | json                  | null              | Array fasilitas                   |
 | price_tiers     | json                  | null              | Array multi-tabel tier harga (max 3) |
 | addons          | json                  | null              | Array fitur tambahan (opsional)   |
-| gallery         | json                  | null              | Array UUID file gambar            |
+| gallery         | M2M (packages_files)  | null              | Relasi M2M ke directus_files      |
 | status          | varchar(20)           | 'draft'           | draft / published / archived      |
 | user_created    | uuid (users)          | null              | Pembuat                           |
 | date_created    | timestamptz           | now()             | Tanggal dibuat                    |
@@ -33,7 +33,7 @@ Tabel `packages` menyimpan data paket wisata yang ditawarkan untuk setiap destin
 ## Relations
 
 - `destination_id` → `destinations.id`
-- `gallery` → JSON array of `directus_files.id`
+- `gallery` → Relasi M2M melalui tabel perantara `packages_files`
 - `user_created` → `directus_users.id`
 - `user_updated` → `directus_users.id`
 
