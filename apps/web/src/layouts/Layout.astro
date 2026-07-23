@@ -3,7 +3,9 @@
 import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import PopupAd from "../components/PopupAd.astro";
 import { getSettings } from "../lib/directus";
+
 import { DEFAULT_WA_NUMBER } from "../lib/constants";
 
 interface Props {
@@ -134,5 +136,6 @@ const autoCanonical = canonical || (siteUrl + currentPath);
       <slot />
     </div>
     <Footer {settings} />
+    <PopupAd />
   </body>
 </html>

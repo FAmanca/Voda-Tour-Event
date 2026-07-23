@@ -11,7 +11,9 @@ import type {
   Setting,
   Status,
   Article,
+  PopupAd,
 } from "../types/directus";
+
 
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
 const BASE = `${DIRECTUS_URL}/items`;
@@ -325,8 +327,28 @@ export async function getRelatedArticles(title: string, excludeSlug: string, lim
 }
 
 // ---------------------------------------------------------------------------
+// Popup Ad (Singleton)
+// ---------------------------------------------------------------------------
+
+export async function getPopupAd(): Promise<PopupAd | null> {
+  try {
+    const ad = await fetchSingle<PopupAd>("popup_ad");
+    if (!ad || !ad.status || !ad.popup_image) {
+      return null;
+    }
+    return ad;
+  } catch (err) {
+    if (import.meta.env.DEV) {
+      console.warn("Directus API: Failed to fetch popup_ad.", err);
+    }
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Gallery / Files
 // ---------------------------------------------------------------------------
+
 
 export function getAssetUrl(uuid: string, opts?: {
   width?: number;
