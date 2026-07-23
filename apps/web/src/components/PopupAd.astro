@@ -1,0 +1,141 @@
+---
+import { getPopupAd, getAssetUrl } from "../lib/directus";
+
+const popupAd = await getPopupAd();
+
+// Fallback: If no popup ad data is found, return null and render nothing.
+if (!popupAd) {
+  return null;
+}
+
+const imageUrl = getAssetUrl(popupAd.popup_image!, {
+  width: 800,
+  format: "webp",
+  quality: 80,
+});
+const targetUrl = popupAd.url || "#";
+---
+
+<div
+  id="popup-ad-overlay"
+  class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-navy-900/60 backdrop-blur-md transition-opacity duration-300 opacity-0"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Pengumuman Spesial"
+>
+  <div
+    id="popup-ad-card"
+    class="relative w-full max-w-[420px] aspect-[3/4] bg-navy-800 rounded-lg shadow-card overflow-hidden transition-transform duration-300 scale-95 flex flex-col"
+  >
+    {/* Close Button - Highly visible, clean circular shape without zoom hover */}
+    <button
+      id="popup-ad-close"
+      class="absolute top-4 right-4 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-white/90 hover:bg-white text-navy-900 shadow-soft transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+      aria-label="Tutup Iklan"
+    >
+      <i class="fa-solid fa-xmark text-lg"></i>
+    </button>
+
+    {/* Popup Banner (Poster 3:4 Aspect Ratio) - No hover scale effects */}
+    {popupAd.url ? (
+      <a
+        href={targetUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="relative w-full h-full block focus:outline-none focus:ring-4 focus:ring-inset focus:ring-orange-500"
+        id="popup-ad-link"
+      >
+        <img
+          src={imageUrl}
+          alt="Iklan Promosi Voda Tour & Event"
+          class="w-full h-full object-cover"
+          loading="eager"
+        />
+      </a>
+    ) : (
+      <div class="relative w-full h-full">
+        <img
+          src={imageUrl}
+          alt="Iklan Promosi Voda Tour & Event"
+          class="w-full h-full object-cover"
+          loading="eager"
+        />
+      </div>
+    )}
+  </div>
+</div>
+
+<script>
+  const overlay = document.getElementById('popup-ad-overlay');
+  const card = document.getElementById('popup-ad-card');
+  const closeBtn = document.getElementById('popup-ad-close');
+  const popupLink = document.getElementById('popup-ad-link');
+
+  if (overlay && card && closeBtn) {
+    const STORAGE_KEY = 'voda_popup_last_shown';
+    const today = new Date().toDateString(); // Format: "Thu Jul 23 2026"
+    const lastShown = localStorage.getItem(STORAGE_KEY);
+
+    // Permudah testing dengan parameter query: ?force_popup
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceShow = urlParams.has('force_popup');
+
+    if (lastShown !== today || forceShow) {
+      // 1. Ubah class display ke flex
+      overlay.classList.remove('hidden');
+      overlay.classList.add('flex');
+
+      // 2. Trigger transisi fade-in & scale-up di frame berikutnya
+      requestAnimationFrame(() => {
+        overlay.classList.remove('opacity-0');
+        overlay.classList.add('opacity-100');
+        card.classList.remove('scale-95');
+        card.classList.add('scale-100');
+      });
+    }
+
+    const closePopup = () => {
+      // Simpan penanda hari ini agar tidak muncul lagi pada refresh berikutnya
+      localStorage.setItem(STORAGE_KEY, today);
+
+      // Mulai transisi penutupan
+      overlay.classList.remove('opacity-100');
+      overlay.classList.add('opacity-0');
+      card.classList.remove('scale-100');
+      card.classList.add('scale-95');
+
+      // Sembunyikan sepenuhnya setelah durasi transisi selesai (300ms)
+      setTimeout(() => {
+        overlay.classList.remove('flex');
+        overlay.classList.add('hidden');
+      }, 300);
+    };
+
+    // Tombol close diklik
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closePopup();
+    });
+
+    // Area backdrop luar diklik
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        closePopup();
+      }
+    });
+
+    // Menekan tombol Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay.classList.contains('flex')) {
+        closePopup();
+      }
+    });
+
+    // Menutup popup saat link poster diklik (opsional, tapi disarankan)
+    if (popupLink) {
+      popupLink.addEventListener('click', () => {
+        closePopup();
+      });
+    }
+  }
+</script>
