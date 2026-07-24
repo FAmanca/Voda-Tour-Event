@@ -12,7 +12,7 @@ Tabel `destinations` menyimpan data destinasi spesifik di dalam suatu region.
 | slug           | varchar(255)      | —                 | URL slug (unique)            |
 | description    | text              | null              | Deskripsi destinasi          |
 | image          | uuid (files)      | null              | Foto utama                   |
-| gallery        | json              | null              | Array UUID file gambar       |
+| gallery        | M2M (destinations_files) | null          | Relasi M2M ke directus_files  |
 | status         | varchar(20)       | 'draft'           | draft / published / archived |
 | user_created   | uuid (users)      | null              | Pembuat                      |
 | date_created   | timestamptz       | now()             | Tanggal dibuat               |
@@ -30,11 +30,12 @@ Tabel `destinations` menyimpan data destinasi spesifik di dalam suatu region.
 
 - `region_id` → `regions.id`
 - `image` → `directus_files.id`
-- `gallery` → JSON array of `directus_files.id`
+- `gallery` → Relasi M2M melalui tabel perantara `destinations_files`
 - `user_created` → `directus_users.id`
 - `user_updated` → `directus_users.id`
 
 ## Notes
 
 - Satu region bisa memiliki banyak destinasi.
-- `gallery` berupa JSON array berisi UUID file dari Directus.
+- `gallery` dikelola lewat tabel penghubung `destinations_files` yang menghubungkan `destinations.id` ke `directus_files.id` (menggunakan interface many-to-many file picker).
+
