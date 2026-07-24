@@ -37,8 +37,6 @@ function loadSharp() {
 	throw new Error('[AutoCompressWebP] Sharp library could not be loaded inside Directus container');
 }
 
-const sharp = loadSharp();
-
 export default defineHook(({ action }) => {
 	action('files.upload', async ({ payload, key }, { database }) => {
 		const mimeType = payload.type;
@@ -70,6 +68,8 @@ export default defineHook(({ action }) => {
 			try {
 				console.log(`[AutoCompressWebP] Compressing ${payload.filename_download} (${(payload.filesize / 1024).toFixed(1)} KB) to WebP...`);
 
+				// Lazy-load sharp inside the event context to prevent Directus startup blocks
+				const sharp = loadSharp();
 				const sharpInstance = sharp(originalFilePath);
 				const metadata = await sharpInstance.metadata();
 
