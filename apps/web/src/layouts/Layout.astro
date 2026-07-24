@@ -38,11 +38,25 @@ const ogImage = image || defaultImage;
 
 const currentPath = Astro.url.pathname === '/' ? '' : Astro.url.pathname.replace(/\/$/, '');
 const autoCanonical = canonical || (siteUrl + currentPath);
+
+// Fetch Google Tag Manager ID dynamically
+const gtmId = import.meta.env.PUBLIC_GTM_ID || settings.gtm_id || settings.google_tag_manager_id;
 ---
 
 <!doctype html>
 <html lang="id">
   <head>
+    <!-- Google Tag Manager -->
+    {gtmId && (
+      <script is:inline define:vars={{ gtmId }}>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',gtmId);
+      </script>
+    )}
+    <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -126,6 +140,18 @@ const autoCanonical = canonical || (siteUrl + currentPath);
     {jsonld && <script type="application/ld+json" set:html={jsonld}></script>}
 </head>
   <body class="pt-[88px] max-lg:pt-[76px]">
+    <!-- Google Tag Manager (noscript) -->
+    {gtmId && (
+      <noscript>
+        <iframe 
+          src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+          height="0" 
+          width="0" 
+          style="display:none;visibility:hidden"
+        ></iframe>
+      </noscript>
+    )}
+    <!-- End Google Tag Manager (noscript) -->
     <!-- Skip to Content Link for Accessibility -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-orange-600 focus:text-white focus:px-6 focus:py-3 focus:rounded-[8px] focus:shadow-lg focus:text-[14px] focus:font-semibold focus:outline-none focus:ring-2 focus:ring-orange-400">
       Langsung ke konten utama
