@@ -40,7 +40,7 @@ const currentPath = Astro.url.pathname === '/' ? '' : Astro.url.pathname.replace
 const autoCanonical = canonical || (siteUrl + currentPath);
 
 // Fetch Google Tag Manager ID dynamically
-const gtmId = import.meta.env.PUBLIC_GTM_ID || settings.gtm_id || settings.google_tag_manager_id;
+const gtmId = (typeof process !== 'undefined' ? process.env.PUBLIC_GTM_ID : undefined) || import.meta.env.PUBLIC_GTM_ID || settings.gtm_id || settings.google_tag_manager_id;
 ---
 
 <!doctype html>
