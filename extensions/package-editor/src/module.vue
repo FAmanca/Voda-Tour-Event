@@ -124,7 +124,7 @@
         <span class="breadcrumb-text">Voda Tour & Event › Paket › <strong class="text-orange">{{ editingPackage.slug || 'baru' }}</strong></span>
       </div>
       <div class="top-bar-right">
-        <v-button @click="savePackage" :loading="saving" icon="check">Simpan Paket</v-button>
+        <v-button @click="savePackage" :loading="saving"><v-icon name="check" small style="margin-right: 6px;" /> Simpan Paket Wisata</v-button>
       </div>
     </div>
 
@@ -295,7 +295,7 @@
               </div>
 
               <div class="card-box-footer">
-                <v-button small secondary icon="add" @click="addFacility" class="btn-full-width">Tambah Fasilitas</v-button>
+                <v-button small secondary @click="addFacility" class="btn-full-width"><span style="font-weight: 800; font-size: 14px; margin-right: 6px; color: #EE7D0F;">+</span> Tambah Fasilitas Termasuk</v-button>
               </div>
             </div>
 
@@ -334,14 +334,14 @@
 
                       <!-- Tombol Tambah Kegiatan di Bawah List Hari Ini -->
                       <div class="day-actions-row">
-                        <v-button small secondary icon="add" @click="addActivity(dIdx)">Tambah Kegiatan</v-button>
+                        <v-button small secondary @click="addActivity(dIdx)"><span style="font-weight: 800; font-size: 14px; margin-right: 6px; color: #EE7D0F;">+</span> Tambah Kegiatan Itinerary</v-button>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div class="timeline-footer">
-                  <v-button @click="addDay" icon="calendar_add_on">Tambah Hari Perjalanan</v-button>
+                  <v-button @click="addDay"><span style="font-weight: 800; font-size: 16px; margin-right: 6px; color: #EE7D0F;">+</span> Tambah Hari Perjalanan Baru</v-button>
                 </div>
               </div>
             </div>
@@ -405,14 +405,14 @@
                   </tbody>
                 </table>
                 <div class="table-card-footer">
-                  <v-button small secondary icon="add" @click="addPriceTier(gIdx)">Tambah Baris Harga</v-button>
+                  <v-button small secondary @click="addPriceTier(gIdx)"><span style="font-weight: 800; font-size: 14px; margin-right: 6px; color: #EE7D0F;">+</span> Tambah Baris Harga (Pax)</v-button>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="add-table-btn-wrapper" v-if="editingPackage.price_tiers.length < 3">
-            <v-button @click="addPriceTable" icon="table_chart">Tambah Kategori Tabel Harga</v-button>
+            <v-button @click="addPriceTable"><span style="font-weight: 800; font-size: 16px; margin-right: 6px; color: #EE7D0F;">+</span> Tambah Kategori Tabel Harga (misal: WNI/WNA/Bintang 4)</v-button>
           </div>
 
           <!-- SUB-SECTION: FASILITAS TAMBAHAN / ADD-ONS -->
@@ -447,7 +447,7 @@
                 </tbody>
               </table>
               <div class="table-card-footer">
-                <v-button small secondary icon="add" @click="addAddon">Tambah Add-on</v-button>
+                <v-button small secondary @click="addAddon"><span style="font-weight: 800; font-size: 14px; margin-right: 6px; color: #EE7D0F;">+</span> Tambah Layanan Add-on</v-button>
               </div>
             </div>
           </div>
@@ -471,7 +471,7 @@
 
             <div class="gallery-add-box" @click="openMediaDialog('gallery')" title="Klik untuk menambahkan foto ke galeri">
               <v-icon name="add_photo_alternate" large class="text-orange mb-2" />
-              <span>Tambah Foto Galeri</span>
+              <span><strong style="font-size: 16px; margin-right: 4px; color: #EE7D0F;">+</strong> Tambah Foto Galeri Dokumentasi</span>
             </div>
           </div>
         </div>
@@ -488,7 +488,7 @@
         <div>
           <input type="file" ref="fileInput" @change="handleFileUpload" accept="image/*" style="display:none" />
           <button class="btn-upload" @click="$refs.fileInput.click()" :disabled="isUploading">
-            <v-icon name="upload" small /> {{ isUploading ? 'Mengunggah...' : 'Unggah Gambar dari Komputer' }}
+            <span style="font-weight: 800; font-size: 15px; margin-right: 6px; color: #EE7D0F;">+</span> {{ isUploading ? 'Mengunggah...' : 'Unggah Gambar dari Komputer' }}
           </button>
         </div>
       </v-card-title>
@@ -2132,7 +2132,6 @@ export default {
 .media-name {
   font-size: 12px;
   font-weight: 600;
-  color: #334155;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2140,5 +2139,25 @@ export default {
 .media-date {
   font-size: 10px;
   color: #94a3b8;
+}
+
+/* BULLETPROOF BUTTON AUTO-WIDTH RULES (Prevent text clipping in Directus SDK v-button) */
+:deep(.v-button) {
+  width: auto !important;
+  min-width: fit-content !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+}
+:deep(.v-button.icon) {
+  width: 36px !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
+}
+:deep(.v-button.small.icon) {
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
 }
 </style>
