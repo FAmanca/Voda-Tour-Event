@@ -128,11 +128,11 @@
       </div>
     </div>
 
-    <!-- Scrollable Main Builder Pane (Visual 100% Contek Dari Frontend Asli) -->
+    <!-- Scrollable Main Builder Pane -->
     <div class="editor-main-scroll">
       <div class="builder-canvas">
         
-        <!-- 1. HERO BANNER VISUAL BUILDER (Persis seperti PackageHero.astro, tanpa input Max Pax) -->
+        <!-- 1. HERO BANNER VISUAL BUILDER -->
         <div class="package-hero-banner" :style="heroBannerStyle" @click.stop>
           <div class="hero-gradient-overlay"></div>
           <div class="hero-glow-orange"></div>
@@ -146,7 +146,7 @@
           <!-- Content Visual Dalam Banner -->
           <div class="hero-inline-content">
             
-            <!-- Searchable Destination Dropdown (Persis link destinasi dengan panah di frontend) -->
+            <!-- Searchable Destination Dropdown -->
             <div class="dest-dropdown-wrap" @click.stop="toggleDestDropdown">
               <div class="dest-trigger">
                 <v-icon name="arrow_back" small class="text-white-50" />
@@ -193,7 +193,7 @@
               <input v-model="editingPackage.slug" class="slug-input" placeholder="url-slug-paket" />
             </div>
 
-            <!-- Visual Badges Bar (Hanya Durasi, Harga Mulai, dan Status - Tanpa Max Pax) -->
+            <!-- Visual Badges Bar (Durasi, Harga Mulai, dan Status - Tanpa Max Pax) -->
             <div class="hero-badges-bar">
               <!-- Durasi Pill -->
               <div class="hero-pill">
@@ -243,7 +243,7 @@
           <h2 class="section-title-frontend">{{ editingPackage.name || 'Judul Paket Wisata' }}</h2>
           <div class="orange-underline-bar"></div>
           
-          <div class="tiptap-wrapper mt-6">
+          <div class="tiptap-wrapper">
             <div class="tiptap-toolbar" v-if="editor">
               <v-button small icon secondary @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }" title="Bold"><v-icon name="format_bold" /></v-button>
               <v-button small icon secondary @click="editor.chain().focus().toggleItalic().run()" :class="{ 'is-active': editor.isActive('italic') }" title="Italic"><v-icon name="format_italic" /></v-button>
@@ -267,20 +267,20 @@
         </div>
 
         <!-- 3. SIDE-BY-SIDE LAYOUT: FASILITAS TERMASUK (KIRI) & RENCANA PERJALANAN / ITINERARY (KANAN) -->
-        <!-- Persis layout grid kiri-kanan pada halaman frontend asli paket/[slug].astro -->
-        <div class="section-container bg-navy-50 py-12 px-6 rounded-2xl border border-slate-200" @click.stop>
-          <div class="text-center mb-10">
+        <!-- Menerapkan custom CSS Grid (.detail-grid-container) agar 100% berdampingan secara presisi -->
+        <div class="section-box-tinted" @click.stop>
+          <div class="section-header-center">
             <div class="section-label-top">DETAIL</div>
-            <h2 class="section-title-frontend text-center">Fasilitas & Itinerary</h2>
-            <p class="text-slate-500 text-sm mt-1">Jadwal perjalanan selama {{ editingPackage.duration || 'tour' }}.</p>
+            <h2 class="section-title-frontend">Fasilitas & Itinerary</h2>
+            <p class="section-subtitle">Jadwal perjalanan dan fasilitas selama {{ editingPackage.duration || 'tour' }}.</p>
           </div>
 
-          <!-- Grid Kiri Kanan: 1fr (Fasilitas) dan 1.5fr (Itinerary) -->
-          <div class="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-8 items-start">
+          <!-- Custom Grid Layout Kiri Kanan (1fr 1.5fr) -->
+          <div class="detail-grid-container">
             
-            <!-- KOLOM KIRI: FASILITAS TERMASUK (PackageFacilities.astro style) -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-              <h3 class="font-display text-navy-800 text-xl font-bold mb-5">Fasilitas Termasuk</h3>
+            <!-- KOLOM KIRI (1fr): FASILITAS TERMASUK -->
+            <div class="feature-card-box">
+              <h3 class="card-box-title">Fasilitas Termasuk</h3>
               
               <div class="facilities-list-frontend">
                 <div v-for="(fac, fIdx) in editingPackage.facilities" :key="fIdx" class="fac-item-row">
@@ -294,21 +294,21 @@
                 </div>
               </div>
 
-              <div class="mt-6">
-                <v-button small secondary icon="add" @click="addFacility" class="w-full justify-center">Tambah Fasilitas</v-button>
+              <div class="card-box-footer">
+                <v-button small secondary icon="add" @click="addFacility" class="btn-full-width">Tambah Fasilitas</v-button>
               </div>
             </div>
 
-            <!-- KOLOM KANAN: RENCANA PERJALANAN / ITINERARY (ItineraryTimeline.astro style - Tanpa kotak card!) -->
-            <div class="bg-white rounded-2xl p-6 lg:p-8 shadow-sm border border-slate-200">
-              <h3 class="font-display text-navy-800 text-xl font-bold mb-6">Rencana Perjalanan</h3>
+            <!-- KOLOM KANAN (1.5fr): RENCANA PERJALANAN / ITINERARY -->
+            <div class="feature-card-box">
+              <h3 class="card-box-title">Rencana Perjalanan</h3>
 
-              <!-- Timeline Vertikal Terbuka (Persis frontend asli, tanpa card box keliling) -->
+              <!-- Timeline Vertikal Terbuka (Tanpa kotak card per hari!) -->
               <div class="timeline-open-frontend">
                 <!-- Garis Vertikal Lurus -->
                 <div class="timeline-vert-line"></div>
 
-                <div class="space-y-8">
+                <div class="timeline-days-list">
                   <div v-for="(day, dIdx) in editingPackage.itinerary" :key="dIdx" class="timeline-day-open">
                     
                     <!-- Day Marker Circle Oranye di Kiri -->
@@ -333,14 +333,14 @@
                       </ul>
 
                       <!-- Tombol Tambah Kegiatan di Bawah List Hari Ini -->
-                      <div class="mt-3">
+                      <div class="day-actions-row">
                         <v-button small secondary icon="add" @click="addActivity(dIdx)">Tambah Kegiatan</v-button>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div class="mt-8 pt-4 border-t border-slate-100 flex justify-center">
+                <div class="timeline-footer">
                   <v-button @click="addDay" icon="calendar_add_on">Tambah Hari Perjalanan</v-button>
                 </div>
               </div>
@@ -349,116 +349,116 @@
           </div>
         </div>
 
-        <!-- 4. SIDE-BY-SIDE LAYOUT: TABEL HARGA PAKET (PriceTable.astro style) -->
-        <!-- Bila ada >1 tabel harga, otomatis menjadi grid kiri-kanan berdampingan -->
-        <div class="section-container bg-navy-50 py-12 px-6 rounded-2xl border border-slate-200" @click.stop>
-          <div class="text-center mb-8">
+        <!-- 4. SIDE-BY-SIDE LAYOUT: TABEL HARGA PAKET -->
+        <!-- Menerapkan .price-tables-grid dengan cols-1, cols-2, cols-3 agar berdampingan secara otomatis -->
+        <div class="section-box-tinted" @click.stop>
+          <div class="section-header-center">
             <div class="section-label-top">HARGA</div>
-            <h2 class="section-title-frontend text-center">Harga Paket & Tambahan</h2>
-            <p class="text-slate-500 text-sm mt-1">Harga per orang berdasarkan jumlah peserta</p>
+            <h2 class="section-title-frontend">Harga Paket & Tambahan</h2>
+            <p class="section-subtitle">Harga per orang berdasarkan jumlah peserta</p>
           </div>
 
-          <!-- Grid Tabel Harga Berdampingan (Responsive 1, 2, atau 3 kolom) -->
-          <div :class="['grid gap-6 items-start', editingPackage.price_tiers.length === 1 ? 'grid-cols-1 max-w-[800px] mx-auto w-full' : editingPackage.price_tiers.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 lg:grid-cols-3']">
-            <div v-for="(group, gIdx) in editingPackage.price_tiers" :key="gIdx" class="flex flex-col gap-3">
+          <!-- Grid Tabel Harga Berdampingan (1, 2, atau 3 kolom) -->
+          <div class="price-tables-grid" :class="'cols-' + Math.min(editingPackage.price_tiers.length, 3)">
+            <div v-for="(group, gIdx) in editingPackage.price_tiers" :key="gIdx" class="price-group-card">
               
               <!-- Judul Tabel Harga -->
-              <div class="flex items-center justify-between gap-2">
+              <div class="price-group-header">
                 <input v-model="group.table_title" class="price-table-title-input" placeholder="Nama Tabel Harga (misal: Harga Domestik WNI)..." />
                 <v-button small icon round secondary @click="removePriceTable(gIdx)" title="Hapus Tabel Harga Ini"><v-icon name="delete" class="text-red" /></v-button>
               </div>
 
               <!-- Tabel Desain Persis PriceTable.astro (Header Navy #0B2340, Harga Bold Oranye) -->
-              <div class="overflow-hidden rounded-xl border border-slate-200 shadow-sm bg-white">
-                <table class="w-full text-left border-collapse">
+              <div class="table-card-wrapper">
+                <table class="custom-data-table">
                   <thead>
-                    <tr class="bg-navy-800 text-white text-[13px] font-semibold">
-                      <th class="px-4 py-3">Jumlah Peserta (Pax)</th>
-                      <th class="px-4 py-3">Harga / Orang (Rp)</th>
-                      <th class="px-4 py-3">Keterangan</th>
-                      <th width="50" class="text-right px-3 py-3">Aksi</th>
+                    <tr>
+                      <th>Jumlah Peserta (Pax)</th>
+                      <th>Harga / Orang (Rp)</th>
+                      <th>Keterangan</th>
+                      <th width="50" class="text-right">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(tier, tIdx) in group.tiers" :key="tIdx" class="border-t border-slate-100 text-[14px] hover:bg-slate-50 transition-colors">
-                      <td class="px-4 py-3 whitespace-nowrap">
-                        <div class="flex items-center gap-1">
+                    <tr v-for="(tier, tIdx) in group.tiers" :key="tIdx">
+                      <td class="whitespace-nowrap">
+                        <div class="pax-input-group">
                           <input type="number" v-model="tier.min_pax" class="tier-num-clean" placeholder="2" />
                           <span>-</span>
                           <input type="number" v-model="tier.max_pax" class="tier-num-clean" placeholder="5" />
                           <span>orang</span>
                         </div>
                       </td>
-                      <td class="px-4 py-3 whitespace-nowrap">
-                        <div class="flex items-center gap-1 font-bold text-orange">
+                      <td class="whitespace-nowrap">
+                        <div class="price-input-group">
                           <span>Rp</span>
                           <input type="number" v-model="tier.price_per_pax" class="tier-price-clean" placeholder="2500000" />
                         </div>
                       </td>
-                      <td class="px-4 py-3">
+                      <td>
                         <input v-model="tier.description" class="tier-desc-clean" placeholder="misal: Hotel Bintang 3" />
                       </td>
-                      <td class="px-3 py-3 text-right">
+                      <td class="text-right">
                         <v-button small icon round secondary @click="removePriceTier(gIdx, tIdx)" title="Hapus Baris"><v-icon name="close" /></v-button>
                       </td>
                     </tr>
                   </tbody>
                 </table>
-                <div class="p-3 bg-slate-50 border-t border-slate-100 flex justify-center">
+                <div class="table-card-footer">
                   <v-button small secondary icon="add" @click="addPriceTier(gIdx)">Tambah Baris Harga</v-button>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="mt-6 flex justify-center" v-if="editingPackage.price_tiers.length < 3">
+          <div class="add-table-btn-wrapper" v-if="editingPackage.price_tiers.length < 3">
             <v-button @click="addPriceTable" icon="table_chart">Tambah Kategori Tabel Harga</v-button>
           </div>
 
-          <!-- SUB-SECTION: FASILITAS TAMBAHAN / ADD-ONS (AdditionalTable.astro style) -->
-          <div class="max-w-[800px] mx-auto w-full mt-12 pt-8 border-t border-slate-300">
-            <h4 class="text-[16px] font-semibold text-navy-800 mb-3 text-center">Fasilitas Tambahan (Opsional / Add-ons)</h4>
+          <!-- SUB-SECTION: FASILITAS TAMBAHAN / ADD-ONS -->
+          <div class="addon-table-section">
+            <h4 class="addon-section-title">Fasilitas Tambahan (Opsional / Add-ons)</h4>
             
-            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-sm bg-white">
-              <table class="w-full text-left border-collapse">
+            <div class="table-card-wrapper max-w-800">
+              <table class="custom-data-table">
                 <thead>
-                  <tr class="bg-navy-800 text-white text-[13px] font-semibold">
-                    <th class="px-4 py-3">Layanan / Fasilitas Tambahan</th>
-                    <th class="px-4 py-3">Harga Tambahan (Rp)</th>
-                    <th width="50" class="text-right px-3 py-3">Aksi</th>
+                  <tr>
+                    <th>Layanan / Fasilitas Tambahan</th>
+                    <th>Harga Tambahan (Rp)</th>
+                    <th width="50" class="text-right">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(addon, aIdx) in editingPackage.addons" :key="aIdx" class="border-t border-slate-100 text-[14px] hover:bg-slate-50 transition-colors">
-                    <td class="px-4 py-3">
-                      <input v-model="addon.addon_name" class="font-semibold text-navy-800 w-full bg-transparent outline-none mb-1" placeholder="Nama layanan (misal: Dokumentasi Drone)..." />
-                      <input v-model="addon.description" class="text-slate-500 text-[13px] w-full bg-transparent outline-none" placeholder="Keterangan (misal: Termasuk video cinematic 1 menit)..." />
+                  <tr v-for="(addon, aIdx) in editingPackage.addons" :key="aIdx">
+                    <td>
+                      <input v-model="addon.addon_name" class="addon-name-input" placeholder="Nama layanan (misal: Dokumentasi Drone)..." />
+                      <input v-model="addon.description" class="addon-desc-input" placeholder="Keterangan (misal: Termasuk video cinematic 1 menit)..." />
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap align-top">
-                      <div class="flex items-center gap-1 font-bold text-orange mt-1">
+                    <td class="whitespace-nowrap align-top">
+                      <div class="price-input-group mt-1">
                         <span>+Rp</span>
                         <input type="number" v-model="addon.price" class="tier-price-clean" placeholder="1500000" />
                       </div>
                     </td>
-                    <td class="px-3 py-3 text-right align-top">
+                    <td class="text-right align-top">
                       <v-button small icon round secondary @click="removeAddon(aIdx)" title="Hapus Add-on"><v-icon name="close" /></v-button>
                     </td>
                   </tr>
                 </tbody>
               </table>
-              <div class="p-3 bg-slate-50 border-t border-slate-100 flex justify-center">
+              <div class="table-card-footer">
                 <v-button small secondary icon="add" @click="addAddon">Tambah Add-on</v-button>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 5. SECTION GALERI FOTO DOKUMENTASI (GallerySection.astro style) -->
+        <!-- 5. SECTION GALERI FOTO DOKUMENTASI -->
         <div class="section-container mb-12" @click.stop>
-          <div class="text-center mb-8">
+          <div class="section-header-center mb-8">
             <div class="section-label-top">GALERI</div>
-            <h2 class="section-title-frontend text-center">Foto {{ editingPackage.name || 'Dokumentasi' }}</h2>
-            <p class="text-slate-500 text-sm mt-1">{{ galleryImages.length }} foto tersedia</p>
+            <h2 class="section-title-frontend">Foto {{ editingPackage.name || 'Dokumentasi' }}</h2>
+            <p class="section-subtitle">{{ galleryImages.length }} foto tersedia</p>
           </div>
 
           <div class="gallery-builder-grid">
@@ -1293,14 +1293,14 @@ export default {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-bottom: 100px;
+  padding-bottom: 120px;
 }
 .builder-canvas {
   max-width: 1140px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 0; /* Let sections handle spacing naturally like frontend */
+  gap: 0;
 }
 
 /* 1. HERO BANNER VISUAL BUILDER (PERSIS FRONTEND PACKAGEHERO.ASTRO) */
@@ -1397,6 +1397,7 @@ export default {
   font-size: 13px;
   outline: none;
   color: #0b2340;
+  box-sizing: border-box;
 }
 .popover-input:focus { border-color: #EE7D0F; }
 .popover-list {
@@ -1439,6 +1440,7 @@ export default {
   outline: none;
   padding-bottom: 4px;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 .hero-title-input:focus { border-color: #EE7D0F; }
 .hero-title-input::placeholder { color: rgba(255,255,255,0.4); }
@@ -1492,7 +1494,7 @@ export default {
   color: #fff;
   font-weight: 600;
   outline: none;
-  width: 130px;
+  width: 140px;
 }
 .pill-input::placeholder { color: rgba(255,255,255,0.5); }
 .status-pill { padding: 4px 12px; }
@@ -1547,11 +1549,17 @@ export default {
   font-weight: 700;
 }
 
-/* GENERAL SECTION STYLES (FRONTEND MIRROR) */
+/* GENERAL SECTION STYLES (100% STANDARD CSS MIRRORING FRONTEND) */
 .section-container {
   padding: 64px 40px;
   background: #fff;
   border-bottom: 1px solid #f1f5f9;
+}
+.section-box-tinted {
+  padding: 64px 40px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
 }
 .section-label-top {
   font-size: 11px;
@@ -1570,6 +1578,16 @@ export default {
   margin: 0;
   line-height: 1.3;
 }
+.section-header-center {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.section-subtitle {
+  color: #64748b;
+  font-size: 14px;
+  margin-top: 6px;
+  margin-bottom: 0;
+}
 .orange-underline-bar {
   width: 40px;
   height: 4px;
@@ -1584,6 +1602,8 @@ export default {
   border-radius: 12px;
   overflow: hidden;
   max-width: 800px;
+  margin-top: 24px;
+  background: #fff;
 }
 .tiptap-toolbar {
   display: flex;
@@ -1622,11 +1642,54 @@ export default {
 :deep(.ProseMirror ul), :deep(.ProseMirror ol) { padding-left: 20px; margin: 10px 0; }
 :deep(.ProseMirror blockquote) { border-left: 4px solid #EE7D0F; padding-left: 14px; color: #64748b; font-style: italic; margin: 12px 0; }
 
-/* 3. SIDE-BY-SIDE LAYOUT: FASILITAS TERMASUK (KIRI) & RENCANA PERJALANAN / ITINERARY (KANAN) */
+/* 3. SIDE-BY-SIDE GRID LAYOUT (1fr 1.5fr) FOR FASILITAS & ITINERARY */
+.detail-grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 32px;
+  align-items: start;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+@media (max-width: 1024px) {
+  .detail-grid-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feature-card-box {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+}
+.card-box-title {
+  font-family: var(--font-display, sans-serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: #0b2340;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+.card-box-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+.btn-full-width {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* FASILITAS LIST STYLES */
 .facilities-list-frontend {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 .fac-item-row {
   display: flex;
@@ -1638,7 +1701,7 @@ export default {
 .fac-check-icon {
   color: #EE7D0F;
   flex-shrink: 0;
-  margin-top: 3px;
+  margin-top: 4px;
 }
 .fac-input-clean {
   flex: 1;
@@ -1649,6 +1712,7 @@ export default {
   outline: none;
   font-weight: 500;
   line-height: 1.5;
+  box-sizing: border-box;
 }
 .fac-row-actions {
   display: flex;
@@ -1665,14 +1729,19 @@ export default {
   position: absolute;
   left: 27px;
   top: 16px;
-  bottom: 24px;
+  bottom: 60px;
   width: 2px;
   background: #cbd5e1;
   z-index: 1;
 }
+.timeline-days-list {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
 .timeline-day-open {
   position: relative;
-  padding-left: 64px;
+  padding-left: 56px;
   z-index: 2;
 }
 .day-circle-marker {
@@ -1694,7 +1763,7 @@ export default {
 .day-open-content {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 .day-title-row {
   display: flex;
@@ -1711,6 +1780,7 @@ export default {
   background: transparent;
   width: 100%;
   outline: none;
+  box-sizing: border-box;
 }
 .activities-ul-clean {
   display: flex;
@@ -1741,9 +1811,54 @@ export default {
   color: #475569;
   outline: none;
   line-height: 1.5;
+  box-sizing: border-box;
+}
+.day-actions-row {
+  margin-top: 4px;
+}
+.timeline-footer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: center;
 }
 
-/* 4. TABEL HARGA PAKET (PriceTable.astro style) */
+/* 4. SIDE-BY-SIDE GRID LAYOUT FOR PRICE TABLES */
+.price-tables-grid {
+  display: grid;
+  gap: 24px;
+  align-items: start;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.price-tables-grid.cols-1 {
+  grid-template-columns: 1fr;
+  max-width: 800px;
+}
+.price-tables-grid.cols-2 {
+  grid-template-columns: 1fr 1fr;
+}
+.price-tables-grid.cols-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+@media (max-width: 900px) {
+  .price-tables-grid.cols-2, .price-tables-grid.cols-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.price-group-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.price-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
 .price-table-title-input {
   font-size: 16px;
   font-weight: 700;
@@ -1753,6 +1868,59 @@ export default {
   outline: none;
   width: 100%;
 }
+.table-card-wrapper {
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  background: #ffffff;
+}
+.table-card-footer {
+  padding: 12px;
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: center;
+}
+.add-table-btn-wrapper {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+/* CUSTOM DATA TABLE (NAVY HEADER #0B2340) */
+.custom-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.custom-data-table thead tr {
+  background: #0b2340;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+}
+.custom-data-table th {
+  padding: 12px 16px;
+}
+.custom-data-table tbody tr {
+  border-top: 1px solid #f1f5f9;
+  transition: background 0.15s;
+}
+.custom-data-table tbody tr:hover {
+  background: #f8fafc;
+}
+.custom-data-table td {
+  padding: 12px 16px;
+  vertical-align: middle;
+}
+.whitespace-nowrap { white-space: nowrap; }
+
+.pax-input-group, .price-input-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 .tier-num-clean {
   width: 45px;
   border: 1px solid #cbd5e1;
@@ -1761,9 +1929,12 @@ export default {
   text-align: center;
   font-size: 13px;
   outline: none;
+  box-sizing: border-box;
 }
+.tier-num-clean:focus { border-color: #EE7D0F; }
+
 .tier-price-clean {
-  width: 120px;
+  width: 110px;
   border: 1px solid #cbd5e1;
   border-radius: 4px;
   padding: 4px 8px;
@@ -1771,7 +1942,10 @@ export default {
   font-weight: 700;
   color: #EE7D0F;
   outline: none;
+  box-sizing: border-box;
 }
+.tier-price-clean:focus { border-color: #EE7D0F; }
+
 .tier-desc-clean {
   width: 100%;
   border: 1px solid #cbd5e1;
@@ -1779,9 +1953,50 @@ export default {
   padding: 4px 8px;
   font-size: 13px;
   outline: none;
+  box-sizing: border-box;
 }
+.tier-desc-clean:focus { border-color: #EE7D0F; }
 
-/* 5. GALERI BUILDER GRID (GallerySection.astro style) */
+/* ADDONS SECTION */
+.addon-table-section {
+  max-width: 800px;
+  margin: 48px auto 0;
+  padding-top: 32px;
+  border-top: 1px solid #cbd5e1;
+}
+.addon-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0b2340;
+  margin-bottom: 12px;
+  text-align: center;
+}
+.addon-name-input {
+  font-weight: 600;
+  color: #0b2340;
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  margin-bottom: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.addon-desc-input {
+  color: #64748b;
+  font-size: 13px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  box-sizing: border-box;
+}
+.max-w-800 { max-width: 800px; margin: 0 auto; }
+.mt-1 { margin-top: 4px; }
+.mb-8 { margin-bottom: 32px; }
+.mb-12 { margin-bottom: 48px; }
+
+/* 5. GALERI BUILDER GRID */
 .gallery-builder-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
