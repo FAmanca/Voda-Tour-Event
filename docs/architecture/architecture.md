@@ -50,3 +50,15 @@
 - **Integrasi langsung** — Directus support S3-compatible storage
 - **Gratis tier** — 10GB storage + 1M request/bulan gratis
 - **VPS tetap ringan** — storage & bandwidth gambar di R2, bukan di VPS
+
+## Directus Custom Extensions (CMS Ecosystem)
+
+Untuk mengatasi keterbatasan antarmuka tabel bawaan Directus dalam manajemen konten berstruktur rumit, sistem admin dilengkapi dengan 4 ekstensi kustom yang dikompilasi ke dalam container Docker (`voda-directus`):
+
+1. **[`article-editor`](file:///home/famanca/voda-tour-event/docs/features/article-editor.md) (Custom Module)**: Menggantikan grid koleksi `articles` dengan antarmuka bergaya **WordPress Gutenberg Fullscreen Mode**. Punya analisis SEO interaktif (*real-time* 0-100% score) ala Yoast/RankMath, manajemen Konten Pilar (`is_pillar` & `pillar_parent`), serta sistem smart chip tag untuk Focus/Secondary keywords.
+2. **`package-editor` (Custom Module)**: Modul khusus untuk mengelola paket wisata (*tour packages*), jadwal hari demi hari (*itinerary*), tier harga dinamis (berdasarkan jumlah pax), serta inklusi/eksklusi layanan.
+3. **[`custom-seo-analyzer`](file:///home/famanca/voda-tour-event/docs/features/seo-analyzer.md) (Custom Interface)**: Antarmuka panel SEO stand-alone (kini aturan dan rumusnya telah ditarik ke dalam `article-editor`).
+4. **`auto-compress-webp` (Action Hook)**: Hook backend otomatis yang mengompresi dan mengonversi setiap gambar yang diunggah ke Directus menjadi format WebP sebelum disimpan ke Cloudflare R2.
+
+> [!TIP]
+> **Panduan Alur Kerja Ekstensi**: Baca dokumentasi lengkap alur kompilasi Vue 3, deployment Docker, dan aturan komponen UI Directus pada berkas [`docs/development/directus-extensions.md`](file:///home/famanca/voda-tour-event/docs/development/directus-extensions.md).

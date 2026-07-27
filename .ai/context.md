@@ -143,6 +143,20 @@ pnpm dev          # → http://localhost:4321
 # Bikin collections: regions, destinations, packages, activity_types, dll
 ```
 
+## Directus Custom Extensions (CMS Admin Ecosystem)
+
+Proyek ini menggunakan 4 ekstensi kustom di dalam folder `extensions/` yang di-compile ke Docker (`voda-directus`):
+1. **`article-editor`**: Custom Module untuk manajemen artikel bergaya **WordPress Gutenberg Fullscreen Mode** (overlay fixed `100vw x 100vh`) dengan SEO Analyzer interaktif ala Yoast/RankMath (skor 0-100%), smart chip tag keywords (Focus/LSI), dan Konten Pilar (`is_pillar`). Di halaman daftar, menggunakan `<private-view>` dengan sidebar filter status (#navigation) dan tombol aksi `+` (#actions), tanpa sidebar kanan.
+2. **`package-editor`**: Custom Module untuk manajemen paket wisata, itinerary, pricing tiers dinamik, dan fasilitas.
+3. **`custom-seo-analyzer`**: Custom Interface (versi awal SEO panel, kini rumusnya ada di dalam `article-editor`).
+4. **`auto-compress-webp`**: Action Hook otomatis kompresi gambar ke WebP di Directus sebelum masuk ke Cloudflare R2.
+
+> **ATURAN DEPLOYMENT EKSTENSI (WAJIB)**:  
+> Ekstensi TIDAK bisa langsung dibaca dari `src/`. Setelah modifikasi kode di `extensions/<ext>/src/`, AI wajib:
+> 1. `cd /home/famanca/voda-tour-event/extensions/<ext> && npm run build`
+> 2. `docker cp extensions/<ext>/dist/. voda-directus:/directus/extensions/<ext>/dist/ && docker exec -u root voda-directus chmod -R 777 /directus/extensions`
+> 3. `docker restart voda-directus`
+
 ## Links Penting
 
 | Resource | Path |
@@ -150,6 +164,9 @@ pnpm dev          # → http://localhost:4321
 | PRD | `docs/product/product-requirements.md` |
 | Arsitektur | `docs/architecture/architecture.md` |
 | Design System | `docs/frontend/design-system.md` |
+| Modul Artikel Editor | `docs/features/article-editor.md` |
+| Panduan Directus Extensions | `docs/development/directus-extensions.md` |
+| SEO Analyzer Rules | `docs/features/seo-analyzer.md` |
 | Mockup HTML | `mockup/landing.html` |
 | Setup | `docs/development/setup.md` |
 | API Integration | `docs/development/api-integration.md` |
