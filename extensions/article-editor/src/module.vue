@@ -62,6 +62,7 @@
                   </div>
                   <div class="row-actions">
                     <span class="action-edit" @click="editArticle(article)">Edit</span> |
+                    <span class="action-duplicate" @click.stop="duplicateArticle(article)">Duplikat</span> |
                     <span class="action-delete" @click.stop="confirmDelete(article)">Hapus</span>
                   </div>
                 </td>
@@ -112,9 +113,13 @@
         <div class="top-bar-left">
           <v-button icon round secondary @click="closeEditor" title="Kembali ke Daftar Artikel"><v-icon name="arrow_back" /></v-button>
           <v-button icon round secondary @click="showLeftToolbox = !showLeftToolbox" :title="showLeftToolbox ? 'Tutup Toolbox Kiri' : 'Buka Toolbox Kiri'"><v-icon name="view_sidebar" /></v-button>
+          <div class="divider-vertical"></div>
+          <v-button icon round secondary @click="editor.chain().focus().undo().run()" :disabled="!editor || !editor.can().undo()" title="Undo (Ctrl+Z)"><v-icon name="undo" /></v-button>
+          <v-button icon round secondary @click="editor.chain().focus().redo().run()" :disabled="!editor || !editor.can().redo()" title="Redo (Ctrl+Y)"><v-icon name="redo" /></v-button>
         </div>
         <div class="editor-title">{{ currentArticle.title || 'Artikel Baru' }}</div>
         <div class="top-actions">
+
           <v-button icon round secondary @click="showRightSidebar = !showRightSidebar" :title="showRightSidebar ? 'Tutup Panel Kanan' : 'Buka Panel Kanan'"><v-icon name="side_navigation" /></v-button>
           <v-button @click="saveArticle" :loading="isSaving" :disabled="isSaving" icon="save">Simpan Artikel</v-button>
         </div>
@@ -170,24 +175,34 @@
               <span>Tambahkan Gambar Cover (Featured Image)</span>
             </div>
 
-            <!-- Bubble Menu (Muncul di kursor saat teks dipilih untuk formatting) -->
+            <!-- Bubble Menu: muncul saat teks dipilih -->
             <bubble-menu :editor="editor" :tippy-options="{ duration: 100 }" v-if="editor" class="bubble-menu-box">
+              <!-- Text Format -->
               <button @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }" title="Bold (Ctrl+B)"><v-icon name="format_bold" small/></button>
               <button @click="editor.chain().focus().toggleItalic().run()" :class="{ 'is-active': editor.isActive('italic') }" title="Italic (Ctrl+I)"><v-icon name="format_italic" small/></button>
               <button @click="editor.chain().focus().toggleUnderline().run()" :class="{ 'is-active': editor.isActive('underline') }" title="Underline (Ctrl+U)"><v-icon name="format_underlined" small/></button>
               <button @click="editor.chain().focus().toggleStrike().run()" :class="{ 'is-active': editor.isActive('strike') }" title="Strike"><v-icon name="format_strikethrough" small/></button>
-              <button @click="editor.chain().focus().toggleCode().run()" :class="{ 'is-active': editor.isActive('code') }" title="Code"><v-icon name="code" small/></button>
-              <button @click="setLink" :class="{ 'is-active': editor.isActive('link') }" title="Link"><v-icon name="link" small/></button>
+              <button @click="editor.chain().focus().toggleHighlight().run()" :class="{ 'is-active': editor.isActive('highlight') }" title="Highlight Teks" class="btn-highlight">▌</button>
+              <button @click="editor.chain().focus().toggleCode().run()" :class="{ 'is-active': editor.isActive('code') }" title="Code Inline"><v-icon name="code" small/></button>
+              <button @click="editor.chain().focus().toggleSubscript().run()" :class="{ 'is-active': editor.isActive('subscript') }" title="Subscript (x₂)">x₂</button>
+              <button @click="editor.chain().focus().toggleSuperscript().run()" :class="{ 'is-active': editor.isActive('superscript') }" title="Superscript (x²)">x²</button>
+              <button @click="setLink" :class="{ 'is-active': editor.isActive('link') }" title="Tautkan URL"><v-icon name="link" small/></button>
               <div class="divider"></div>
-              <button @click="editor.chain().focus().setTextAlign('left').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }" title="Align Left"><v-icon name="format_align_left" small/></button>
-              <button @click="editor.chain().focus().setTextAlign('center').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }" title="Align Center"><v-icon name="format_align_center" small/></button>
-              <button @click="editor.chain().focus().setTextAlign('right').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }" title="Align Right"><v-icon name="format_align_right" small/></button>
+              <!-- Alignment -->
+              <button @click="editor.chain().focus().setTextAlign('left').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }" title="Rata Kiri"><v-icon name="format_align_left" small/></button>
+              <button @click="editor.chain().focus().setTextAlign('center').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }" title="Rata Tengah"><v-icon name="format_align_center" small/></button>
+              <button @click="editor.chain().focus().setTextAlign('right').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }" title="Rata Kanan"><v-icon name="format_align_right" small/></button>
               <div class="divider"></div>
-              <button @click="editor.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }" title="Heading 2">H2</button>
-              <button @click="editor.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 3 }) }" title="Heading 3">H3</button>
+              <!-- Headings -->
+              <button @click="editor.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }" title="Heading 1 (H1)">H1</button>
+              <button @click="editor.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }" title="Heading 2 (H2)">H2</button>
+              <button @click="editor.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 3 }) }" title="Heading 3 (H3)">H3</button>
+              <button @click="editor.chain().focus().toggleHeading({ level: 4 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 4 }) }" title="Heading 4 (H4)">H4</button>
+              <div class="divider" v-if="editor.can().toggleCaption()"></div>
+              <button @click="editor.chain().focus().toggleCaption().run()" v-if="editor.can().toggleCaption()" :class="{ 'is-active': editor.isActive('figure') }" title="Tampilkan/Sembunyikan Caption Gambar"><v-icon name="subtitles" small/> Caption</button>
             </bubble-menu>
 
-            <!-- Floating Menu (Muncul di kursor saat klik baris kosong ala WordPress + Inserter Lengkap Tanpa Emoji) -->
+            <!-- Floating Menu: muncul saat klik baris kosong ala WordPress -->
             <floating-menu :editor="editor" :tippy-options="{ duration: 100, placement: 'right' }" v-if="editor" class="floating-menu-box">
               <button @click="editor.chain().focus().toggleHeading({ level: 2 }).run()" title="Heading 2">## H2</button>
               <button @click="editor.chain().focus().toggleHeading({ level: 3 }).run()" title="Heading 3">### H3</button>
@@ -197,14 +212,24 @@
               <button @click="editor.chain().focus().toggleOrderedList().run()" title="Numbered List"><v-icon name="format_list_numbered" small/> Angka</button>
               <button @click="editor.chain().focus().toggleBlockquote().run()" title="Quote"><v-icon name="format_quote" small/> Kutipan</button>
               <button @click="editor.chain().focus().toggleCodeBlock().run()" title="Code Block"><v-icon name="code" small/> Kode</button>
-              <button @click="editor.chain().focus().setHorizontalRule().run()" title="Horizontal Rule"><v-icon name="horizontal_rule" small/> Garis</button>
+              <button @click="editor.chain().focus().setHorizontalRule().run()" title="Garis Pemisah"><v-icon name="horizontal_rule" small/> Garis</button>
               <div class="divider"></div>
-              <button @click="insertToc" class="btn-toc" title="Sisipkan Daftar Isi (TOC) Polos"><v-icon name="toc" small/> TOC</button>
-              <button @click="openMediaDialog('inline')" class="btn-img" title="Sisipkan Gambar dari Directus Library"><v-icon name="image" small/> Gambar</button>
-              <button @click="editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()" class="btn-tbl" title="Sisipkan Tabel 3x3"><v-icon name="table_chart" small/> Tabel</button>
+              <button @click="insertToc" class="btn-toc" title="Sisipkan Daftar Isi"><v-icon name="toc" small/> TOC</button>
+              <button @click="openMediaDialog('inline')" class="btn-img" title="Sisipkan Gambar"><v-icon name="image" small/> Gambar</button>
+              <button @click="editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()" class="btn-tbl" title="Tabel 3x3"><v-icon name="table_chart" small/> Tabel</button>
             </floating-menu>
 
             <editor-content :editor="editor" class="paper-content" />
+
+            <!-- Word Count & Reading Time Status Bar -->
+            <div v-if="editor" class="editor-status-bar">
+              <span><v-icon name="format_size" small /> {{ wordCount }} kata</span>
+              <span><v-icon name="schedule" small /> ~{{ readingTime }} menit baca</span>
+              <span class="autosave-status" :class="autoSaveStatus">
+                <v-icon :name="autoSaveStatus === 'saved' ? 'cloud_done' : autoSaveStatus === 'saving' ? 'sync' : 'edit'" small />
+                {{ autoSaveStatus === 'saved' ? 'Tersimpan otomatis' : autoSaveStatus === 'saving' ? 'Menyimpan...' : 'Ada perubahan' }}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -426,12 +451,17 @@ import Heading from '@tiptap/extension-heading';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Link from '@tiptap/extension-link';
-import Image from '@tiptap/extension-image';
+import { ImageResize, Figure, Figcaption } from 'tiptap-extension-resize-image';
+import Placeholder from '@tiptap/extension-placeholder';
 import Table from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
-import { Node, mergeAttributes, InputRule } from '@tiptap/core';
+import Highlight from '@tiptap/extension-highlight';
+import Subscript from '@tiptap/extension-subscript';
+import Superscript from '@tiptap/extension-superscript';
+import CharacterCount from '@tiptap/extension-character-count';
+import { Node, Extension, mergeAttributes, InputRule } from '@tiptap/core';
 
 // Custom Table of Contents Node (POLOS / PLAIN LIST dengan Judul yang BISA DIEDIT)
 const TableOfContentsNode = Node.create({
@@ -612,7 +642,12 @@ export default {
     
     const toastMessage = ref('');
     let tocSyncTimeout = null;
-    
+    let cannibalTimeout = null;
+
+    // Auto-save State
+    const autoSaveStatus = ref('saved'); // 'saved' | 'unsaved' | 'saving'
+    let autoSaveTimer = null;
+
     // TipTap Editor
     const editor = useEditor({
       extensions: [
@@ -623,16 +658,27 @@ export default {
           levels: [1, 2, 3, 4, 5, 6],
         }),
         Underline,
+        Highlight.configure({ multicolor: false }),
+        Subscript,
+        Superscript,
+        CharacterCount,
         TextAlign.configure({
-          types: ['heading', 'paragraph'],
+          types: ['heading', 'paragraph', 'imageResize'],
         }),
         Link.configure({
           openOnClick: false,
           autolink: true,
         }),
-        Image.configure({
-          inline: true,
+        ImageResize.configure({
           allowBase64: true,
+        }),
+        Figure,
+        Figcaption.configure({
+          placeholder: 'Tulis caption gambar di sini...',
+        }),
+        Placeholder.configure({
+          placeholder: 'Ketik \'/\' untuk menu perintah, atau mulai mengetik...',
+          emptyEditorClass: 'is-editor-empty',
         }),
         Table.configure({
           resizable: false,
@@ -648,6 +694,10 @@ export default {
           currentArticle.value.content = editor.value.getHTML();
           runSeoAnalysis();
           syncTocAndHeadings();
+          // Trigger auto-save
+          autoSaveStatus.value = 'unsaved';
+          if (autoSaveTimer) clearTimeout(autoSaveTimer);
+          autoSaveTimer = setTimeout(() => autoSave(), 30000); // 30 detik
         }
       }
     });
@@ -742,7 +792,6 @@ export default {
     const keywordsList = ref([]);
     const newKeyword = ref('');
     const cannibalizedCount = ref(0);
-    let cannibalTimeout = null;
 
     const seoResults = reactive({
       basic: [],
@@ -778,6 +827,7 @@ export default {
     onUnmounted(() => {
       if (tocSyncTimeout) clearTimeout(tocSyncTimeout);
       if (cannibalTimeout) clearTimeout(cannibalTimeout);
+      if (autoSaveTimer) clearTimeout(autoSaveTimer);
       if (editor.value) {
         editor.value.destroy();
       }
@@ -1164,14 +1214,62 @@ export default {
           await api.post('/items/ads', adsPayload);
         }
 
-        showToast('Artikel dan Iklan berhasil disimpan!');
+        showToast('✅ Artikel dan Iklan berhasil disimpan!');
+        autoSaveStatus.value = 'saved';
         fetchArticles();
         fetchPillars();
       } catch (err) {
         console.error('Save error', err);
-        showToast('Gagal menyimpan artikel. Periksa koneksi atau data Anda.');
+        showToast('❌ Gagal menyimpan artikel. Periksa koneksi atau data Anda.');
       }
       isSaving.value = false;
+    };
+
+    // Auto-save setiap 30 detik saat ada perubahan (simpan ke draft tanpa notifikasi)
+    const autoSave = async () => {
+      if (!currentArticle.value || autoSaveStatus.value !== 'unsaved') return;
+      autoSaveStatus.value = 'saving';
+      try {
+        const payload = {
+          title: currentArticle.value.title,
+          slug: currentArticle.value.slug,
+          content: currentArticle.value.content,
+          status: currentArticle.value.status,
+          featured_image: currentArticle.value.featured_image,
+          SEO: currentArticle.value.SEO,
+        };
+        if (currentArticle.value.id) {
+          await api.patch(`/items/articles/${currentArticle.value.id}`, payload);
+          autoSaveStatus.value = 'saved';
+        }
+      } catch {
+        autoSaveStatus.value = 'unsaved'; // Tetap unsaved jika gagal
+      }
+    };
+
+    // Duplikasi Artikel (Salin sebagai Draft Baru)
+    const duplicateArticle = async (art) => {
+      try {
+        const res = await api.get(`/items/articles/${art.id}`, {
+          params: { fields: 'title,slug,content,featured_image,is_pillar,pillar_parent,SEO' }
+        });
+        const src = res.data.data;
+        const payload = {
+          title: `${src.title} (Salinan)`,
+          slug: `${src.slug}-salinan-${Date.now()}`,
+          content: src.content || '',
+          status: 'draft',
+          featured_image: src.featured_image || null,
+          is_pillar: false,
+          SEO: src.SEO || {},
+        };
+        await api.post('/items/articles', payload);
+        showToast('✅ Artikel berhasil diduplikasi sebagai Draft!');
+        fetchArticles();
+      } catch (err) {
+        console.error('Duplicate error', err);
+        showToast('❌ Gagal menduplikasi artikel.');
+      }
     };
 
     const closeEditor = () => {
@@ -1287,15 +1385,14 @@ export default {
 
     // Link insertion di editor
     const setLink = () => {
-      const previousUrl = editor.value.getAttributes('link').href;
-      const url = window.prompt('Masukkan URL link tujuan:', previousUrl);
-      if (url === null) return; // cancelled
-      if (url === '') {
+      if (editor.value.isActive('link')) {
         editor.value.chain().focus().extendMarkRange('link').unsetLink().run();
         return;
       }
-      editor.value.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+      const url = prompt('Masukkan URL tautan:');
+      if (url) editor.value.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
     };
+
 
     // TOC insertion shortcut
     const insertToc = () => {
@@ -1387,6 +1484,18 @@ export default {
       seoResults.readability = results.readability;
     };
 
+    const wordCount = computed(() => {
+      if (!editor.value) return 0;
+      return editor.value.storage.characterCount.words();
+    });
+
+    const readingTime = computed(() => {
+      const wpm = 225; // rata-rata kecepatan baca (words per minute)
+      const words = wordCount.value;
+      return Math.ceil(words / wpm);
+    });
+
+
     return {
       articles, loading, searchQuery, activeFilter, filteredArticles,
       currentPage, totalPages, paginatedArticles,
@@ -1401,7 +1510,8 @@ export default {
       circumference, offset, scoreColor, scoreLabel,
       getCharColor, toastMessage,
       setLink, insertToc,
-      showDeleteDialog, articleToDelete, confirmDelete, executeDelete
+      showDeleteDialog, articleToDelete, confirmDelete, executeDelete,
+      autoSaveStatus, duplicateArticle, wordCount, readingTime
     };
   }
 };
@@ -1636,11 +1746,37 @@ export default {
   gap: 6px;
   align-items: center;
 }
-.action-edit { color: #EE7D0F; font-weight: 600; cursor: pointer; }
+.action-edit { color: #0284c7; font-weight: 600; cursor: pointer; }
 .action-edit:hover { text-decoration: underline; }
+.action-duplicate { color: #16a34a; font-weight: 600; cursor: pointer; }
+.action-duplicate:hover { text-decoration: underline; }
 .action-preview a { color: #0284c7; text-decoration: none; font-weight: 500; }
 .action-preview a:hover { text-decoration: underline; }
 .action-delete { color: #ef4444; font-weight: 500; cursor: pointer; }
+
+/* Custom Placeholder Styles */
+.tiptap p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Figcaption Styles */
+.tiptap figcaption {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 8px;
+}
+.tiptap figcaption.is-empty::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
 .action-delete:hover { text-decoration: underline; }
 
 .kw-pill {
@@ -1727,13 +1863,22 @@ export default {
   background: #fff;
   border-bottom: 1px solid #e2e8f0;
   gap: 16px;
-  z-index: 20;
+  z-index: 100;
+  position: sticky;
+  top: 0;
 }
 .top-bar-left {
   display: flex;
   align-items: center;
   gap: 8px;
 }
+.divider-vertical {
+  width: 1px;
+  height: 24px;
+  background: #e2e8f0;
+  margin: 0 8px;
+}
+
 .editor-title {
   flex: 1;
   font-size: 18px;
@@ -1864,6 +2009,33 @@ export default {
   position: relative;
   width: 100%;
 }
+.editor-status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 280px;
+  right: 320px;
+  height: 40px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 24px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 10;
+}
+.autosave-status {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.autosave-status.saved { color: #16a34a; }
+.autosave-status.unsaved { color: #f59e0b; }
+.autosave-status.saving { color: #3b82f6; }
+
 .canvas-container {
   width: 100%;
   max-width: 960px;

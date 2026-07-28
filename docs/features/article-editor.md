@@ -107,6 +107,12 @@ Editor teks menggunakan pustaka **TipTap** (`@tiptap/vue-3`) dengan ekstensi sta
 > ```
 > Selain itu, seluruh area `.dashboard-view` dan area gulir editor dijamin memiliki atribut `overflow-y: auto` dengan penanganan pembatas kanvas yang tepat.
 
+**Fitur Tambahan Editor:**
+- **Toolbar Undo & Redo**: Terdapat tombol `Undo` dan `Redo` di pojok kiri atas (*top bar*) agar penulis dapat dengan mudah membatalkan atau mengulang ketikan.
+- **Interaksi Gambar Interaktif (Drag Resize & Align)**: Gambar dapat diubah ukurannya secara langsung dengan menyeret (*drag*) ujung-ujung gambar (*handle*), dan posisinya dapat diatur (kiri, tengah, kanan) menggunakan tombol *Text Align* bawaan pada *bubble menu* atau *floating menu*.
+- **Caption Gambar (Figcaption)**: Menggunakan `<figure>` dan `<figcaption>`. Penulis dapat mengeklik tombol "Caption" pada gambar untuk menambahkan teks penjelas di bawah gambar yang sangat berguna untuk SEO.
+- **Popup Menu Cepat (Gaya Notion)**: Pada baris kosong, muncul panduan `Ketik '/' untuk menu perintah, atau mulai mengetik...`. Saat pengguna berada di baris kosong tersebut, *floating menu* otomatis muncul di samping kursor untuk mempermudah penyisipan Headings, Daftar Isi, Gambar, atau Tabel tanpa harus ke *toolbar* atas.
+
 ### 2. Sistem Tag Keyword Interaktif (Smart Chip Tags)
 Penginputan kata kunci tidak lagi menggunakan kolom teks biasa yang terpisah, melainkan menggunakan sistem **Smart Chip Tag Input** dalam satu kolom terpadu:
 - **Cara Kerja**: Pengguna mengetik kata kunci lalu menekan tombol **Enter** atau **Koma (`,`)**.
