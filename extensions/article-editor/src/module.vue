@@ -18,6 +18,9 @@
             <button class="nav-item" :class="{ active: activeFilter === 'published' }" @click="activeFilter = 'published'">
               <span style="display: flex; align-items: center; gap: 8px;"><v-icon name="check_circle" small /> Diterbitkan</span> <span class="badge">{{ articles.filter(a => a.status === 'published').length }}</span>
             </button>
+            <button class="nav-item" :class="{ active: activeFilter === 'scheduled' }" @click="activeFilter = 'scheduled'">
+              <span style="display: flex; align-items: center; gap: 8px;"><v-icon name="schedule" small /> Dijadwalkan</span> <span class="badge">{{ articles.filter(a => a.status === 'scheduled').length }}</span>
+            </button>
             <button class="nav-item" :class="{ active: activeFilter === 'draft' }" @click="activeFilter = 'draft'">
               <span style="display: flex; align-items: center; gap: 8px;"><v-icon name="edit_note" small /> Draft</span> <span class="badge">{{ articles.filter(a => a.status === 'draft').length }}</span>
             </button>
@@ -75,12 +78,12 @@
                 </td>
                 <td class="col-status">
                   <span class="status-badge" :class="article.status">
-                    {{ article.status === 'published' ? 'Diterbitkan' : (article.status === 'draft' ? 'Draft' : 'Arsip') }}
+                    {{ article.status === 'published' ? 'Diterbitkan' : (article.status === 'scheduled' ? 'Dijadwalkan' : (article.status === 'draft' ? 'Draft' : 'Arsip')) }}
                   </span>
                 </td>
                 <td class="col-date">
                   <div class="date-text">{{ formatDate(article.publish_date) }}</div>
-                  <div class="date-sub">{{ article.status === 'published' ? 'Tanggal Rilis' : 'Terakhir Diubah' }}</div>
+                  <div class="date-sub">{{ article.status === 'published' ? 'Tanggal Rilis' : (article.status === 'scheduled' ? 'Jadwal Rilis' : 'Terakhir Diubah') }}</div>
                 </td>
               </tr>
             </tbody>
@@ -219,13 +222,14 @@
                 <label>Status</label>
                 <v-select v-model="currentArticle.status" :items="[
                   { text: 'Published (Diterbitkan)', value: 'published' },
+                  { text: 'Scheduled (Dijadwalkan)', value: 'scheduled' },
                   { text: 'Draft (Konsep)', value: 'draft' },
                   { text: 'Archived (Diarsipkan)', value: 'archived' }
                 ]" />
               </div>
               
-              <div class="panel-section">
-                <label>Tanggal Rilis</label>
+              <div class="panel-section" v-if="currentArticle.status === 'scheduled'">
+                <label>Tanggal Jadwal Tayang</label>
                 <v-input v-model="currentArticle.publish_date" type="datetime-local" />
               </div>
 
@@ -1101,6 +1105,21 @@ export default {
     };
 
     const saveArticle = async () => {
+      if (currentArticle.value.status === 'scheduled') {
+        if (!currentArticle.value.publish_date) {
+          showToast('❌ Tanggal jadwal harus diisi!');
+          return;
+        }
+        const now = new Date();
+        const pubDate = new Date(currentArticle.value.publish_date);
+        if (pubDate < now) {
+          showToast('❌ Tanggal jadwal tidak boleh kurang dari waktu sekarang!');
+          return;
+        }
+      } else if (currentArticle.value.status === 'published') {
+        currentArticle.value.publish_date = new Date().toISOString().slice(0, 16);
+      }
+
       isSaving.value = true;
       try {
         const fk = keywordsList.value.length > 0 ? keywordsList.value[0] : '';
@@ -1663,6 +1682,7 @@ export default {
   display: inline-block;
 }
 .status-badge.published { background: #dcfce7; color: #166534; }
+.status-badge.scheduled { background: #dbeafe; color: #1e40af; }
 .status-badge.draft { background: #fef9c3; color: #854d0e; }
 .status-badge.archived { background: #f1f5f9; color: #475569; }
 
