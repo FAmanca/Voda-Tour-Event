@@ -35,7 +35,10 @@ async function fetchApi<T>(path: string, params?: Record<string, string>): Promi
   if (params) {
     Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
   }
-  const res = await fetch(url.toString());
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: { "Cache-Control": "no-cache" },
+  });
   if (!res.ok) throw new Error(`Directus ${res.status}: ${res.statusText}`);
   const json = await res.json();
   return (json.data || []) as T[];
@@ -43,7 +46,10 @@ async function fetchApi<T>(path: string, params?: Record<string, string>): Promi
 
 async function fetchSingle<T>(path: string): Promise<T | null> {
   const url = new URL(`${BASE}/${path}`);
-  const res = await fetch(url.toString());
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: { "Cache-Control": "no-cache" },
+  });
   if (!res.ok) return null;
   const json = await res.json();
   return (json.data || null) as T | null;
@@ -240,21 +246,10 @@ export async function getActivityTypes(): Promise<ActivityType[]> {
 // Articles
 // ---------------------------------------------------------------------------
 
-function getPublishDateFilter() {
-  const now = new Date().toISOString();
-  return {
-    _or: [
-      { publish_date: { _lte: now } },
-      { publish_date: { _null: true } },
-    ],
-  };
-}
-
 export async function getArticles(limit = 12): Promise<Article[]> {
   return fetchApi<Article>("articles", {
     filter: JSON.stringify({
       status: { _eq: "published" },
-      ...getPublishDateFilter(),
     }),
     sort: "-publish_date",
     limit: String(limit),
@@ -266,7 +261,6 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
     filter: JSON.stringify({
       status: { _eq: "published" },
       slug: { _eq: slug },
-      ...getPublishDateFilter(),
     }),
     fields: "*,ads.*,pillar_parent.*",
   });
@@ -278,7 +272,6 @@ export async function getClusterArticles(pillarId: string, limit = 10): Promise<
     filter: JSON.stringify({
       status: { _eq: "published" },
       pillar_parent: { _eq: pillarId },
-      ...getPublishDateFilter(),
     }),
     sort: "-publish_date",
     limit: String(limit),
@@ -289,17 +282,13 @@ export async function getRelatedArticles(title: string, excludeSlug: string, lim
   const stopWords = new Set(["di", "ke", "dari", "dan", "atau", "untuk", "dengan", "yang", "ini", "itu", "pada", "dalam", "sebuah", "adalah", "tips", "cara"]);
   const words = title.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w));
   
-  const pubFilter = getPublishDateFilter();
-
   let filter: any = {
     status: { _eq: "published" },
     slug: { _neq: excludeSlug },
-    ...pubFilter,
   };
 
   if (words.length > 0) {
     filter._and = [
-      pubFilter,
       { _or: words.map(w => ({ title: { _icontains: w } })) }
     ];
   }
@@ -316,7 +305,6 @@ export async function getRelatedArticles(title: string, excludeSlug: string, lim
       filter: JSON.stringify({
         status: { _eq: "published" },
         slug: { _neq: excludeSlug },
-        ...pubFilter,
       }),
       sort: "-publish_date",
       limit: String(limit),
