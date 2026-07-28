@@ -10,9 +10,9 @@ export const GET: APIRoute = async () => {
 
   try {
     const [destRes, pkgRes, articleRes] = await Promise.all([
-      fetch(DIRECTUS_URL + "/items/destinations?fields=slug,date_updated&filter[status][_eq]=published"),
-      fetch(DIRECTUS_URL + "/items/packages?fields=slug,date_updated&filter[status][_eq]=published"),
-      fetch(DIRECTUS_URL + "/items/articles?fields=slug,date_updated&filter[status][_eq]=published&filter[_or][0][publish_date][_lte]=" + encodeURIComponent(new Date().toISOString()) + "&filter[_or][1][publish_date][_null]=true"),
+      fetch(DIRECTUS_URL + "/items/destinations?fields=slug,date_updated&filter[status][_eq]=published", { cache: "no-store" }),
+      fetch(DIRECTUS_URL + "/items/packages?fields=slug,date_updated&filter[status][_eq]=published", { cache: "no-store" }),
+      fetch(DIRECTUS_URL + "/items/articles?fields=slug,date_updated&filter[status][_eq]=published", { cache: "no-store" }),
     ]);
     if (destRes.ok) { const data = await destRes.json(); destinations = data.data || []; }
     if (pkgRes.ok) { const data = await pkgRes.json(); packages = data.data || []; }
