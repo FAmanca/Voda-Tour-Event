@@ -47,7 +47,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="article in filteredArticles" :key="article.id" class="wp-row">
+              <tr v-for="article in paginatedArticles" :key="article.id" class="wp-row">
                 <td class="col-title">
                   <div class="title-wrapper">
                     <span class="title-text" @click="editArticle(article)">
@@ -85,6 +85,11 @@
               </tr>
             </tbody>
           </table>
+          <div class="pagination-controls" v-if="totalPages > 1">
+            <v-button @click="currentPage--" :disabled="currentPage === 1" secondary>Sebelumnya</v-button>
+            <span class="page-info">Halaman {{ currentPage }} dari {{ totalPages }}</span>
+            <v-button @click="currentPage++" :disabled="currentPage === totalPages" secondary>Selanjutnya</v-button>
+          </div>
         </div>
         <div v-else class="empty-state">
           <v-icon name="article" x-large />
@@ -773,6 +778,10 @@ export default {
     });
 
     // Computed
+    const currentPage = ref(1);
+    const itemsPerPage = ref(10);
+    watch([searchQuery, activeFilter], () => { currentPage.value = 1; });
+
     const filteredArticles = computed(() => {
       let list = articles.value;
       if (activeFilter.value !== 'all') {
@@ -786,6 +795,12 @@ export default {
         );
       }
       return list;
+    });
+
+    const totalPages = computed(() => Math.ceil(filteredArticles.value.length / itemsPerPage.value) || 1);
+    const paginatedArticles = computed(() => {
+      const start = (currentPage.value - 1) * itemsPerPage.value;
+      return filteredArticles.value.slice(start, start + itemsPerPage.value);
     });
 
     const filteredMediaFiles = computed(() => {
@@ -1353,6 +1368,7 @@ export default {
 
     return {
       articles, loading, searchQuery, activeFilter, filteredArticles,
+      currentPage, totalPages, paginatedArticles,
       currentArticle, isSaving, sidebarTab, checkTab,
       editor, pillarOptions,
       createNew, editArticle, saveArticle, closeEditor, generateSlug, formatDate, getImageSrc,
@@ -2479,5 +2495,19 @@ export default {
   font-weight: 600;
   z-index: 100;
   border: 1px solid #334155;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+.page-info {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
 }
 </style>

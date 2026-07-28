@@ -70,7 +70,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="pkg in filteredPackages" :key="pkg.id" class="table-row" @click="editPackage(pkg)">
+            <tr v-for="pkg in paginatedPackages" :key="pkg.id" class="table-row" @click="editPackage(pkg)">
               <td>
                 <div class="thumb-box">
                   <img v-if="pkg.image" :src="getImageSrc(pkg.image)" :alt="pkg.name" class="table-thumb" />
@@ -105,6 +105,11 @@
             </tr>
           </tbody>
         </table>
+        <div class="pagination-controls" v-if="totalPages > 1">
+          <v-button @click="currentPage--" :disabled="currentPage === 1" secondary>Sebelumnya</v-button>
+          <span class="page-info">Halaman {{ currentPage }} dari {{ totalPages }}</span>
+          <v-button @click="currentPage++" :disabled="currentPage === totalPages" secondary>Selanjutnya</v-button>
+        </div>
       </div>
     </div>
   </private-view>
@@ -663,6 +668,10 @@ export default {
     });
 
     // Dashboard Computeds & Helpers
+    const currentPage = ref(1);
+    const itemsPerPage = ref(10);
+    watch([searchQuery, statusFilter], () => { currentPage.value = 1; });
+
     const filteredPackages = computed(() => {
       return packages.value.filter(p => {
         const matchSearch = (p.name?.toLowerCase() || '').includes(searchQuery.value.toLowerCase()) ||
@@ -670,6 +679,12 @@ export default {
         const matchStatus = !statusFilter.value || p.status === statusFilter.value;
         return matchSearch && matchStatus;
       });
+    });
+
+    const totalPages = computed(() => Math.ceil(filteredPackages.value.length / itemsPerPage.value) || 1);
+    const paginatedPackages = computed(() => {
+      const start = (currentPage.value - 1) * itemsPerPage.value;
+      return filteredPackages.value.slice(start, start + itemsPerPage.value);
     });
 
     const getStatusCount = (status) => {
@@ -1046,6 +1061,7 @@ export default {
 
     return {
       packages, filteredPackages, loadingPackages, searchQuery, statusFilter, statusOptions, getStatusCount,
+      currentPage, totalPages, paginatedPackages,
       destinations, activityTypes, getDestinationName, getImageSrc, getStartingPrice, formatPrice, formatDate,
       editingPackage, editPackage, createNewPackage, cancelEdit, savePackage, saving, generateSlug,
       toggleActivityType, selectedActivityTypes, heroBannerStyle,
@@ -2159,5 +2175,19 @@ export default {
   min-width: 28px !important;
   height: 28px !important;
   padding: 0 !important;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+.page-info {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
 }
 </style>
