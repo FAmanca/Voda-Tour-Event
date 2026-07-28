@@ -523,7 +523,11 @@
       <v-card-text class="media-content">
         <div class="media-search-bar">
           <v-input v-model="mediaSearchQuery" placeholder="Cari nama file gambar di library Directus..." class="w-full">
-            <template #prepend><v-icon name="search" /></template>
+            <template #prepend><v-icon name="search" />
+  <div v-if="toastMessage" class="toast-notification">
+    {{ toastMessage }}
+  </div>
+</template>
           </v-input>
         </div>
         <div v-if="loadingMedia" class="media-loading">
@@ -537,7 +541,7 @@
         <div v-else class="media-grid">
           <div v-for="file in filteredMediaFiles" :key="file.id" class="media-item" :class="{ selected: selectedMediaFile?.id === file.id }" @click="selectedMediaFile = file; confirmMediaSelect();">
             <div class="thumb-wrap">
-              <img :src="`/assets/${file.id}?width=200&height=200&fit=cover`" :alt="file.title || file.filename_download" loading="lazy" />
+              <img :src="`/assets/${file.id}?width=200&height=200&fit=cover&format=webp&quality=80`" :alt="file.title || file.filename_download" loading="lazy" />
             </div>
             <div class="media-info">
               <div class="media-name" :title="file.filename_download">{{ file.title || file.filename_download }}</div>
@@ -565,6 +569,10 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <div v-if="toastMessage" class="toast-notification">
+    {{ toastMessage }}
+  </div>
 </template>
 
 <script>
@@ -749,7 +757,7 @@ export default {
     const getImageSrc = (id) => {
       if (!id) return '';
       const fileId = typeof id === 'object' ? id.id : id;
-      return `/assets/${fileId}?width=100&height=100&fit=cover`;
+      return `/assets/${fileId}?width=800&height=800&fit=cover&format=webp&quality=80`;
     };
 
     const getStartingPrice = (priceTiers) => {
@@ -780,7 +788,7 @@ export default {
     const heroBannerStyle = computed(() => {
       if (editingPackage.value?.image) {
         const fileId = typeof editingPackage.value.image === 'object' ? editingPackage.value.image.id : editingPackage.value.image;
-        return { backgroundImage: `url(/assets/${fileId})`, backgroundSize: 'cover', backgroundPosition: 'center' };
+        return { backgroundImage: `url(/assets/${fileId}?format=webp&quality=80)`, backgroundSize: 'cover', backgroundPosition: 'center' };
       }
       return { background: '#0b2340' };
     });
@@ -879,10 +887,18 @@ export default {
       }
     };
 
+    // Toast Notification
+    const toastMessage = ref('');
+    const showToast = (msg) => {
+      toastMessage.value = msg;
+      setTimeout(() => { toastMessage.value = ''; }, 3500);
+    };
+
     // Save Package Logic
     const savePackage = async () => {
-      if (!editingPackage.value.name) {
-        alert('Judul Paket Wisata wajib diisi!');
+      if (!editingPackage.value.name?.trim()) {
+        showToast('❌ Judul Paket Wisata wajib diisi!');
+        saving.value = false;
         return;
       }
       if (!editingPackage.value.slug) generateSlug();
@@ -940,10 +956,11 @@ export default {
         if (actToAdd.length > 0) await api.post(`/items/packages_activity_types`, actToAdd);
 
         await fetchPackages();
+        showToast('✅ Paket wisata berhasil disimpan!');
         cancelEdit();
       } catch (err) {
         console.error('Gagal menyimpan paket wisata:', err);
-        alert('Gagal menyimpan paket wisata. Periksa koneksi atau validasi form.');
+        showToast('❌ Gagal menyimpan paket wisata. Periksa koneksi atau validasi form.');
       } finally {
         saving.value = false;
       }
@@ -964,8 +981,8 @@ export default {
         packageToDelete.value = null;
         await fetchPackages();
       } catch (err) {
-        console.error('Gagal menghapus paket:', err);
-        alert('Gagal menghapus paket wisata.');
+        console.error('Gagal menghapus paket wisata:', err);
+        showToast('❌ Gagal menghapus paket wisata.');
       } finally {
         deleting.value = false;
       }
@@ -1069,8 +1086,8 @@ export default {
         selectedMediaFile.value = uploadedFile;
         confirmMediaSelect();
       } catch (err) {
-        console.error('Upload error', err);
-        alert('Gagal mengunggah gambar dari komputer.');
+        console.error('Gagal mengunggah gambar:', err);
+        showToast('❌ Gagal mengunggah gambar dari komputer.');
       } finally {
         isUploading.value = false;
         if (fileInput.value) fileInput.value.value = '';
@@ -1096,7 +1113,8 @@ export default {
       selectedMediaFile, isUploading, fileInput, openMediaDialog, confirmMediaSelect, handleFileUpload,
       galleryImages, removeGalleryImage,
       showDeleteDialog, packageToDelete, confirmDelete, executeDelete, deleting,
-      editor
+      editor,
+      toastMessage, showToast
     };
   }
 };
@@ -2211,5 +2229,22 @@ export default {
   font-size: 14px;
   color: #64748b;
   font-weight: 500;
+}
+
+/* Toast Notification — muncul di atas semua layer (z-index: 99999 aman untuk toast, bukan editor overlay) */
+.toast-notification {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0f172a;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 99999;
+  border: 1px solid #334155;
 }
 </style>

@@ -145,11 +145,12 @@ pnpm dev          # → http://localhost:4321
 
 ## Directus Custom Extensions (CMS Admin Ecosystem)
 
-Proyek ini menggunakan 4 ekstensi kustom di dalam folder `extensions/` yang di-compile ke Docker (`voda-directus`):
+Proyek ini menggunakan 5 ekstensi kustom di dalam folder `extensions/` yang di-compile ke Docker (`voda-directus`):
 1. **`article-editor`**: Custom Module untuk manajemen artikel bergaya **WordPress Gutenberg Fullscreen Mode** (overlay fixed `100vw x 100vh`) dengan SEO Analyzer interaktif ala Yoast/RankMath (skor 0-100%), smart chip tag keywords (Focus/LSI), dan Konten Pilar (`is_pillar`). Di halaman daftar, menggunakan `<private-view>` dengan sidebar filter status (#navigation) dan tombol aksi `+` (#actions), tanpa sidebar kanan.
 2. **`package-editor`**: Custom Module untuk manajemen paket wisata bergaya **Visual Page Builder (ala Elementor / WordPress Gutenberg)**. Di halaman daftar, menggunakan layout tabel ala artikel dengan top search bar, tombol aksi ikon tunggal (`+`, `edit`, `delete`), dan filter status di sidebar kiri (#navigation). Di mode editor, menerapkan *inline editing* langsung pada Hero Banner (tanpa box hero-controls yang kaku), deskripsi WYSIWYG dengan TipTap, dan builder interaktif untuk Itinerary, Fasilitas, Tabel Harga Dinamis, serta Galeri Foto. Menerapkan Aturan Emas Z-Index (`z-index: 150`).
 3. **`custom-seo-analyzer`**: Custom Interface (versi awal SEO panel, kini rumusnya ada di dalam `article-editor`).
 4. **`auto-compress-webp`**: Action Hook otomatis kompresi gambar ke WebP di Directus sebelum masuk ke Cloudflare R2.
+5. **`publish-cron`**: Schedule Hook yang berjalan setiap menit untuk otomatis mengubah status artikel dari `scheduled` ke `published` ketika `publish_date` sudah terlewati. Menggunakan `ItemsService.updateMany()` dengan konversi zona waktu eksplisit ke Asia/Jakarta (WIB).
 
 > **ATURAN DEPLOYMENT EKSTENSI (WAJIB)**:  
 > Ekstensi TIDAK bisa langsung dibaca dari `src/`. Setelah modifikasi kode di `extensions/<ext>/src/`, AI wajib:
@@ -166,6 +167,7 @@ Proyek ini menggunakan 4 ekstensi kustom di dalam folder `extensions/` yang di-c
 | Design System | `docs/frontend/design-system.md` |
 | Modul Artikel Editor | `docs/features/article-editor.md` |
 | Modul Paket Wisata Editor | `docs/features/package-editor.md` |
+| Auto-Publish Terjadwal | `docs/features/publish-cron.md` |
 | Panduan Directus Extensions | `docs/development/directus-extensions.md` |
 | SEO Analyzer Rules | `docs/features/seo-analyzer.md` |
 | Mockup HTML | `mockup/landing.html` |

@@ -18,6 +18,7 @@ Saat ini terdapat 4 ekstensi aktif di dalam direktori `extensions/`:
 | **`package-editor`** | Custom Module | `extensions/package-editor/` | Modul kustom untuk mengelola paket wisata (*tour packages*), jadwal perjalanan (*itinerary*), tier harga berdasarkan jumlah pax, dan fasilitas. |
 | **`custom-seo-analyzer`** | Custom Interface | `extensions/custom-seo-analyzer/` | Interface SEO Analyzer versi awal (stand-alone panel). Aturan dan rumusnya kini telah diintegrasikan 100% ke dalam `article-editor`. |
 | **`auto-compress-webp`** | Action Hook | `extensions/auto-compress-webp/` | *Hook backend* yang otomatis mengompresi dan mengonversi setiap gambar yang diunggah ke Directus menjadi format WebP berukuran ringkas. |
+| **`publish-cron`** | Schedule Hook | `extensions/publish-cron/` | *Hook background* yang berjalan setiap menit, otomatis mengubah status artikel dari `scheduled` ke `published` ketika `publish_date` sudah terlewati. Menggunakan `ItemsService.updateMany()` dengan konversi timezone eksplisit ke Asia/Jakarta (WIB). Lihat: `docs/features/publish-cron.md`. |
 
 ---
 

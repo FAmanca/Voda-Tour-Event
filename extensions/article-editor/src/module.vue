@@ -382,7 +382,7 @@
           <div v-else class="media-grid">
             <div v-for="file in filteredMediaFiles" :key="file.id" class="media-item" :class="{ selected: selectedMediaFile?.id === file.id }" @click="selectedMediaFile = file; confirmMediaSelect();">
               <div class="thumb-wrap">
-                <img :src="`/assets/${file.id}?width=200&height=200&fit=cover`" :alt="file.title || file.filename_download" loading="lazy" />
+                <img :src="`/assets/${file.id}?width=200&height=200&fit=cover&format=webp&quality=80`" :alt="file.title || file.filename_download" loading="lazy" />
               </div>
               <div class="media-info">
                 <div class="media-name" :title="file.filename_download">{{ file.title || file.filename_download }}</div>
@@ -776,6 +776,8 @@ export default {
     });
     
     onUnmounted(() => {
+      if (tocSyncTimeout) clearTimeout(tocSyncTimeout);
+      if (cannibalTimeout) clearTimeout(cannibalTimeout);
       if (editor.value) {
         editor.value.destroy();
       }
@@ -1213,7 +1215,7 @@ export default {
     const getImageSrc = (imgId) => {
       if (!imgId) return '';
       const id = (typeof imgId === 'object' && imgId.id) ? imgId.id : imgId;
-      return `/assets/${id}`;
+      return `/assets/${id}?format=webp&quality=80`;
     };
 
     // Directus Media Library Methods
@@ -1252,7 +1254,7 @@ export default {
       if (mediaTarget.value === 'cover') {
         currentArticle.value.featured_image = fileId;
       } else if (mediaTarget.value === 'inline') {
-        editor.value.chain().focus().setImage({ src: `/assets/${fileId}` }).run();
+        editor.value.chain().focus().setImage({ src: `/assets/${fileId}?format=webp&quality=80` }).run();
       } else if (mediaTarget.value === 'ad' && selectAdImageIndex.value >= 0) {
         ads.value[selectAdImageIndex.value].image = fileId;
       }
@@ -2513,7 +2515,7 @@ export default {
   box-shadow: 0 10px 25px rgba(0,0,0,0.3);
   font-size: 14px;
   font-weight: 600;
-  z-index: 100;
+  z-index: 99999;
   border: 1px solid #334155;
 }
 
