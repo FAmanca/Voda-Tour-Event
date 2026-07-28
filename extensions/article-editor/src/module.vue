@@ -835,7 +835,7 @@ export default {
       const docTitle = art.title || '';
       
       const fkLower = fk ? fk.toLowerCase() : '';
-      const sksLower = sks.map(k => k.toLowerCase());
+      const sksLower = sks.map(k => k.toLowerCase().trim());
 
       const powerWords = ['terbaik', 'rahasia', 'panduan', 'lengkap', 'mudah', 'cepat', 'gratis', 'terbaru', 'murah', 'tips', 'trik', 'terpercaya', 'top', 'rekomendasi', 'promo', 'diskon'];
       const transWords = ['namun', 'oleh karena itu', 'selain itu', 'sehingga', 'dengan demikian', 'sementara itu', 'walaupun demikian', 'akan tetapi', 'selanjutnya', 'kemudian', 'bahkan', 'sebaliknya', 'karena itu', 'oleh sebab itu', 'tambahan pula', 'lebih lanjut', 'sebagai contoh', 'misalnya'];

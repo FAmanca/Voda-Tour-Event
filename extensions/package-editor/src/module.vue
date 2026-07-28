@@ -244,12 +244,14 @@
 
         <!-- 2. SECTION TENTANG PAKET INI (DESKRIPSI DENGAN TIPTAP VISUAL EDITOR) -->
         <div class="section-container" @click.stop>
-          <div class="section-label-top">TENTANG PAKET INI</div>
-          <h2 class="section-title-frontend">{{ editingPackage.name || 'Judul Paket Wisata' }}</h2>
-          <div class="orange-underline-bar"></div>
-          
-          <div class="tiptap-wrapper">
-            <div class="tiptap-toolbar" v-if="editor">
+          <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 300px;">
+              <div class="section-label-top">TENTANG PAKET INI</div>
+              <h2 class="section-title-frontend">{{ editingPackage.name || 'Judul Paket Wisata' }}</h2>
+              <div class="orange-underline-bar"></div>
+              
+              <div class="tiptap-wrapper" style="margin-top: 16px;">
+                <div class="tiptap-toolbar" v-if="editor">
               <v-button small icon secondary @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }" title="Bold"><v-icon name="format_bold" /></v-button>
               <v-button small icon secondary @click="editor.chain().focus().toggleItalic().run()" :class="{ 'is-active': editor.isActive('italic') }" title="Italic"><v-icon name="format_italic" /></v-button>
               <v-button small icon secondary @click="editor.chain().focus().toggleUnderline().run()" :class="{ 'is-active': editor.isActive('underline') }" title="Underline"><v-icon name="format_underlined" /></v-button>
@@ -268,6 +270,27 @@
               <v-button small icon secondary @click="editor.chain().focus().redo().run()" title="Redo"><v-icon name="redo" /></v-button>
             </div>
             <editor-content :editor="editor" class="tiptap-content-box" />
+              </div>
+            </div>
+            
+            <div style="width: 320px; flex-shrink: 0; padding-top: 8px;">
+              <div class="section-label-top" style="margin-bottom: 4px;">POSTER GAMBAR (1:1)</div>
+              <p style="font-size: 13px; color: var(--theme--foreground-subdued); margin-bottom: 16px;">Tampil di sebelah teks "Tentang Paket Ini".</p>
+              
+              <div 
+                style="width: 100%; aspect-ratio: 1/1; background: var(--theme--background-normal); border: 2px dashed var(--theme--border-color); border-radius: 12px; overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: all 0.2s;"
+                @click="openMediaDialog('poster')"
+                onmouseover="this.style.borderColor='var(--theme--primary)'"
+                onmouseout="this.style.borderColor='var(--theme--border-color)'"
+              >
+                <img v-if="editingPackage.poster" :src="getImageSrc(editingPackage.poster)" style="width: 100%; height: 100%; object-fit: cover;" />
+                <div v-else style="display: flex; flex-direction: column; align-items: center; color: var(--theme--foreground-subdued);">
+                  <v-icon name="add_photo_alternate" large />
+                  <span style="margin-top: 8px; font-weight: 500;">Pilih Poster</span>
+                </div>
+              </div>
+              <v-button v-if="editingPackage.poster" style="margin-top: 16px; width: 100%;" small secondary danger @click.stop="editingPackage.poster = null">Hapus Poster</v-button>
+            </div>
           </div>
         </div>
 
@@ -895,23 +918,22 @@ export default {
         const currentGal = currentGalRes.data.data || [];
         const galToDelete = currentGal.filter(g => !galleryImages.value.includes(g.directus_files_id)).map(g => g.id);
         const existingGalFiles = currentGal.map(g => g.directus_files_id);
-        const galToAdd = galleryImages.value.filter(fid => !existingGalFiles.includes(fid)).map((fid, idx) => ({
+        const galToAdd = galleryImages.value.filter(fid => !existingGalFiles.includes(fid)).map((fid) => ({
           packages_id: pkgId,
-          directus_files_id: fid,
-          sort: idx + 1
+          directus_files_id: fid
         }));
 
         if (galToDelete.length > 0) await api.delete(`/items/packages_files`, { data: galToDelete });
         if (galToAdd.length > 0) await api.post(`/items/packages_files`, galToAdd);
 
         // Sync Activity Types (M2M packages_activity_types)
-        const currentActRes = await api.get(`/items/packages_activity_types`, { params: { filter: { package_id: { _eq: pkgId } } } });
+        const currentActRes = await api.get(`/items/packages_activity_types`, { params: { filter: { packages_id: { _eq: pkgId } } } });
         const currentAct = currentActRes.data.data || [];
-        const actToDelete = currentAct.filter(a => !selectedActivityTypes.value.includes(a.activity_type_id)).map(a => a.id);
-        const existingActIds = currentAct.map(a => a.activity_type_id);
-        const actToAdd = selectedActivityTypes.value.filter(aid => !existingActIds.includes(aid)).map(aid => ({
-          package_id: pkgId,
-          activity_type_id: aid
+        const actToDelete = currentAct.filter(a => !selectedActivityTypes.value.includes(a.activity_types_id)).map(a => a.id);
+        const existingActIds = currentAct.map(a => a.activity_types_id);
+        const actToAdd = selectedActivityTypes.value.filter(id => !existingActIds.includes(id)).map(id => ({
+          packages_id: pkgId,
+          activity_types_id: id
         }));
 
         if (actToDelete.length > 0) await api.delete(`/items/packages_activity_types`, { data: actToDelete });
