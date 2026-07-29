@@ -1443,8 +1443,10 @@ export default {
       };
       keywordsList.value = [];
       ads.value = [];
-      editor.value.commands.setContent('');
-      runSeoAnalysis();
+      nextTick(() => {
+        editor.value.commands.setContent('');
+        runSeoAnalysis();
+      });
     };
 
     const editArticle = async (articleStub) => {
@@ -1487,10 +1489,12 @@ export default {
           image: (ad.image && typeof ad.image === 'object' && ad.image.id) ? ad.image.id : ad.image
         }));
 
-        editor.value.commands.setContent(art.content || '');
-        runSeoAnalysis();
-        checkCannibalization();
-        setTimeout(() => syncTocAndHeadings(), 300);
+        nextTick(() => {
+          editor.value.commands.setContent(art.content || '');
+          runSeoAnalysis();
+          checkCannibalization();
+          setTimeout(() => syncTocAndHeadings(), 300);
+        });
       } catch (err) {
         console.error('Error loading article', err);
       }
