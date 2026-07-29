@@ -800,27 +800,22 @@ export default {
         slug: '',
         destination_id: '',
         status: 'draft',
-        duration: '3 Hari 2 Malam',
-        max_participants: null,
+        duration: '',
         description: '',
-        facilities: ['Transportasi AC berstandar pariwisata', 'Akomodasi hotel bintang sesuai pilihan', 'Tiket masuk seluruh objek wisata', 'Air mineral & snack selama perjalanan'],
+        facilities: [''],
         itinerary: [
-          { day: 1, title: 'Kedatangan & Check-in Hotel', activities: ['Penjemputan di Bandara / Stasiun oleh tim Voda Tour', 'Makan siang di restoran lokal', 'Check-in hotel dan istirahat sore', 'Makan malam selamat datang (Welcome Dinner)'] },
-          { day: 2, title: 'Tour Destinasi Utama & Sunset', activities: ['Sarapan pagi di hotel', 'Mengunjungi objek wisata pilihan 1', 'Makan siang berwisata kuliner', 'Menikmati sunset dan foto bersama'] }
+          { day: 1, title: '', activities: [''] }
         ],
         price_tiers: [
           {
-            table_title: 'Harga Paket Domestik (WNI)',
+            table_title: '',
             tiers: [
-              { min_pax: 2, max_pax: 3, price_per_pax: 2850000, description: 'Hotel Bintang 3' },
-              { min_pax: 4, max_pax: 6, price_per_pax: 2450000, description: 'Hotel Bintang 3' },
-              { min_pax: 7, max_pax: 12, price_per_pax: 2150000, description: 'Hotel Bintang 3' }
+              { min_pax: null, max_pax: null, price_per_pax: null, description: '' }
             ]
           }
         ],
         addons: [
-          { addon_name: 'Dokumentasi Drone & DSLR Profesional', price: 1500000, description: 'Termasuk editing video cinematic 1 menit & seluruh file asli' },
-          { addon_name: 'Upgrade Kamar Hotel Bintang 4', price: 350000, description: 'Harga per kamar per malam' }
+          { addon_name: '', price: null, description: '' }
         ],
         image: null,
         poster: null
@@ -854,7 +849,7 @@ export default {
         galleryImages.value = [...originalGalleryIds.value];
 
         const act = data.activity_types || [];
-        originalActivityTypeIds.value = act.map(a => a.activity_type_id?.id || a.activity_type_id || a);
+        originalActivityTypeIds.value = act.map(a => a.activity_types_id?.id || a.activity_types_id || a);
         selectedActivityTypes.value = [...originalActivityTypeIds.value];
 
         if (editor.value) editor.value.commands.setContent(editingPackage.value.description || '');
@@ -911,7 +906,6 @@ export default {
           destination_id: editingPackage.value.destination_id || null,
           status: editingPackage.value.status || 'draft',
           duration: editingPackage.value.duration || '',
-          max_participants: null,
           description: editingPackage.value.description || '',
           facilities: editingPackage.value.facilities || [],
           itinerary: editingPackage.value.itinerary || [],
@@ -1009,13 +1003,13 @@ export default {
     const removeActivity = (dayIdx, actIdx) => editingPackage.value.itinerary[dayIdx].activities.splice(actIdx, 1);
 
     // Price Tiers Actions
-    const addPriceTable = () => editingPackage.value.price_tiers.push({ table_title: '', tiers: [{ min_pax: 2, max_pax: 5, price_per_pax: 2000000, description: '' }] });
+    const addPriceTable = () => editingPackage.value.price_tiers.push({ table_title: '', tiers: [{ min_pax: null, max_pax: null, price_per_pax: null, description: '' }] });
     const removePriceTable = (idx) => editingPackage.value.price_tiers.splice(idx, 1);
-    const addPriceTier = (groupIndex) => editingPackage.value.price_tiers[groupIndex].tiers.push({ min_pax: 1, max_pax: 2, price_per_pax: 0, description: '' });
+    const addPriceTier = (groupIndex) => editingPackage.value.price_tiers[groupIndex].tiers.push({ min_pax: null, max_pax: null, price_per_pax: null, description: '' });
     const removePriceTier = (gIdx, tIdx) => editingPackage.value.price_tiers[gIdx].tiers.splice(tIdx, 1);
 
     // Addons Actions
-    const addAddon = () => editingPackage.value.addons.push({ addon_name: '', price: 0, description: '' });
+    const addAddon = () => editingPackage.value.addons.push({ addon_name: '', price: null, description: '' });
     const removeAddon = (idx) => editingPackage.value.addons.splice(idx, 1);
 
     // Media Library Methods

@@ -217,6 +217,7 @@
               <button @click="insertToc" class="btn-toc" title="Sisipkan Daftar Isi"><v-icon name="toc" small/> TOC</button>
               <button @click="openMediaDialog('inline')" class="btn-img" title="Sisipkan Gambar"><v-icon name="image" small/> Gambar</button>
               <button @click="editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()" class="btn-tbl" title="Tabel 3x3"><v-icon name="table_chart" small/> Tabel</button>
+              <button @click="openYoutubeModal" class="btn-yt" title="Embed YouTube"><v-icon name="smart_display" small/> YT</button>
             </floating-menu>
 
             <editor-content :editor="editor" class="paper-content" />
@@ -435,6 +436,200 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- === SLASH COMMAND MENU === -->
+    <teleport to="body">
+      <transition name="slash-fade">
+        <div
+          v-if="showSlashMenu"
+          class="slash-menu"
+          :style="{ left: slashMenuPos.x + 'px', top: slashMenuPos.y + 'px' }"
+          @mousedown.prevent
+        >
+          <div class="slash-header">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ketik untuk filter blok...
+          </div>
+          <div class="slash-list" ref="slashMenuListRef">
+            <div
+              v-for="(cmd, idx) in filteredSlashCommands"
+              :key="cmd.id"
+              class="slash-item"
+              :class="{ active: idx === slashMenuIndex }"
+              @mouseenter="slashMenuIndex = idx"
+              @mousedown.prevent="executeSlashCommand(cmd)"
+            >
+              <div class="slash-icon"><v-icon :name="cmd.icon" small /></div>
+              <div class="slash-info">
+                <div class="slash-label">{{ cmd.label }}</div>
+                <div class="slash-desc">{{ cmd.desc }}</div>
+              </div>
+            </div>
+            <div v-if="filteredSlashCommands.length === 0" class="slash-empty">Tidak ada blok ditemukan</div>
+          </div>
+          <div class="slash-footer">↑↓ Navigasi &nbsp;·&nbsp; Enter Pilih &nbsp;·&nbsp; Esc Tutup</div>
+        </div>
+      </transition>
+    </teleport>
+
+    <!-- === YOUTUBE MODAL === -->
+    <teleport to="body">
+      <transition name="link-modal">
+        <div v-if="showYoutubeModal" class="link-modal-backdrop" @mousedown.self="showYoutubeModal = false">
+          <div class="link-modal-box" role="dialog" aria-modal="true" aria-label="Sisipkan Video YouTube" style="max-width:460px">
+            <div class="lm-header">
+              <div class="lm-header-icon" style="background:linear-gradient(135deg,#FF0000 0%,#cc0000 100%)">
+                <svg width="18" height="13" viewBox="0 0 16 11" fill="none"><path d="M15.665 1.72A2 2 0 0 0 14.26.3C13.01 0 8 0 8 0S2.99 0 1.74.3A2 2 0 0 0 .336 1.72C0 2.98 0 5.6 0 5.6s0 2.62.336 3.88A2 2 0 0 0 1.74 10.9C2.99 11.2 8 11.2 8 11.2s5.01 0 6.26-.3a2 2 0 0 0 1.405-1.42C16 8.22 16 5.6 16 5.6s0-2.62-.335-3.88z" fill="white"/><path d="M6.4 8l4.16-2.4L6.4 3.2V8z" fill="#FF0000"/></svg>
+              </div>
+              <h3 class="lm-title">Embed Video YouTube</h3>
+              <button class="lm-close" @click="showYoutubeModal = false">&times;</button>
+            </div>
+            <div class="lm-body">
+              <div class="lm-field">
+                <label class="lm-label">URL YouTube <span class="lm-required">*</span></label>
+                <div class="lm-input-wrap" :class="{ error: youtubeUrlError }">
+                  <input
+                    ref="youtubeInputRef"
+                    v-model="youtubeUrlVal"
+                    type="url"
+                    class="lm-input"
+                    placeholder="https://www.youtube.com/watch?v=... atau https://youtu.be/..."
+                    @keydown.enter.prevent="applyYoutube"
+                    @keydown.escape.prevent="showYoutubeModal = false"
+                    @input="youtubeUrlError = ''"
+                  />
+                </div>
+                <span v-if="youtubeUrlError" class="lm-error-text">{{ youtubeUrlError }}</span>
+                <div style="font-size:11px;color:#94a3b8;margin-top:4px;">💡 Juga bisa: tempel URL YouTube langsung di editor lalu tekan Spasi untuk auto-convert</div>
+              </div>
+            </div>
+            <div class="lm-footer">
+              <div class="lm-footer-right">
+                <button class="lm-btn lm-btn-secondary" @click="showYoutubeModal = false">Batal</button>
+                <button class="lm-btn lm-btn-primary" @click="applyYoutube" style="background:linear-gradient(135deg,#FF0000,#cc0000);box-shadow:0 4px 12px rgba(255,0,0,0.3)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Sisipkan Video
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </teleport>
+
+    <!-- === LINK MODAL === -->
+    <teleport to="body">
+      <transition name="link-modal">
+        <div v-if="showLinkModal" class="link-modal-backdrop" @mousedown.self="closeLinkModal">
+          <div class="link-modal-box" role="dialog" aria-modal="true" aria-label="Sisipkan Tautan">
+            <div class="lm-header">
+              <div class="lm-header-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              </div>
+              <h3 class="lm-title">{{ linkModal.isEditing ? 'Edit Tautan' : 'Sisipkan Tautan' }}</h3>
+              <button class="lm-close" @click="closeLinkModal" title="Tutup">&times;</button>
+            </div>
+
+            <div class="lm-body">
+              <!-- URL Input -->
+              <div class="lm-field">
+                <label class="lm-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  URL Tautan <span class="lm-required">*</span>
+                </label>
+                <div class="lm-input-wrap" :class="{ error: linkModal.urlError }">
+                  <input
+                    ref="linkUrlInput"
+                    v-model="linkModal.url"
+                    type="url"
+                    class="lm-input"
+                    placeholder="https://contoh.com/halaman-tujuan"
+                    @keydown.enter.prevent="applyLink"
+                    @keydown.escape.prevent="closeLinkModal"
+                    @input="linkModal.urlError = ''"
+                  />
+                </div>
+                <span v-if="linkModal.urlError" class="lm-error-text">{{ linkModal.urlError }}</span>
+              </div>
+
+              <!-- Teks Tautan (hanya jika tidak ada selection) -->
+              <div class="lm-field" v-if="!linkModal.hasSelection">
+                <label class="lm-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                  Teks Tautan
+                </label>
+                <div class="lm-input-wrap">
+                  <input
+                    v-model="linkModal.text"
+                    type="text"
+                    class="lm-input"
+                    placeholder="Teks yang akan ditampilkan (kosongkan = pakai URL)"
+                    @keydown.enter.prevent="applyLink"
+                    @keydown.escape.prevent="closeLinkModal"
+                  />
+                </div>
+              </div>
+
+              <!-- Opsi Lanjutan -->
+              <div class="lm-advanced" @click="linkModal.showAdvanced = !linkModal.showAdvanced">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" :style="{ transform: linkModal.showAdvanced ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }"><polyline points="9 18 15 12 9 6"/></svg>
+                Opsi Lanjutan
+              </div>
+              <div v-show="linkModal.showAdvanced" class="lm-advanced-panel">
+                <div class="lm-field">
+                  <label class="lm-label">Buka di</label>
+                  <div class="lm-radio-group">
+                    <label class="lm-radio">
+                      <input type="radio" v-model="linkModal.target" value="_self" />
+                      <span class="lm-radio-label">Tab Sama</span>
+                    </label>
+                    <label class="lm-radio">
+                      <input type="radio" v-model="linkModal.target" value="_blank" />
+                      <span class="lm-radio-label">Tab Baru</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="lm-field">
+                  <label class="lm-label">Atribut Rel</label>
+                  <div class="lm-checkbox-group">
+                    <label class="lm-checkbox">
+                      <input type="checkbox" v-model="linkModal.relNofollow" />
+                      <span>nofollow <small>(tidak teruskan otoritas SEO)</small></span>
+                    </label>
+                    <label class="lm-checkbox">
+                      <input type="checkbox" v-model="linkModal.relNoopener" />
+                      <span>noopener <small>(keamanan tab baru)</small></span>
+                    </label>
+                    <label class="lm-checkbox">
+                      <input type="checkbox" v-model="linkModal.relSponsored" />
+                      <span>sponsored <small>(tautan berbayar / iklan)</small></span>
+                    </label>
+                    <label class="lm-checkbox">
+                      <input type="checkbox" v-model="linkModal.relUgc" />
+                      <span>ugc <small>(user generated content)</small></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="lm-footer">
+              <button v-if="linkModal.isEditing" class="lm-btn lm-btn-danger" @click="removeLink">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Hapus Tautan
+              </button>
+              <div class="lm-footer-right">
+                <button class="lm-btn lm-btn-secondary" @click="closeLinkModal">Batal</button>
+                <button class="lm-btn lm-btn-primary" @click="applyLink">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  {{ linkModal.isEditing ? 'Perbarui Tautan' : 'Sisipkan Tautan' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </teleport>
     
     <div v-if="toastMessage" class="toast-notification">
       {{ toastMessage }}
@@ -443,7 +638,7 @@
 </template>
 
 <script>
-import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { useApi } from '@directus/extensions-sdk';
 import { useEditor, EditorContent, BubbleMenu, FloatingMenu } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
@@ -598,6 +793,58 @@ const CustomHeading = Heading.extend({
   },
 });
 
+// ===== YouTube Embed Node =====
+const YouTubeNode = Node.create({
+  name: 'youtube',
+  group: 'block',
+  atom: true,
+  draggable: true,
+  addAttributes() {
+    return { videoId: { default: null } };
+  },
+  parseHTML() {
+    return [{ tag: 'div[data-youtube-id]' }];
+  },
+  renderHTML({ node }) {
+    const vid = node.attrs.videoId;
+    if (!vid) return ['div', { class: 'youtube-embed-wrapper' }];
+    return ['div', { 'data-youtube-id': vid, class: 'youtube-embed-wrapper' },
+      ['iframe', {
+        src: `https://www.youtube.com/embed/${vid}?rel=0`,
+        frameborder: '0', allowfullscreen: 'true',
+        allow: 'accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture',
+        title: 'YouTube Video', class: 'youtube-embed-iframe',
+      }]
+    ];
+  },
+  addNodeView() {
+    return ({ node }) => {
+      const dom = document.createElement('div');
+      dom.className = 'youtube-nodeview';
+      dom.contentEditable = 'false';
+      const render = () => {
+        const vid = node.attrs.videoId;
+        if (vid) {
+          dom.innerHTML = `<div class="yt-ratio-box"><iframe src="https://www.youtube.com/embed/${vid}?rel=0" frameborder="0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" title="YouTube Video"></iframe><div class="yt-badge"><svg width="14" height="10" viewBox="0 0 16 11" fill="none"><path d="M15.665 1.72A2 2 0 0 0 14.26.3C13.01 0 8 0 8 0S2.99 0 1.74.3A2 2 0 0 0 .336 1.72C0 2.98 0 5.6 0 5.6s0 2.62.336 3.88A2 2 0 0 0 1.74 10.9C2.99 11.2 8 11.2 8 11.2s5.01 0 6.26-.3a2 2 0 0 0 1.405-1.42C16 8.22 16 5.6 16 5.6s0-2.62-.335-3.88z" fill="#FF0000"/><path d="M6.4 8l4.16-2.4L6.4 3.2V8z" fill="white"/></svg> YouTube</div></div>`;
+        } else {
+          dom.innerHTML = '<div style="padding:24px;text-align:center;color:#94a3b8;font-size:13px;">Video tidak tersedia</div>';
+        }
+      };
+      render();
+      return { dom, update: (u) => { if (u.type.name !== 'youtube') return false; node = u; render(); return true; } };
+    };
+  },
+  addInputRules() {
+    return [new InputRule({
+      find: /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:[^\s]*)? $/,
+      handler: ({ state, range, match }) => {
+        const node = this.type.create({ videoId: match[1] });
+        state.tr.replaceWith(range.from, range.to, node);
+      },
+    })];
+  },
+});
+
 export default {
   components: {
     EditorContent,
@@ -644,6 +891,96 @@ export default {
     let tocSyncTimeout = null;
     let cannibalTimeout = null;
 
+    // Link Modal State
+    const showLinkModal = ref(false);
+    const linkUrlInput = ref(null);
+    const linkModal = reactive({
+      url: '',
+      text: '',
+      target: '_blank',
+      relNofollow: false,
+      relNoopener: true,
+      relSponsored: false,
+      relUgc: false,
+      hasSelection: false,
+      isEditing: false,
+      showAdvanced: false,
+      urlError: '',
+    });
+
+    // ===== Slash Command State =====
+    const showSlashMenu = ref(false);
+    const slashQuery = ref('');
+    const slashMenuPos = reactive({ x: 0, y: 0 });
+    const slashMenuIndex = ref(0);
+    const slashMenuListRef = ref(null);
+    let slashStartPos = null;
+
+    // ===== YouTube Modal State =====
+    const showYoutubeModal = ref(false);
+    const youtubeUrlVal = ref('');
+    const youtubeUrlError = ref('');
+    const youtubeInputRef = ref(null);
+
+    // ===== Slash Command TipTap Extension (defined here to close over reactive state) =====
+    const SlashCommandExtension = Extension.create({
+      name: 'slashCommand',
+      addKeyboardShortcuts() {
+        return {
+          Escape: () => {
+            if (showSlashMenu.value) { showSlashMenu.value = false; slashStartPos = null; return true; }
+            return false;
+          },
+          ArrowDown: () => {
+            if (!showSlashMenu.value) return false;
+            const len = filteredSlashCommands.value.length;
+            if (len === 0) return true;
+            slashMenuIndex.value = (slashMenuIndex.value + 1) % len;
+            nextTick(() => scrollSlashItem());
+            return true;
+          },
+          ArrowUp: () => {
+            if (!showSlashMenu.value) return false;
+            const len = filteredSlashCommands.value.length;
+            if (len === 0) return true;
+            slashMenuIndex.value = (slashMenuIndex.value - 1 + len) % len;
+            nextTick(() => scrollSlashItem());
+            return true;
+          },
+          Enter: () => {
+            if (showSlashMenu.value && filteredSlashCommands.value.length > 0) {
+              executeSlashCommand(filteredSlashCommands.value[slashMenuIndex.value]);
+              return true;
+            }
+            return false;
+          },
+        };
+      },
+      onUpdate() {
+        const { state } = this.editor;
+        const { selection } = state;
+        const { $from } = selection;
+        if ($from.parent.type.name !== 'paragraph') {
+          if (showSlashMenu.value) { showSlashMenu.value = false; slashStartPos = null; }
+          return;
+        }
+        const lineText = $from.parent.textContent;
+        if (lineText.startsWith('/')) {
+          slashQuery.value = lineText.slice(1);
+          slashMenuIndex.value = 0;
+          slashStartPos = $from.start();
+          try {
+            const coords = this.editor.view.coordsAtPos(selection.from);
+            slashMenuPos.x = coords.left;
+            slashMenuPos.y = coords.bottom + 6;
+          } catch (e) {}
+          showSlashMenu.value = true;
+        } else {
+          if (showSlashMenu.value) { showSlashMenu.value = false; slashStartPos = null; }
+        }
+      },
+    });
+
     // Auto-save State
     const autoSaveStatus = ref('saved'); // 'saved' | 'unsaved' | 'saving'
     let autoSaveTimer = null;
@@ -687,6 +1024,8 @@ export default {
         TableHeader,
         TableCell,
         TableOfContentsNode,
+        YouTubeNode,
+        SlashCommandExtension,
       ],
       content: '',
       onUpdate: () => {
@@ -771,7 +1110,8 @@ export default {
           { id: 'table', title: 'Tabel 3x3', desc: 'Tabel data dengan baris dan kolom', icon: 'table_chart', action: () => editor.value.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run() },
           { id: 'tbl-col', title: 'Tambah Kolom Tabel', desc: 'Sisipkan kolom baru di sisi kanan', icon: 'add_box', action: () => editor.value.chain().focus().addColumnAfter().run() },
           { id: 'tbl-row', title: 'Tambah Baris Tabel', desc: 'Sisipkan baris baru di bagian bawah', icon: 'add_box', action: () => editor.value.chain().focus().addRowAfter().run() },
-          { id: 'tbl-del', title: 'Hapus Tabel', desc: 'Hapus tabel yang sedang dipilih', icon: 'delete', action: () => editor.value.chain().focus().deleteTable().run() }
+          { id: 'tbl-del', title: 'Hapus Tabel', desc: 'Hapus tabel yang sedang dipilih', icon: 'delete', action: () => editor.value.chain().focus().deleteTable().run() },
+          { id: 'youtube', title: 'YouTube Embed', desc: 'Sisipkan video YouTube ke dalam artikel', icon: 'smart_display', action: () => openYoutubeModal() }
         ]
       }
     ]);
@@ -988,7 +1328,7 @@ export default {
       else if (wordCount >= 300) addRes('readability', 'content-len', 'orange', `Panjang konten cukup (${wordCount} kata), disarankan ≥ 600 kata untuk SEO mendalam`);
       else addRes('readability', 'content-len', 'red', `Konten terlalu pendek (${wordCount} kata), minimal 300 kata`);
 
-      const paras = content.match(/<p>(.*?)<\/p>/g) || [];
+      const paras = content.match(/<p>([\s\S]*?)<\/p>/g) || [];
       const longParas = paras.filter(p => p.split(' ').length > 150);
       if (longParas.length === 0) addRes('readability', 'para-len', 'green', 'Panjang paragraf baik (tidak ada yang > 150 kata)');
       else addRes('readability', 'para-len', 'orange', `Ada ${longParas.length} paragraf yang terlalu panjang (> 150 kata), pecah menjadi beberapa paragraf agar mudah dibaca`);
@@ -1383,21 +1723,166 @@ export default {
       if (event.target) event.target.value = '';
     };
 
-    // Link insertion di editor
+    // Link Modal Methods
     const setLink = () => {
-      if (editor.value.isActive('link')) {
-        editor.value.chain().focus().extendMarkRange('link').unsetLink().run();
-        return;
+      if (!editor.value) return;
+      const { state } = editor.value;
+      const { selection } = state;
+      const isActive = editor.value.isActive('link');
+      const hasSelection = !selection.empty;
+
+      if (isActive) {
+        // Editing existing link
+        const attrs = editor.value.getAttributes('link');
+        const rel = attrs.rel || '';
+        linkModal.url = attrs.href || '';
+        linkModal.target = attrs.target || '_blank';
+        linkModal.relNofollow = rel.includes('nofollow');
+        linkModal.relNoopener = rel.includes('noopener');
+        linkModal.relSponsored = rel.includes('sponsored');
+        linkModal.relUgc = rel.includes('ugc');
+        linkModal.isEditing = true;
+      } else {
+        // New link
+        linkModal.url = '';
+        linkModal.text = '';
+        linkModal.target = '_blank';
+        linkModal.relNofollow = false;
+        linkModal.relNoopener = true;
+        linkModal.relSponsored = false;
+        linkModal.relUgc = false;
+        linkModal.isEditing = false;
       }
-      const url = prompt('Masukkan URL tautan:');
-      if (url) editor.value.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+
+      linkModal.hasSelection = hasSelection;
+      linkModal.urlError = '';
+      linkModal.showAdvanced = false;
+      showLinkModal.value = true;
+
+      // Auto-focus input after render
+      setTimeout(() => {
+        if (linkUrlInput.value) linkUrlInput.value.focus();
+      }, 80);
     };
 
+    const closeLinkModal = () => {
+      showLinkModal.value = false;
+    };
+
+    const buildRel = () => {
+      const parts = [];
+      if (linkModal.relNofollow) parts.push('nofollow');
+      if (linkModal.relNoopener) parts.push('noopener');
+      if (linkModal.relSponsored) parts.push('sponsored');
+      if (linkModal.relUgc) parts.push('ugc');
+      return parts.join(' ') || undefined;
+    };
+
+    const applyLink = () => {
+      const raw = linkModal.url.trim();
+      if (!raw) {
+        linkModal.urlError = 'URL wajib diisi.';
+        return;
+      }
+      // Auto-add https:// if no protocol
+      const url = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+
+      const rel = buildRel();
+      const linkAttrs = { href: url, target: linkModal.target };
+      if (rel) linkAttrs.rel = rel;
+
+      const chain = editor.value.chain().focus().extendMarkRange('link');
+
+      if (!linkModal.hasSelection && !linkModal.isEditing && linkModal.text.trim()) {
+        // Insert new text with link mark
+        chain.insertContent({
+          type: 'text',
+          text: linkModal.text.trim(),
+          marks: [{ type: 'link', attrs: linkAttrs }],
+        }).run();
+      } else {
+        chain.setLink(linkAttrs).run();
+      }
+
+      showLinkModal.value = false;
+    };
+
+    const removeLink = () => {
+      editor.value.chain().focus().extendMarkRange('link').unsetLink().run();
+      showLinkModal.value = false;
+    };
 
     // TOC insertion shortcut
     const insertToc = () => {
       editor.value.chain().focus().insertContent({ type: 'tableOfContents' }).run();
       syncTocAndHeadings();
+    };
+
+    // ===== YouTube helpers =====
+    const extractYouTubeId = (url) => {
+      const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+      return m ? m[1] : null;
+    };
+
+    const openYoutubeModal = () => {
+      youtubeUrlVal.value = '';
+      youtubeUrlError.value = '';
+      showYoutubeModal.value = true;
+      nextTick(() => { if (youtubeInputRef.value) youtubeInputRef.value.focus(); });
+    };
+
+    const applyYoutube = () => {
+      const raw = youtubeUrlVal.value.trim();
+      if (!raw) { youtubeUrlError.value = 'URL YouTube wajib diisi.'; return; }
+      const videoId = extractYouTubeId(raw);
+      if (!videoId) { youtubeUrlError.value = 'URL tidak valid. Contoh: https://youtu.be/dQw4w9WgXcQ'; return; }
+      editor.value.chain().focus().insertContent({ type: 'youtube', attrs: { videoId } }).run();
+      showYoutubeModal.value = false;
+    };
+
+    // ===== Slash Command helpers =====
+    const slashMenuCommands = computed(() => [
+      { id: 'p',       label: 'Paragraf',        desc: 'Teks biasa standar',                   icon: 'notes',                action: () => editor.value.chain().focus().setParagraph().run() },
+      { id: 'h2',      label: 'Heading 2',        desc: 'Judul bagian utama (H2)',               icon: 'title',                action: () => editor.value.chain().focus().toggleHeading({ level: 2 }).run() },
+      { id: 'h3',      label: 'Heading 3',        desc: 'Sub-bagian (H3)',                       icon: 'title',                action: () => editor.value.chain().focus().toggleHeading({ level: 3 }).run() },
+      { id: 'h4',      label: 'Heading 4',        desc: 'Sub-detail (H4)',                       icon: 'title',                action: () => editor.value.chain().focus().toggleHeading({ level: 4 }).run() },
+      { id: 'bullet',  label: 'Daftar Poin',      desc: 'Bullet list tidak berurutan',           icon: 'format_list_bulleted',  action: () => editor.value.chain().focus().toggleBulletList().run() },
+      { id: 'ordered', label: 'Daftar Angka',     desc: 'Numbered list berurutan',               icon: 'format_list_numbered',  action: () => editor.value.chain().focus().toggleOrderedList().run() },
+      { id: 'quote',   label: 'Kutipan',          desc: 'Blockquote teks kutipan',               icon: 'format_quote',          action: () => editor.value.chain().focus().toggleBlockquote().run() },
+      { id: 'code',    label: 'Blok Kode',        desc: 'Code block pemrograman',                icon: 'code',                  action: () => editor.value.chain().focus().toggleCodeBlock().run() },
+      { id: 'hr',      label: 'Garis Pemisah',    desc: 'Horizontal rule antar bagian',          icon: 'horizontal_rule',       action: () => editor.value.chain().focus().setHorizontalRule().run() },
+      { id: 'toc',     label: 'Daftar Isi',       desc: 'TOC otomatis dari heading H2/H3',       icon: 'toc',                   action: () => insertToc() },
+      { id: 'image',   label: 'Gambar',           desc: 'Pilih dari Directus Media Library',     icon: 'image',                 action: () => openMediaDialog('inline') },
+      { id: 'table',   label: 'Tabel',            desc: 'Tabel 3x3 dengan header',               icon: 'table_chart',           action: () => editor.value.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run() },
+      { id: 'youtube', label: 'YouTube',          desc: 'Embed video YouTube',                   icon: 'smart_display',         action: () => openYoutubeModal() },
+    ]);
+
+    const filteredSlashCommands = computed(() => {
+      const q = slashQuery.value.toLowerCase().trim();
+      if (!q) return slashMenuCommands.value;
+      return slashMenuCommands.value.filter(c =>
+        c.label.toLowerCase().includes(q) ||
+        c.desc.toLowerCase().includes(q) ||
+        c.id.toLowerCase().includes(q)
+      );
+    });
+
+    const scrollSlashItem = () => {
+      if (!slashMenuListRef.value) return;
+      const el = slashMenuListRef.value.querySelector('.slash-item.active');
+      if (el) el.scrollIntoView({ block: 'nearest' });
+    };
+
+    const executeSlashCommand = (cmd) => {
+      if (!cmd || !editor.value) return;
+      // Delete /query text before inserting block
+      if (slashStartPos !== null) {
+        const { selection } = editor.value.state;
+        editor.value.chain().focus().deleteRange({ from: slashStartPos, to: selection.from }).run();
+      }
+      showSlashMenu.value = false;
+      slashStartPos = null;
+      nextTick(() => cmd.action());
     };
 
     // Ads logic
@@ -1511,7 +1996,10 @@ export default {
       getCharColor, toastMessage,
       setLink, insertToc,
       showDeleteDialog, articleToDelete, confirmDelete, executeDelete,
-      autoSaveStatus, duplicateArticle, wordCount, readingTime
+      autoSaveStatus, duplicateArticle, wordCount, readingTime,
+      showLinkModal, linkModal, linkUrlInput, closeLinkModal, applyLink, removeLink,
+      showSlashMenu, slashMenuPos, slashMenuIndex, filteredSlashCommands, executeSlashCommand, slashMenuListRef,
+      showYoutubeModal, youtubeUrlVal, youtubeUrlError, youtubeInputRef, openYoutubeModal, applyYoutube,
     };
   }
 };
@@ -2704,4 +3192,459 @@ export default {
   color: #64748b;
   font-weight: 500;
 }
+
+/* =========================================
+   LINK MODAL
+   ========================================= */
+.link-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 35, 64, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.link-modal-box {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(11, 35, 64, 0.25), 0 0 0 1px rgba(11, 35, 64, 0.08);
+  width: 100%;
+  max-width: 520px;
+  overflow: hidden;
+  animation: lm-slide-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes lm-slide-in {
+  from { transform: translateY(-16px) scale(0.97); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+.lm-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+}
+.lm-header-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #EE7D0F 0%, #f59e0b 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(238, 125, 15, 0.35);
+}
+.lm-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0b2340;
+  flex: 1;
+  margin: 0;
+}
+.lm-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.lm-close:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.lm-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.lm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.lm-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.lm-required {
+  color: #ef4444;
+}
+.lm-input-wrap {
+  position: relative;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fff;
+}
+.lm-input-wrap:focus-within {
+  border-color: #EE7D0F;
+  box-shadow: 0 0 0 3px rgba(238, 125, 15, 0.12);
+}
+.lm-input-wrap.error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10);
+}
+.lm-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #0f172a;
+  background: transparent;
+  border-radius: 8px;
+}
+.lm-input::placeholder {
+  color: #94a3b8;
+}
+.lm-error-text {
+  font-size: 12px;
+  color: #ef4444;
+  font-weight: 500;
+}
+.lm-advanced {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+  padding: 0 2px;
+}
+.lm-advanced:hover {
+  color: #EE7D0F;
+}
+.lm-advanced-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #f1f5f9;
+}
+.lm-radio-group {
+  display: flex;
+  gap: 20px;
+}
+.lm-radio {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+}
+.lm-radio input[type="radio"] {
+  accent-color: #EE7D0F;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+.lm-radio-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+}
+.lm-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lm-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #334155;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.lm-checkbox input[type="checkbox"] {
+  accent-color: #EE7D0F;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  cursor: pointer;
+}
+.lm-checkbox small {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 400;
+}
+.lm-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-top: 1px solid #f1f5f9;
+  background: #f8fafc;
+  gap: 12px;
+}
+.lm-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+.lm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: inherit;
+}
+.lm-btn-primary {
+  background: linear-gradient(135deg, #EE7D0F 0%, #f59e0b 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(238, 125, 15, 0.35);
+}
+.lm-btn-primary:hover {
+  background: linear-gradient(135deg, #d96c00 0%, #e08c00 100%);
+  box-shadow: 0 6px 16px rgba(238, 125, 15, 0.45);
+  transform: translateY(-1px);
+}
+.lm-btn-secondary {
+  background: #fff;
+  color: #64748b;
+  border: 1.5px solid #e2e8f0;
+}
+.lm-btn-secondary:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+.lm-btn-danger {
+  background: #fff;
+  color: #dc2626;
+  border: 1.5px solid #fecaca;
+  padding-left: 14px;
+}
+.lm-btn-danger:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+}
+/* Link Modal Transition */
+.link-modal-enter-active, .link-modal-leave-active { transition: opacity 0.2s ease; }
+.link-modal-enter-from, .link-modal-leave-to { opacity: 0; }
+
+/* =========================================
+   LINK HIGHLIGHT in Editor
+   ========================================= */
+:deep(.ProseMirror a) {
+  color: #0284c7;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: rgba(2, 132, 199, 0.45);
+  background: rgba(2, 132, 199, 0.07);
+  border-radius: 3px;
+  padding: 0 2px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+:deep(.ProseMirror a:hover) {
+  background: rgba(2, 132, 199, 0.14);
+  color: #0369a1;
+  text-decoration-color: rgba(2, 132, 199, 0.7);
+}
+
+/* =========================================
+   SLASH COMMAND MENU
+   ========================================= */
+.slash-menu {
+  position: fixed;
+  z-index: 99998;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(11, 35, 64, 0.18), 0 4px 12px rgba(0,0,0,0.08);
+  width: 280px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.slash-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
+}
+.slash-list {
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 4px;
+}
+.slash-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.slash-item:hover,
+.slash-item.active {
+  background: #f1f5f9;
+}
+.slash-item.active {
+  background: linear-gradient(90deg, #fff7ed 0%, #fff 100%);
+  border-left: 3px solid #EE7D0F;
+}
+.slash-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+.slash-item.active .slash-icon {
+  background: #fff7ed;
+  border-color: #fed7aa;
+  color: #EE7D0F;
+}
+.slash-info {
+  flex: 1;
+  min-width: 0;
+}
+.slash-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.slash-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+.slash-empty {
+  padding: 16px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+}
+.slash-footer {
+  padding: 7px 14px;
+  font-size: 10px;
+  color: #cbd5e1;
+  font-weight: 600;
+  border-top: 1px solid #f1f5f9;
+  background: #f8fafc;
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+.slash-fade-enter-active, .slash-fade-leave-active { transition: opacity 0.15s, transform 0.15s; }
+.slash-fade-enter-from, .slash-fade-leave-to { opacity: 0; transform: translateY(-6px) scale(0.97); }
+
+/* =========================================
+   YOUTUBE EMBED
+   ========================================= */
+:deep(.youtube-nodeview) {
+  margin: 1.5em 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  position: relative;
+  user-select: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+:deep(.yt-ratio-box) {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  background: #000;
+}
+:deep(.yt-ratio-box iframe) {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: none;
+  border-radius: 12px;
+}
+:deep(.yt-badge) {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+/* YouTube in rendered HTML output */
+:deep(.youtube-embed-wrapper) {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  margin: 1.5em 0;
+  background: #000;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+}
+:deep(.youtube-embed-iframe) {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: none;
+}
+/* Floating menu YT button */
+.btn-yt { color: #dc2626 !important; }
 </style>
