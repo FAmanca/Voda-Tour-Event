@@ -2381,6 +2381,13 @@ export default {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
+}
+:deep(.ad-image .v-button) {
+  min-height: 40px;
+  white-space: normal;
+  height: auto;
+  line-height: 1.2;
 }
 .btn-preview-link {
   text-decoration: none;
