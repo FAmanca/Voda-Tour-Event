@@ -20,9 +20,14 @@ let totalPackages = 0;
 let totalPages = 1;
 
 try {
+  const fetchOptions = {
+    cache: "no-store" as RequestCache,
+    headers: { "Cache-Control": "no-cache" },
+  };
+
   const [destCountRes, pkgRes, activities] = await Promise.all([
-    fetch(`${DIRECTUS_URL}/items/destinations?fields=id&filter[status][_eq]=published&limit=1&meta=total_count`),
-    fetch(`${DIRECTUS_URL}/items/packages?fields=*,destination_id.*&filter[status][_eq]=published&sort=-id&limit=${limit}&page=${currentPage}&meta=filter_count`),
+    fetch(`${DIRECTUS_URL}/items/destinations?fields=id&filter[status][_eq]=published&limit=1&meta=total_count`, fetchOptions),
+    fetch(`${DIRECTUS_URL}/items/packages?fields=*,destination_id.*&filter[status][_eq]=published&sort=-id&limit=${limit}&page=${currentPage}&meta=filter_count`, fetchOptions),
     getActivityTypes()
   ]);
 
