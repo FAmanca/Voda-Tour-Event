@@ -50,7 +50,7 @@ function getNowInTimezone(tz) {
   return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}`;
 }
 
-export default ({ schedule }, { services, database, getSchema }) => {
+export default ({ schedule }, { services, database, getSchema, cache }) => {
   const { ItemsService } = services;
 
   schedule('* * * * *', async () => {
@@ -74,6 +74,8 @@ export default ({ schedule }, { services, database, getSchema }) => {
         const keys = scheduledArticles.map((a) => a.id);
         await articlesService.updateMany(keys, { status: 'published' });
         console.log(`[publish-cron] Published ${keys.length} scheduled article(s).`);
+        
+        if (cache) await cache.clear();
       }
     } catch (err) {
       console.error('[publish-cron] Error:', err.message || err);
