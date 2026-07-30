@@ -1,0 +1,17 @@
+{
+  "name": "publish-cron",
+  "version": "1.0.0",
+  "description": "Cron for publishing articles and packages",
+  "directus:extension": {
+    "type": "hook",
+    "path": "dist/index.js",
+    "source": "src/index.js",
+    "host": "^10.10.0"
+  },
+  "scripts": {
+    "build": "directus-extension build"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "^11.0.0"
+  }
+}

@@ -38,6 +38,7 @@ const {
 // Support both individual props AND full package object
 const title = _title || pkg?.name || '';
 const description = _desc || pkg?.description || '';
+const cleanDescription = description.replace(/<[^>]*>?/gm, '').trim();
 const slug = _slug || pkg?.slug || '';
 const priceFrom = _priceFrom ?? (pkg ? getStartingPrice(pkg.price_tiers || []) : undefined);
 const image = _img || (pkg?.image ? getAssetUrl(pkg.image) + '?width=400&height=250&fit=cover&format=webp' : undefined);
@@ -84,7 +85,7 @@ const displayPrice = priceFrom
   <!-- Body Content -->
   <div class="relative z-10 p-5">
     <h3 class="font-[family-name:var(--font-display)] text-white font-semibold text-base leading-tight line-clamp-2">{title}</h3>
-    <p class="text-white/70 text-sm leading-relaxed mt-1.5 line-clamp-2">{description}</p>
+    <p class="text-white/70 text-sm leading-relaxed mt-1.5 line-clamp-2">{cleanDescription}</p>
     {showDestination && destName && <p class="text-xs text-white/50 mt-2"><i class="fa-solid fa-location-dot text-orange-400 text-[10px] mr-1"></i>{destName}</p>}
 
     <!-- Dashed divider -->

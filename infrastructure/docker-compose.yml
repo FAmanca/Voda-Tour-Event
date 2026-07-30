@@ -58,6 +58,9 @@ services:
 
       # Diperlukan supaya extension bundle (seperti seo-plugin) diizinkan di-load
       MARKETPLACE_TRUST: "all"
+      
+      # Agar extension yang baru di-build atau diload bisa langsung terbaca tanpa restart (aktifkan via .env di lokal, matikan di prod)
+      EXTENSIONS_AUTO_RELOAD: ${EXTENSIONS_AUTO_RELOAD:-false}
     volumes:
       - directus_uploads:/directus/uploads
       - directus_database:/directus/database

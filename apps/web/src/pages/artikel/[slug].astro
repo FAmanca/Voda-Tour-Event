@@ -278,4 +278,29 @@ const jsonldData = article ? JSON.stringify({
       </a>
     </div>
   </main>
+  <style is:global>
+  .prose img {
+    max-width: 100%;
+    height: auto;
+  }
+  .prose img[style*="float: left"] {
+    margin-right: 1.5em;
+    margin-bottom: 1em;
+    margin-top: 0.5em;
+  }
+  .prose img[style*="float: right"] {
+    margin-left: 1.5em;
+    margin-bottom: 1em;
+    margin-top: 0.5em;
+  }
+  .prose [style*="justify-content: center"] img {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .prose img[style] {
+    /* Allow inline width and margins to override prose defaults */
+    margin-top: initial;
+    margin-bottom: initial;
+  }
+</style>
 </Layout>

@@ -101,6 +101,7 @@ export interface Package {
   price_tiers: PriceTierGroup[] | null;  // JSON
   addons: Addon[] | null;           // JSON
   gallery: FileUuid[] | null;
+  poster: FileUuid | null;
 
   status: Status;
   date_created: string;
