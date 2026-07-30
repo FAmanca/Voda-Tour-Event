@@ -300,8 +300,7 @@ export function renderResults(container: HTMLElement | null, packages: PackageWi
     container.className = 'text-center py-20';
     container.innerHTML = ''
       + '<div class="text-center py-16 max-w-md mx-auto">'
-      + '<div class="w-20 h-20 rounded-full bg-navy-50 flex items-center justify-center mx-auto mb-5">'
-      + '<i class="fa-regular fa-face-frown text-3xl text-navy-300"></i></div>'
+      + '<img src="/images/empty-search.jpg" alt="Pencarian Kosong" class="w-[200px] h-auto mx-auto mix-blend-multiply mb-[16px]" />'
       + '<h3 class="font-[family-name:var(--font-display)] text-navy-600 text-xl font-semibold">Paket Tidak Ditemukan</h3>'
       + '<p class="text-navy-400 text-sm mt-2 leading-relaxed">'
       + 'Coba hilangkan beberapa filter atau cari dengan kata yang lebih umum. Contoh: cari "<strong>bandung</strong>" saja, atau "<strong>outbound</strong>" tanpa filter kegiatan.</p>'
