@@ -163,5 +163,28 @@ const gtmId = (typeof process !== 'undefined' ? process.env.PUBLIC_GTM_ID : unde
     </div>
     <Footer {settings} />
     <PopupAd />
+    <!-- AI WebMCP Support -->
+    <script>
+      if ('modelContext' in navigator) {
+        // @ts-ignore
+        navigator.modelContext.provideContext({
+          tools: [
+            {
+              name: 'search_tours',
+              description: 'Mencari paket tur Voda Tour yang tersedia',
+              inputSchema: {
+                type: 'object',
+                properties: {
+                  destination: { type: 'string', description: 'Tujuan destinasi tur' }
+                }
+              },
+              execute: async (args: any) => {
+                return { result: `Pencarian dimulai untuk: ${args.destination || 'semua destinasi'}` };
+              }
+            }
+          ]
+        });
+      }
+    </script>
   </body>
 </html>

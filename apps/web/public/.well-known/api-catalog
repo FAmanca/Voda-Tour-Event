@@ -1,0 +1,9 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://api.vodatrip.id",
+      "service-desc": [{"href": "https://api.vodatrip.id/openapi.json", "type": "application/openapi+json"}],
+      "service-doc": [{"href": "https://vodatrip.id/docs"}]
+    }
+  ]
+}

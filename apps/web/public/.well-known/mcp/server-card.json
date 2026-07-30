@@ -1,0 +1,10 @@
+{
+  "serverInfo": {
+    "name": "Voda Tour MCP",
+    "version": "1.0.0"
+  },
+  "transport": {
+    "type": "sse",
+    "endpoint": "https://api.vodatrip.id/mcp/sse"
+  }
+}
