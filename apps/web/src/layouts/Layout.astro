@@ -179,7 +179,9 @@ const gtmId = (typeof process !== 'undefined' ? process.env.PUBLIC_GTM_ID : unde
                 }
               },
               execute: async (args: any) => {
-                return { result: `Pencarian dimulai untuk: ${args.destination || 'semua destinasi'}` };
+                const q = args.destination || '';
+                window.location.href = `/cari?q=${encodeURIComponent(q)}`;
+                return { result: `Mengarahkan pengguna ke halaman pencarian untuk: ${q}` };
               }
             }
           ]

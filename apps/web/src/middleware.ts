@@ -26,6 +26,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const html = await response.text();
     
     const turndownService = new TurndownService({ headingStyle: 'atx' });
+    turndownService.remove(['script', 'style', 'noscript']);
     const markdown = turndownService.turndown(html);
     
     return new Response(markdown, {

@@ -1,4 +1,19 @@
 {
   "$schema": "https://agentskills.io/schema/v0.2.0/index.json",
-  "skills": []
+  "skills": [
+    {
+      "name": "Search Tour Packages",
+      "type": "api",
+      "description": "Searches for Voda Tour packages by keyword, destination, or category.",
+      "url": "https://api.vodatrip.id/items/packages",
+      "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "Markdown Content Retrieval",
+      "type": "content",
+      "description": "Retrieves the main web pages in clean Markdown format for easy parsing.",
+      "url": "https://vodatrip.id/paket",
+      "digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
 }
