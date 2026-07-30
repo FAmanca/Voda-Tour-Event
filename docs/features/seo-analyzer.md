@@ -1,5 +1,9 @@
 # Custom SEO Analyzer
 
+> [!IMPORTANT]
+> **Evolusi & Integrasi Modul**  
+> Seluruh logika, aturan penghitungan skor (100%), sistem Smart Tag Keywords, dan pemeriksaan kriteria pada `custom-seo-analyzer` (versi panel antarmuka lama) kini telah **diintegrasikan sepenuhnya ke dalam Modul Kustom utama**: [`article-editor`](file:///home/famanca/voda-tour-event/docs/features/article-editor.md). Dokumen ini tetap dipertahankan sebagai referensi spesifikasi teknis dari mesin analisis SEO (SEO Rules Engine) yang digunakan.
+
 ## 1. Overview
 The `custom-seo-analyzer` adalah ekstensi (custom interface) Directus buatan khusus yang berfungsi menyerupai Yoast SEO atau RankMath. Extension ini melakukan evaluasi konten artikel secara *real-time* untuk memberikan panduan optimasi on-page SEO yang terukur dan mudah dipahami. 
 
