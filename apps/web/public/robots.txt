@@ -1,3 +1,102 @@
+# --------------------------------------------------------------
+# robots.txt — Voda Tour & Event (vodatrip.id)
+# --------------------------------------------------------------
+#
+# -- AI Content Signals ----------------------------------------
+# Preferences for AI agents regarding content usage.
+# See https://contentsignals.org/ for specification.
+#
+Content-Signal: ai-train=no, search=yes, ai-input=no
+#
+# --------------------------------------------------------------
+#            AI TRAINING BOTS — BLOCKED
+# --------------------------------------------------------------
+# These bots crawl the web to train AI/LLM foundation models.
+# Blocking them protects our content from being used for
+# training without generating traffic or attribution.
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: cohere-ai
+Disallow: /
+
+# --------------------------------------------------------------
+#      AI TRAINING OPT-OUT (SEARCH ENGINE BOTS)
+# --------------------------------------------------------------
+# These are special tokens that tell existing search engine
+# crawlers NOT to use crawled content for AI training.
+# They still index normally for search — just no training.
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+# --------------------------------------------------------------
+#        AI SEARCH/RETRIEVAL BOTS — ALLOWED
+# --------------------------------------------------------------
+# These bots fetch content to display in AI chat answers with
+# attribution and a link back to our site (drives traffic).
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+# --------------------------------------------------------------
+#            GENERAL CRAWLERS (SEARCH ENGINES)
+# --------------------------------------------------------------
+# Google, Bing, Yahoo, Yandex, Baidu, etc.
+# Allowed to index public content. Blocked from private areas.
+
 User-agent: *
 Allow: /
-Sitemap: https://vodatrip.id/sitemap.xml
+
+# --------------------------------------------------------------
+#                     CRAWL DELAY
+# --------------------------------------------------------------
+Crawl-Delay: 1
+
+# --------------------------------------------------------------
+#                    SITEMAP REFERENCE
+# --------------------------------------------------------------
+Sitemap: https://vodatrip.id/sitemap-index.xml
+
+# --------------------------------------------------------------
+#                    AGENT DISCOVERY
+# --------------------------------------------------------------
+# Link to agent-accessible resources:
+#   /.well-known/api-catalog      — Full API linkset

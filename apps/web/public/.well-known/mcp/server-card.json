@@ -1,0 +1,69 @@
+{
+  "serverInfo": {
+    "name": "Voda Tour API",
+    "description": "Travel and event booking platform API. Information includes tour packages, destinations, corporate gatherings, and travel articles.",
+    "version": "1.0.0",
+    "vendor": "Voda Tour & Event",
+    "docsUrl": "https://vodatrip.id/docs/features/ai-agent.md"
+  },
+  "transport": {
+    "type": "http",
+    "endpoint": "https://api.vodatrip.id",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  },
+  "capabilities": {
+    "tools": {
+      "enabled": true,
+      "description": "REST API endpoints for retrieving travel packages, articles, and destinations.",
+      "endpoints": [
+        {
+          "path": "/items/packages",
+          "methods": [
+            "GET"
+          ],
+          "description": "List available tour packages"
+        },
+        {
+          "path": "/items/destinations",
+          "methods": [
+            "GET"
+          ],
+          "description": "List travel destinations"
+        },
+        {
+          "path": "/items/articles",
+          "methods": [
+            "GET"
+          ],
+          "description": "List travel articles and blogs"
+        }
+      ]
+    },
+    "resources": {
+      "enabled": true,
+      "description": "Static documentation and content for AI agents.",
+      "endpoints": [
+        {
+          "path": "/paket",
+          "type": "text/markdown",
+          "description": "List of tour packages (Markdown representation)"
+        },
+        {
+          "path": "/artikel",
+          "type": "text/markdown",
+          "description": "List of articles (Markdown representation)"
+        },
+        {
+          "path": "/sitemap-index.xml",
+          "type": "application/xml",
+          "description": "Site sitemap"
+        }
+      ]
+    },
+    "prompts": {
+      "enabled": false
+    }
+  }
+}

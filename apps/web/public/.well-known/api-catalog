@@ -1,0 +1,42 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://vodatrip.id",
+      "service-meta": [
+        {
+          "href": "https://vodatrip.id/sitemap-index.xml",
+          "type": "application/xml"
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://vodatrip.id/paket",
+          "type": "text/markdown",
+          "title": "Daftar Paket Wisata Voda Tour"
+        },
+        {
+          "href": "https://vodatrip.id/artikel",
+          "type": "text/markdown",
+          "title": "Daftar Artikel & Blog"
+        },
+        {
+          "href": "https://vodatrip.id/destinasi",
+          "type": "text/markdown",
+          "title": "Daftar Destinasi Populer"
+        },
+        {
+          "href": "https://vodatrip.id/gathering",
+          "type": "text/markdown",
+          "title": "Layanan Corporate Gathering"
+        }
+      ],
+      "search": [
+        {
+          "href": "https://vodatrip.id/cari?q={query}",
+          "type": "text/markdown",
+          "title": "Pencarian Paket Wisata"
+        }
+      ]
+    }
+  ]
+}
