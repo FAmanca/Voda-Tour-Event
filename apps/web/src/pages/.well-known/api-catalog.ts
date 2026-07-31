@@ -18,6 +18,10 @@ export const GET: APIRoute = async () => {
             href: `${SITE}/sitemap-index.xml`,
             type: 'application/xml',
           },
+          {
+            href: `${SITE}/llms.txt`,
+            type: 'text/plain',
+          },
         ],
         collection: [
           {

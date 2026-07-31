@@ -460,6 +460,7 @@ Buat di Directus Admin Panel:
 - [x] Update `types/directus.ts` kalo ada perubahan model
 
 ### 12.2 AI Agent Docs
+- [x] Ekspos Halaman Dokumentasi Publik (`llms.txt` / `auth.md`)
 - [x] Pastiin `.ai/README.md` masih akurat
 - [x] Pastiin CLAUDE.md, CODEX.md, CHATGPT.md, CURSOR.md up-to-date
 
