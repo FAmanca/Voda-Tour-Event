@@ -1,0 +1,18 @@
+# Voda Tour & Event
+
+Voda Tour & Event (https://vodatrip.id) adalah platform layanan pemesanan paket wisata, corporate gathering, dan artikel perjalanan di Indonesia.
+
+## Panduan Discovery untuk AI Agent
+Website ini mendukung Content Negotiation. Jika Anda mengirimkan HTTP Request dengan header `Accept: text/markdown`, server kami akan merender halaman web dalam format Markdown bersih (tanpa navigasi, header, dan footer) untuk menghemat penggunaan token Anda.
+
+## API & Resource Utama
+- **Katalog API (Linkset)**: `https://vodatrip.id/.well-known/api-catalog`
+- **Daftar Paket Wisata**: `https://vodatrip.id/paket` (Accept: text/markdown)
+- **Layanan Corporate Gathering**: `https://vodatrip.id/gathering` (Accept: text/markdown)
+- **Daftar Destinasi Populer**: `https://vodatrip.id/destinasi` (Accept: text/markdown)
+- **Artikel & Blog Perjalanan**: `https://vodatrip.id/artikel` (Accept: text/markdown)
+- **Pencarian Paket Wisata**: `https://vodatrip.id/cari?q={query}` (Accept: text/markdown)
+
+## Mekanisme WebMCP
+Jika Anda berjalan di konteks browser klien yang mendukung WebMCP (`navigator.modelContext`), Anda dapat menggunakan tool berikut:
+- `search_tours(destination: string)`: Mengarahkan pengguna langsung ke halaman pencarian destinasi yang diminta.
