@@ -3,16 +3,32 @@ import type { APIRoute } from "astro";
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
 const SITE_URL = import.meta.env.SITE_URL || "https://vodatrip.id";
 
+/**
+ * Formats a date string into a valid W3C DateTime format for sitemaps.
+ * Fallback to dateCreated if dateUpdated is null/empty.
+ */
+function formatLastmod(dateUpdated?: string | null, dateCreated?: string | null): string {
+  const dateStr = dateUpdated || dateCreated;
+  if (!dateStr) return "";
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "";
+    return d.toISOString();
+  } catch {
+    return "";
+  }
+}
+
 export const GET: APIRoute = async () => {
-  let destinations: { slug: string; date_updated: string }[] = [];
-  let packages: { slug: string; date_updated: string }[] = [];
-  let articles: { slug: string; date_updated: string }[] = [];
+  let destinations: { slug: string; date_created?: string | null; date_updated?: string | null }[] = [];
+  let packages: { slug: string; date_created?: string | null; date_updated?: string | null }[] = [];
+  let articles: { slug: string; date_created?: string | null; date_updated?: string | null }[] = [];
 
   try {
     const [destRes, pkgRes, articleRes] = await Promise.all([
-      fetch(DIRECTUS_URL + "/items/destinations?fields=slug,date_updated&filter[status][_eq]=published", { cache: "no-store" }),
-      fetch(DIRECTUS_URL + "/items/packages?fields=slug,date_updated&filter[status][_eq]=published", { cache: "no-store" }),
-      fetch(DIRECTUS_URL + "/items/articles?fields=slug,date_updated&filter[status][_eq]=published", { cache: "no-store" }),
+      fetch(DIRECTUS_URL + "/items/destinations?fields=slug,date_created,date_updated&filter[status][_eq]=published", { cache: "no-store" }),
+      fetch(DIRECTUS_URL + "/items/packages?fields=slug,date_created,date_updated&filter[status][_eq]=published", { cache: "no-store" }),
+      fetch(DIRECTUS_URL + "/items/articles?fields=slug,date_created,date_updated&filter[status][_eq]=published", { cache: "no-store" }),
     ]);
     if (destRes.ok) { const data = await destRes.json(); destinations = data.data || []; }
     if (pkgRes.ok) { const data = await pkgRes.json(); packages = data.data || []; }
@@ -44,34 +60,34 @@ export const GET: APIRoute = async () => {
     )
     .join(NL)}
   ${destinations
-    .map(
-      (dest) => `  <url>
-    <loc>${SITE_URL}/destinasi/${dest.slug}</loc>
-    <lastmod>${dest.date_updated}</lastmod>
+    .map((dest) => {
+      const lastmod = formatLastmod(dest.date_updated, dest.date_created);
+      return `  <url>
+    <loc>${SITE_URL}/destinasi/${dest.slug}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ""}
     <priority>0.7</priority>
     <changefreq>weekly</changefreq>
-  </url>`
-    )
+  </url>`;
+    })
     .join(NL)}
   ${packages
-    .map(
-      (pkg) => `  <url>
-    <loc>${SITE_URL}/paket/${pkg.slug}</loc>
-    <lastmod>${pkg.date_updated}</lastmod>
+    .map((pkg) => {
+      const lastmod = formatLastmod(pkg.date_updated, pkg.date_created);
+      return `  <url>
+    <loc>${SITE_URL}/paket/${pkg.slug}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ""}
     <priority>0.6</priority>
     <changefreq>weekly</changefreq>
-  </url>`
-    )
+  </url>`;
+    })
     .join(NL)}
   ${articles
-    .map(
-      (art) => `  <url>
-    <loc>${SITE_URL}/artikel/${art.slug}</loc>
-    <lastmod>${art.date_updated}</lastmod>
+    .map((art) => {
+      const lastmod = formatLastmod(art.date_updated, art.date_created);
+      return `  <url>
+    <loc>${SITE_URL}/artikel/${art.slug}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ""}
     <priority>0.8</priority>
     <changefreq>daily</changefreq>
-  </url>`
-    )
+  </url>`;
+    })
     .join(NL)}
 </urlset>`;
 

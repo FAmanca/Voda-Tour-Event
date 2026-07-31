@@ -5,15 +5,16 @@
 # -- AI Content Signals ----------------------------------------
 # Preferences for AI agents regarding content usage.
 # See https://contentsignals.org/ for specification.
-#
-Content-Signal: ai-train=no, search=yes, ai-input=no
-#
+# (Content-Signal ditempel langsung ke User-agent: * di bawah,
+#  supaya konsisten dengan cara Cloudflare menulisnya dan lebih
+#  aman dibaca parser yang strict.)
+
 # --------------------------------------------------------------
 #            AI TRAINING BOTS — BLOCKED
 # --------------------------------------------------------------
-# These bots crawl the web to train AI/LLM foundation models.
-# Blocking them protects our content from being used for
-# training without generating traffic or attribution.
+# Bot-bot ini crawl web untuk training AI/LLM foundation model.
+# Diblokir supaya konten kita tidak dipakai training tanpa
+# menghasilkan traffic atau atribusi balik ke situs kita.
 
 User-agent: GPTBot
 Disallow: /
@@ -42,9 +43,9 @@ Disallow: /
 # --------------------------------------------------------------
 #      AI TRAINING OPT-OUT (SEARCH ENGINE BOTS)
 # --------------------------------------------------------------
-# These are special tokens that tell existing search engine
-# crawlers NOT to use crawled content for AI training.
-# They still index normally for search — just no training.
+# Token khusus yang bilang ke crawler search engine biar TIDAK
+# pakai konten hasil crawl untuk training AI. Mereka tetap index
+# normal untuk search — cuma tidak untuk training.
 
 User-agent: Google-Extended
 Disallow: /
@@ -55,8 +56,9 @@ Disallow: /
 # --------------------------------------------------------------
 #        AI SEARCH/RETRIEVAL BOTS — ALLOWED
 # --------------------------------------------------------------
-# These bots fetch content to display in AI chat answers with
-# attribution and a link back to our site (drives traffic).
+# Bot-bot ini fetch konten untuk ditampilkan di jawaban chat AI
+# dengan atribusi dan link balik ke situs kita (mendatangkan
+# traffic).
 
 User-agent: OAI-SearchBot
 Allow: /
@@ -79,10 +81,14 @@ Allow: /
 # --------------------------------------------------------------
 #            GENERAL CRAWLERS (SEARCH ENGINES)
 # --------------------------------------------------------------
-# Google, Bing, Yahoo, Yandex, Baidu, etc.
-# Allowed to index public content. Blocked from private areas.
+# Google, Bing, Yahoo, Yandex, Baidu, dll.
+# Diizinkan index konten publik. Diblokir dari area privat.
+# Content-Signal ditempel di sini, konsisten dengan format yang
+# dipakai Cloudflare, supaya tidak ada dua directive terpisah
+# untuk User-agent yang sama.
 
 User-agent: *
+Content-Signal: ai-train=no, search=yes, ai-input=no, use=reference
 Allow: /
 
 # --------------------------------------------------------------
@@ -98,5 +104,5 @@ Sitemap: https://vodatrip.id/sitemap-index.xml
 # --------------------------------------------------------------
 #                    AGENT DISCOVERY
 # --------------------------------------------------------------
-# Link to agent-accessible resources:
+# Link ke resource yang bisa diakses agent:
 #   /.well-known/api-catalog      — Full API linkset

@@ -20,6 +20,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   response.headers.append('Link', '</.well-known/api-catalog>; rel="api-catalog"');
   response.headers.append('Link', '</.well-known/agent-skills/index.json>; rel="agent-skills"');
+  response.headers.append('Link', '</llms.txt>; rel="help"');
   
   const acceptHeader = context.request.headers.get('Accept') || '';
   if (acceptHeader.includes('text/markdown') && response.headers.get('Content-Type')?.includes('text/html')) {
