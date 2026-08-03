@@ -75,7 +75,7 @@ Full-bleed gradient "photo" (never a flat color) with a two-column layout: copy 
 White rounded card (radius-lg, shadow-card) sitting on the overlap, 4-column icon+text row. Icon = orange glyph in solid navy circle. Never bullet points — always icon-led.
 
 ### Package / offer cards
-Photo top (gradient block + circular icon badge pinned top-left, half-overlapping the photo edge), body with title, 2-line description, dashed divider, then a price row (`Mulai dari` micro-label + bold orange price) paired with a circular navy arrow button that turns orange on hover.
+1:1 (square) photo at the top (with a circular icon badge pinned top-left), followed by a high-contrast white body section below it. The body contains the title, a 2-line description, a dashed divider, and a price row (`Mulai dari` micro-label + bold orange price) paired with a circular navy arrow button that turns orange on hover. Cards use a distinct border (`border-slate-300`) and elevated shadow to ensure readability against white backgrounds.
 
 ### Stats bar
 Navy floating card (`bg-navy-900`, `radius-lg`, `shadow-card`) dengan negative margin overlap. Horizontal grid: section kiri berisi 4-kolom stats (icon outline/circle + bold number + label), section kanan berisi testimonial card (quote, avatar, rating).
