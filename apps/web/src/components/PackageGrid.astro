@@ -48,15 +48,7 @@ if (!packages) {
   !loadError && packages && packages.length > 0 && (
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
       {packages.map((pkg) => (
-        <PackageCard
-          title={pkg.name}
-          description={pkg.description}
-          slug={pkg.slug}
-          priceFrom={getStartingPrice(pkg.price_tiers || [])}
-          icon={'fa-solid fa-map-marked-alt'}
-          category={'wisata'}
-          image={pkg.image ? `${getAssetUrl(pkg.image)}?width=400&height=250&fit=cover&format=webp` : undefined}
-        />
+        <PackageCard package={pkg} />
       ))}
     </div>
   )
