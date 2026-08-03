@@ -15,7 +15,7 @@ let fetchError = false;
 const pageParam = Astro.url.searchParams.get("page") || "1";
 let currentPage = parseInt(pageParam, 10);
 if (isNaN(currentPage) || currentPage < 1) currentPage = 1;
-const limit = 9;
+const limit = 12;
 let totalPackages = 0;
 let totalPages = 1;
 
@@ -106,7 +106,7 @@ try {
             <div class="flex items-center justify-between mb-[28px]">
               <p class="text-navy-500 text-[13px]"><strong class="text-navy-800">{totalPackages}</strong> paket ditemukan</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[24px]">
               {packages.map((pkg, index) => <PackageCard package={pkg} showDestination lcp={index === 0} />)}
             </div>
 

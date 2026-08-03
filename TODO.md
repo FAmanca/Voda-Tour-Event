@@ -470,27 +470,40 @@ Buat di Directus Admin Panel:
 - [x] `pnpm build` — success
 - [x] `pnpm preview` — semua halaman jalan
 
+## Phase 13: Security Hardening & Dependency Updates
+
+### 13.1 Dependency Audits & Updates
+- [ ] Upgrade versi `astro` ke `^7.1.6` (atau terbaru) di `apps/web/package.json` untuk menambal kerentanan Moderate XSS.
+- [ ] Verifikasi bahwa sub-dependensi `postcss` dan `svgo` yang bermasalah ter-upgrade otomatis.
+- [ ] Jalankan ulang `pnpm audit` di `apps/web` untuk memastikan zero vulnerabilities.
+
+### 13.2 Web Server Security Headers (Nginx)
+- [ ] Tambahkan security headers di file `infrastructure/nginx/nginx.conf` (HTTP / server block):
+  - [ ] `X-Frame-Options: SAMEORIGIN` (mencegah Clickjacking).
+  - [ ] `X-Content-Type-Options: nosniff` (mencegah MIME Sniffing).
+  - [ ] `X-XSS-Protection: 1; mode=block`.
+  - [ ] `Referrer-Policy: strict-origin-when-cross-origin`.
+  - [ ] `Strict-Transport-Security` (HSTS).
+  - [ ] `Content-Security-Policy` (CSP) untuk membatasi pemuatan external resources (GTM, Google Fonts, Directus).
+- [ ] Uji validasi konfigurasi Nginx dan muat ulang web server.
+
+### 13.3 Directus API Permissions Check
+- [ ] Verifikasi role `Public` di panel admin Directus agar tidak memiliki hak akses berlebih ke tabel sistem atau data sensitif.
+
+### 13.4 AI Agent Discovery (DNS-AID)
+- [ ] Publish DNS untuk AI Discovery (DNS-AID) di dashboard provider DNS (misal Cloudflare, Route53, Namecheap).
+- [ ] Buat record tipe `SVCB` (atau `HTTPS`) dengan nama `_a2a._agents` dan target `vodatrip.id.`.
+- [ ] Set Parameter: `alpn="a2a" port=443 mandatory=alpn,port`.
+- [ ] Aktifkan DNSSEC pada provider DNS untuk autentikasi data.
+- [ ] Verifikasi penyiapan menggunakan API pemindai `https://isitagentready.com/api/scan`.
+
+### 13.5 Server Monitoring & Anti-DDoS
+- [ ] Konfigurasi GoAccess di `docker-compose.yml` untuk menganalisa `access.log` Nginx (deteksi IP spam/crawler).
+- [ ] Instalasi agen Netdata di VPS untuk memonitor beban hardware (CPU, RAM, Jaringan) secara *real-time*.
+- [ ] Cloudflare Hardening: Aktifkan "Bot Fight Mode" dan sesuaikan rule WAF di dashboard Cloudflare.
+
 ---
 
-## Summary
-
-| Phase | Tasks | Priority |
-|-------|-------|----------|
-| 0: Setup Infra | ~10 | 🔴 First |
-| 1: Astro Bootstrap | ~15 | 🔴 First |
-| 2: Shared Components | ~7 | 🔴 First |
-| 3: Landing Page | ~25 | 🔴 First |
-| 4: CRUD Pages | ~20 | 🟡 Second |
-| 5: Search Feature | ~10 | 🟡 Second |
-| 6: Directus Setup | ~15 | 🔴 Before Phase 3-5 |
-| 7: SEO & Perf | ~15 | 🟡 Second |
-| 8: Client JS | ~10 | 🟡 Second |
-| 9: Error Pages | ~8 | 🟢 Third |
-| 10: Production | ~10 | 🟢 Third |
-| 11: Testing | ~15 | 🟢 Third |
-| 12: Docs Final | ~8 | 🟢 Third |
-
-**Total:** ~168 task items
 
 # Phase 2 Voda Tour & Event - TODO List
 
@@ -530,11 +543,6 @@ Buat di Directus Admin Panel:
   - [x] Buat Custom Interface Extension menggunakan Directus SDK (`defineInterface`).
   - [x] Gunakan Vue 3 `inject('values')` untuk memantau perubahan pada field `content` (WYSIWYG/Editor.js JSON) dan `seo` secara real-time.
   - [x] Integrasikan library NPM **`yoastseo`** di dalam ekstensi untuk memproses kata kunci fokus, kepadatan kata kunci, sebaran heading, dan alt tag gambar, lalu tampilkan checklist skor lampu merah/kuning/hijau di panel editor Directus.
-- [ ] **Konfigurasi Flows (Otomatisasi Rebuild):**
-  - [ ] Buat Flow baru bernama `Rebuild Web on Article Publish`.
-  - [ ] Trigger: `Event Hook` ➡️ `items.create` dan `items.update` pada collection `articles`.
-  - [ ] Condition: Pastikan payload memiliki `status` sama dengan `"published"`.
-  - [ ] Action: `Webhook` ➡️ Kirim POST request ke Deploy Hook hosting produksi (Vercel/Netlify/GitHub Actions) untuk memicu rebuild otomatis website Astro agar artikel langsung live di internet.
 - [x] **Aksesibilitas Perizinan (Roles & Permissions):**
   - [x] Buka perizinan baca (**Read**) secara publik (*Public Role*) untuk collection `articles` agar bisa di-fetch oleh Astro.
 
@@ -619,3 +627,47 @@ Buat di Directus Admin Panel:
   - [x] Berikan penanganan fallback jika data `addons` kosong (sembunyikan seksi add-ons secara anggun).
 
 ### 3. 📊 Analytics & Tracking
+
+---
+
+# Future Ideas & Backlog (30 Fitur Potensial)
+
+### ⚙️ A. Infrastruktur & DevOps (Server)
+- [ ] 1. **Automated Database Backups:** Script cron job harian mem-backup PostgreSQL ke S3/Cloudflare R2.
+- [ ] 2. **Uptime & Health Monitoring:** Setup Uptime Kuma untuk notifikasi Telegram jika server mati.
+- [ ] 3. **Redis Caching Layer:** Menyimpan hasil query API Directus di memory (Redis) untuk SSR lebih cepat.
+- [ ] 4. **CI/CD Pipeline (GitHub Actions):** Sistem deploy otomatis ke VPS setiap kali push ke branch `main`.
+- [ ] 5. **Log Aggregation:** Promtail & Grafana Loki untuk memusatkan log Nginx, Astro, dan Directus.
+- [ ] 6. **Docker Auto-restart Policies:** Membatasi pemakaian RAM per container (mencegah OOM Killer).
+- [ ] 7. **Brotli Compression Nginx:** Mengaktifkan kompresi Brotli untuk ukuran file HTML/CSS yang jauh lebih kecil.
+
+### 🛡️ B. Keamanan & Perlindungan (Security)
+- [ ] 8. **Rate Limiting API:** Mencegah spam pada fitur pencarian (Search) atau form kontak.
+- [ ] 9. **Mandatory 2FA (Two-Factor Auth):** Mewajibkan seluruh staf mengaktifkan 2FA di admin panel Directus.
+- [ ] 10. **Fail2Ban di VPS:** Otomatis memblokir IP jika mencoba membobol SSH atau Nginx berulang kali.
+- [ ] 11. **Cloudflare Turnstile (Captcha):** Integrasi invisible captcha pada form interaktif (mencegah bot/spam).
+- [ ] 12. **Strict Content-Security-Policy (CSP):** Mengunci sumber asset website (mencegah serangan XSS).
+
+### 📈 C. SEO & Visibilitas Marketing
+- [ ] 13. **Dynamic Open Graph (OG) Images:** Auto-generate gambar thumbnail/banner ketika link paket dibagikan.
+- [ ] 14. **RSS Feed XML:** Membuat endpoint `/rss.xml` dari koleksi Artikel/Blog.
+- [ ] 15. **Advanced JSON-LD Schemas:** Melengkapi Structured Data untuk `FAQPage`, `LocalBusiness`, dan `BreadcrumbList`.
+- [ ] 16. **Product Catalog Export (API):** Endpoint API khusus ekspor paket wisata (untuk FB Ads / Google Merchant).
+- [ ] 17. **Integrasi Email Auto-responder:** Mengirim email konfirmasi (via Resend/Brevo) saat pengunjung mengisi form.
+
+### 💸 D. Peningkatan Konversi & Bisnis (Fitur Baru)
+- [ ] 18. **Lead Capture Form (Intercept WA):** Pengunjung memasukkan Nama & No WA di website *sebelum* tombol WhatsApp terbuka (simpan ke Directus).
+- [ ] 19. **Kalender Ketersediaan (Availability Calendar):** Menampilkan kalender tanggal *fully booked* di halaman paket.
+- [ ] 20. **Integrasi Google Maps API (Live Reviews):** Menarik review/ulasan bintang 5 asli dari profil Google Maps bisnis Voda.
+- [ ] 21. **Fitur "Bandingkan Paket" (Compare):** Pengunjung bisa membandingkan 2-3 paket secara *side-by-side*.
+- [ ] 22. **Custom Itinerary Builder:** Fitur drag & drop destinasi untuk membuat custom itinerary (dikirim via form).
+- [ ] 23. **Sistem Multi-bahasa (i18n):** Bahasa Indonesia & Inggris (mengakomodir Tabel Harga WNA).
+- [ ] 24. **Payment Gateway Integration:** Integrasi Midtrans/Xendit agar klien bisa langsung membayar Down Payment (DP) via website.
+
+### 🎨 E. Performa Frontend & UX
+- [ ] 25. **PWA (Progressive Web App):** Membuat *manifest.json* & *Service Worker* (bisa di-install di HP).
+- [ ] 26. **Blur-up Image Placeholder:** Efek gambar "blur" saat *loading* gambar (mencegah layout shift).
+- [ ] 27. **Intelligent Link Prefetching:** Auto-download halaman di belakang layar saat mouse *hover* tombol.
+- [ ] 28. **Fitur "Wishlist" Lokal:** Simpan paket favorit pengunjung di *Local Storage* browser tanpa perlu login.
+- [ ] 29. **Dark Mode (Tema Gelap):** Menambahkan *toggle* tema gelap.
+- [ ] 30. **Animasi Mikro (Micro-interactions):** Transisi halaman menggunakan *Astro View Transitions* agar lebih premium.

@@ -149,9 +149,19 @@ export function pluralize(count: number, singular: string, plural?: string): str
   return count === 1 ? `${count} ${singular}` : `${count} ${plural || singular + "s"}`;
 }
 
-/** Strip HTML tags */
+/** Strip HTML tags and decode basic HTML entities */
 export function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, "").trim();
+  if (!html) return "";
+  return html
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .replace(/<[^>]*>?/gm, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 /** Truncate text */
