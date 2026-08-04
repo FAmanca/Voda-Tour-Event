@@ -9,6 +9,7 @@ import SectionHeader from "../components/SectionHeader.astro";
 import PackageGrid from "../components/PackageGrid.astro";
 import StatsBar from "../components/StatsBar.astro";
 import CTABand from "../components/CTABand.astro";
+import ErrorAlert from "../components/ErrorAlert.astro";
 
 import { getSettings, getDestinations, getPackages, getActivityTypes } from "../lib/directus";
 import type { DestinationWithRegion, Package, ActivityType } from "../types/directus";
@@ -63,10 +64,7 @@ try {
         </div>
         <div class="lg:col-span-4">
           {fetchError ? (
-            <div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[16px] text-red-700 text-[14px]">
-              <i class="fa-solid fa-circle-exclamation mr-[8px]"></i>
-              Gagal memuat data. Pastikan Directus sudah berjalan.
-            </div>
+            <ErrorAlert message="Gagal memuat data. Pastikan Directus sudah berjalan." />
           ) : (
             <PackageGrid packages={packages} />
           )}

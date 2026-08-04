@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Eyebrow from "../components/Eyebrow.astro";
+import ErrorAlert from "../components/ErrorAlert.astro";
 import type { Destination, Package } from "../types/directus";
 
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
@@ -68,9 +69,7 @@ try {
     {fetchError && (
       <section>
         <div class="wrap py-[60px]">
-          <div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[20px] text-red-700 text-[14px] text-center">
-            <i class="fa-solid fa-circle-exclamation mr-[8px]"></i>Gagal memuat galeri.
-          </div>
+          <ErrorAlert message="Gagal memuat galeri." />
         </div>
       </section>
     )}

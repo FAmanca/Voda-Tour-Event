@@ -3,6 +3,7 @@
 // Client-side rendered search results with loading/empty/error states
 
 import PackageCard from "./PackageCard.astro";
+import ErrorAlert from "./ErrorAlert.astro";
 import type { PackageWithDestination } from "../types/directus";
 
 interface Props {
@@ -15,23 +16,27 @@ interface Props {
 
 <div id="search-results">
   {Astro.props.error && (
-    <div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[18px] text-red-700 text-[14px] flex items-start gap-[10px]">
-      <i class="fa-solid fa-circle-exclamation mt-[2px] shrink-0"></i>
-      <span>{Astro.props.error}</span>
-    </div>
+    <ErrorAlert message={Astro.props.error} />
   )}
 
   {Astro.props.loading && (
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">
-      {[1, 2, 3, 4, 5, 6].map((i) => (
-        <div class="rounded-[var(--radius-md)] bg-navy-50 animate-pulse overflow-hidden" key={i}>
-          <div class="h-[150px] bg-navy-100"></div>
-          <div class="p-[18px] space-y-[10px]">
-            <div class="h-[16px] bg-navy-100 rounded w-[70%]"></div>
-            <div class="h-[12px] bg-navy-50 rounded w-[50%]"></div>
-            <div class="flex justify-between pt-[10px] border-t border-navy-100">
-              <div class="h-[12px] bg-navy-50 rounded w-[60px]"></div>
-              <div class="h-[12px] bg-navy-50 rounded w-[80px]"></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[24px]">
+      {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+        <div class="w-full bg-white border border-slate-200 flex flex-col rounded-[var(--radius-md)] shadow-sm overflow-hidden animate-pulse">
+          <div class="relative w-full aspect-square bg-slate-200 overflow-hidden shrink-0">
+            <div class="absolute top-4 left-4 z-10 w-10 h-10 bg-slate-300 rounded-full"></div>
+          </div>
+          <div class="p-5 flex-1 flex flex-col">
+            <div class="h-5 bg-slate-200 rounded w-3/4 mb-2"></div>
+            <div class="h-4 bg-slate-100 rounded w-full mt-2"></div>
+            <div class="h-4 bg-slate-100 rounded w-2/3 mt-1"></div>
+            <div class="border-t border-dashed border-slate-200 my-4"></div>
+            <div class="flex items-center justify-between mt-auto">
+              <div>
+                <div class="h-3 bg-slate-200 rounded w-16 mb-1"></div>
+                <div class="h-5 bg-slate-200 rounded w-24"></div>
+              </div>
+              <div class="w-10 h-10 bg-slate-200 rounded-full"></div>
             </div>
           </div>
         </div>
@@ -42,20 +47,22 @@ interface Props {
   {!Astro.props.loading && !Astro.props.error && (
     <>
       {Astro.props.totalCount !== undefined && (
-        <p class="text-navy-500 text-[13px] mb-[20px]">
-          <strong class="text-navy-800">{Astro.props.totalCount}</strong> paket ditemukan
-        </p>
+        <div class="flex items-center justify-between mb-[28px]">
+          <p class="text-navy-500 text-[13px]">
+            <strong class="text-navy-800">{Astro.props.totalCount}</strong> paket ditemukan
+          </p>
+        </div>
       )}
 
       {Astro.props.packages.length > 0 ? (
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[28px]">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[24px]">
           {Astro.props.packages.map((pkg) => <PackageCard package={pkg} showDestination />)}
         </div>
       ) : (
-        <div class="text-center py-[60px]">
-          <img src="/images/empty-search.jpg" alt="Pencarian Kosong" class="w-[200px] h-auto mx-auto mix-blend-multiply mb-[16px]" />
+        <div class="text-center py-[80px]">
+          <i class="fa-regular fa-face-smile text-[56px] text-navy-200 block mb-[16px]"></i>
           <h3 class="font-[family-name:var(--font-display)] text-navy-600 text-[20px] font-semibold">Paket Tidak Ditemukan</h3>
-          <p class="text-navy-400 text-[14px] mt-[8px] max-w-[400px] mx-auto">Coba ubah kata kunci atau filter pencarian kamu.</p>
+          <p class="text-navy-400 text-[14px] mt-[6px]">Coba ubah kata kunci atau filter pencarian kamu.</p>
         </div>
       )}
     </>

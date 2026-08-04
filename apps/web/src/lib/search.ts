@@ -3,7 +3,7 @@
 // Scoring-based: match minimal 50% kata, urutan bebas, case-insensitive
 // ============================================================================
 import type { PackageWithDestination, DestinationWithRegion, ActivityType, PackageActivityType, DirectusResponse, Package } from "../types/directus";
-import { getStartingPrice } from "./utils";
+import { getStartingPrice, stripHtml } from "./utils";
 
 const DIRECTUS_URL = (window as unknown as { __DIRECTUS_URL__?: string }).__DIRECTUS_URL__ || 'http://localhost:8055';
 
@@ -278,9 +278,9 @@ export function renderResults(container: HTMLElement | null, packages: PackageWi
   if (loading) {
     container.className = 'text-left py-0';
     if (skeletonTpl) {
-      container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7"></div>';
+      container.innerHTML = '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[24px]"></div>';
       const grid = container.firstChild as HTMLElement;
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 8; i++) {
         grid.appendChild(skeletonTpl.content.cloneNode(true));
       }
     } else {
@@ -291,8 +291,8 @@ export function renderResults(container: HTMLElement | null, packages: PackageWi
   }
   
   if (error) {
-    container.className = 'text-center py-20';
-    container.innerHTML = '<div class="rounded-lg bg-red-50 border border-red-200 p-5 text-red-700 text-sm flex items-start gap-3"><i class="fa-solid fa-circle-exclamation mt-0.5 shrink-0"></i><span>' + error + '</span></div>';
+    container.className = 'text-left py-0';
+    container.innerHTML = '<div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[16px] text-red-700 text-[14px] flex items-start gap-[10px]"><i class="fa-solid fa-circle-exclamation mt-[2px] shrink-0 text-red-500"></i><span>' + error + '</span></div>';
     return;
   }
   
@@ -317,12 +317,12 @@ export function renderResults(container: HTMLElement | null, packages: PackageWi
     return;
   }
 
-  container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7"></div>';
+  container.innerHTML = '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[24px]"></div>';
   const grid = container.firstChild as HTMLElement;
 
   packages.forEach((pkg) => {
     const title = pkg.name || '';
-    const description = pkg.description || '';
+    const description = stripHtml(pkg.description || '');
     const slug = pkg.slug || '';
     const startingPrice = getStartingPrice(pkg.price_tiers || []);
     const publicApiUrl = (window as unknown as { __DIRECTUS_URL__?: string }).__DIRECTUS_URL__ || 'http://localhost:8055';

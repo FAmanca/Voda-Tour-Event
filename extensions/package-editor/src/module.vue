@@ -704,9 +704,10 @@ export default {
     watch([searchQuery, statusFilter], () => { currentPage.value = 1; });
 
     const filteredPackages = computed(() => {
+      const q = (searchQuery.value || '').toLowerCase();
       return packages.value.filter(p => {
-        const matchSearch = (p.name?.toLowerCase() || '').includes(searchQuery.value.toLowerCase()) ||
-                            (p.slug?.toLowerCase() || '').includes(searchQuery.value.toLowerCase());
+        const matchSearch = (p.name?.toLowerCase() || '').includes(q) ||
+                            (p.slug?.toLowerCase() || '').includes(q);
         const matchStatus = !statusFilter.value || p.status === statusFilter.value;
         return matchSearch && matchStatus;
       });
