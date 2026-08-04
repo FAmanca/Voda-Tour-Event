@@ -329,9 +329,9 @@ export function renderResults(container: HTMLElement | null, packages: PackageWi
     
     let imageStr: string | null = null;
     if (pkg.image) {
-      imageStr = `${publicApiUrl}/assets/${pkg.image}?width=400&height=250&fit=cover`;
-    } else if (pkg.gallery && pkg.gallery.length > 0) {
-      imageStr = `${publicApiUrl}/assets/${pkg.gallery[0]}?width=400&height=250&fit=cover`;
+      imageStr = `${publicApiUrl}/assets/${pkg.image}?width=400&height=400&fit=cover&format=webp`;
+    } else if (pkg.poster) {
+      imageStr = `${publicApiUrl}/assets/${pkg.poster}?width=400&height=400&fit=cover&format=webp`;
     }
       
     const destName = pkg.destination_id && typeof pkg.destination_id === 'object' ? pkg.destination_id.name : '';
