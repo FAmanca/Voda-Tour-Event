@@ -1,6 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Eyebrow from "../../components/Eyebrow.astro";
+import ErrorAlert from "../../components/ErrorAlert.astro";
 import { getArticles, getAssetUrl } from "../../lib/directus";
 import type { Article } from "../../types/directus";
 
@@ -82,9 +83,7 @@ function formatDate(dateStr: string | null): string {
 
         {/* ------- Error state ------- */}
         {fetchError && (
-          <div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[24px] text-red-700 text-[14px] text-center">
-            <i class="fa-solid fa-circle-exclamation mr-[8px]"></i>Gagal memuat artikel. Silakan coba lagi nanti.
-          </div>
+          <ErrorAlert message="Gagal memuat artikel. Silakan coba lagi nanti." />
         )}
 
         {/* ------- Empty state ------- */}

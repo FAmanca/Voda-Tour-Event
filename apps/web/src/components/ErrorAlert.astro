@@ -1,0 +1,25 @@
+---
+interface Props {
+  message?: string;
+  variant?: 'inline' | 'block';
+  class?: string;
+}
+
+const { 
+  message = "Gagal memuat data.", 
+  variant = 'inline', 
+  class: className = '' 
+} = Astro.props;
+---
+
+{variant === 'block' ? (
+  <div class={`max-w-[400px] mx-auto text-center bg-red-50 border border-red-200 rounded-[var(--radius-lg)] p-[30px] ${className}`}>
+    <i class="fa-solid fa-circle-exclamation text-[36px] text-red-400 block mb-[12px]"></i>
+    <p class="text-red-700 text-[14px] font-medium">{message}</p>
+  </div>
+) : (
+  <div class={`rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[16px] text-red-700 text-[14px] flex items-start gap-[10px] ${className}`}>
+    <i class="fa-solid fa-circle-exclamation mt-[2px] shrink-0 text-red-500"></i>
+    <span>{message}</span>
+  </div>
+)}

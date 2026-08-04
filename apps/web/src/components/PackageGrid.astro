@@ -4,6 +4,7 @@
 
 import PackageCard from "./PackageCard.astro";
 import SkeletonCard from "./SkeletonCard.astro";
+import ErrorAlert from "./ErrorAlert.astro";
 
 import type { PackageWithDestination } from "../types/directus";
 import { getPackages, getAssetUrl } from "../lib/directus";
@@ -31,16 +32,7 @@ if (!packages) {
 
 {
   loadError && (
-    <div class="rounded-[var(--radius-md)] bg-red-50 border border-red-200 p-[16px] text-red-700 text-[14px]">
-      <i class="fa-solid fa-circle-exclamation mr-[8px]"></i>
-      Gagal memuat paket. Silakan coba lagi nanti.
-      <button
-        class="ml-[12px] text-red-700 font-semibold underline bg-transparent border-none cursor-pointer text-[13px]"
-        onclick="window.location.reload()"
-      >
-        Muat ulang
-      </button>
-    </div>
+    <ErrorAlert message="Gagal memuat paket. Silakan coba lagi nanti." />
   )
 }
 
