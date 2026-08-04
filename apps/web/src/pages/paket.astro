@@ -2,10 +2,9 @@
 import Layout from "../layouts/Layout.astro";
 import PackageCard from "../components/PackageCard.astro";
 import Eyebrow from "../components/Eyebrow.astro";
-import { getPackages, getActivityTypes } from "../lib/directus";
+import ErrorAlert from "../components/ErrorAlert.astro";
+import { getPaginatedPackages, getDestinationCount, getActivityTypes } from "../lib/directus";
 import type { PackageWithDestination, ActivityType } from "../types/directus";
-
-const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || "http://localhost:8055";
 
 let packages: PackageWithDestination[] = [];
 let activityTypes: ActivityType[] = [];
@@ -20,29 +19,16 @@ let totalPackages = 0;
 let totalPages = 1;
 
 try {
-  const fetchOptions = {
-    cache: "no-store" as RequestCache,
-    headers: { "Cache-Control": "no-cache" },
-  };
-
-  const [destCountRes, pkgRes, activities] = await Promise.all([
-    fetch(`${DIRECTUS_URL}/items/destinations?fields=id&filter[status][_eq]=published&limit=1&meta=total_count`, fetchOptions),
-    fetch(`${DIRECTUS_URL}/items/packages?fields=*,destination_id.*&filter[status][_eq]=published&sort=-id&limit=${limit}&page=${currentPage}&meta=filter_count`, fetchOptions),
+  const [destCount, paginatedPkgs, activities] = await Promise.all([
+    getDestinationCount(),
+    getPaginatedPackages(currentPage, limit),
     getActivityTypes()
   ]);
 
-  if (destCountRes.ok) {
-    const json = await destCountRes.json();
-    destinationCount = json.meta?.total_count ?? 0;
-  }
-
-  if (pkgRes.ok) {
-    const pkgJson = await pkgRes.json();
-    packages = (pkgJson.data || []) as PackageWithDestination[];
-    totalPackages = pkgJson.meta?.filter_count || 0;
-    totalPages = Math.ceil(totalPackages / limit);
-  }
-
+  destinationCount = destCount;
+  packages = paginatedPkgs.packages as PackageWithDestination[];
+  totalPackages = paginatedPkgs.total;
+  totalPages = Math.ceil(totalPackages / limit);
   activityTypes = activities;
 } catch {
   fetchError = true;
@@ -92,10 +78,7 @@ try {
 
     {fetchError && (
       <section class="py-[80px]"><div class="wrap">
-        <div class="max-w-[400px] mx-auto text-center bg-red-50 border border-red-200 rounded-[var(--radius-lg)] p-[30px]">
-          <i class="fa-solid fa-circle-exclamation text-[36px] text-red-400 block mb-[12px]"></i>
-          <p class="text-red-700 text-[14px] font-medium">Gagal memuat paket.</p>
-        </div>
+        <ErrorAlert variant="block" message="Gagal memuat paket." />
       </div></section>
     )}
 

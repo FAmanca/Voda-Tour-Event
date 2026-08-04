@@ -99,6 +99,22 @@ export async function getDestinations(fields = "*"): Promise<Destination[]> {
   }); 
 }
 
+export async function getDestinationCount(): Promise<number> {
+  const url = new URL(`${BASE}/destinations`);
+  url.searchParams.set("fields", "id");
+  url.searchParams.set("filter", JSON.stringify({ status: { _eq: "published" } }));
+  url.searchParams.set("limit", "1");
+  url.searchParams.set("meta", "total_count");
+  
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: { "Cache-Control": "no-cache" },
+  });
+  if (!res.ok) return 0;
+  const json = await res.json();
+  return json.meta?.total_count || 0;
+}
+
 export async function getDestinationsByRegion(
   regionSlug: string
 ): Promise<Destination[]> {
@@ -145,6 +161,30 @@ export async function getPackages(
     limit: String(limit),
     sort: "-id",
   });
+}
+
+export async function getPaginatedPackages(
+  page: number = 1,
+  limit: number = 12
+): Promise<{ packages: Package[]; total: number }> {
+  const url = new URL(`${BASE}/packages`);
+  url.searchParams.set("fields", "*,destination_id.*");
+  url.searchParams.set("filter", JSON.stringify({ status: { _eq: "published" } }));
+  url.searchParams.set("sort", "-id");
+  url.searchParams.set("limit", String(limit));
+  url.searchParams.set("page", String(page));
+  url.searchParams.set("meta", "filter_count");
+  
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: { "Cache-Control": "no-cache" },
+  });
+  if (!res.ok) throw new Error(`Directus error: ${res.status}`);
+  const json = await res.json();
+  return {
+    packages: (json.data || []) as Package[],
+    total: json.meta?.filter_count || 0,
+  };
 }
 
 export async function getPackageBySlug(
