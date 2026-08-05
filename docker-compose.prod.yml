@@ -153,6 +153,7 @@ services:
       - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - certbot_conf:/etc/letsencrypt
       - certbot_www:/var/www/certbot
+      - nginx_logs:/var/log/nginx
     deploy:
       resources:
         limits:
@@ -160,6 +161,24 @@ services:
     depends_on:
       - web
       - directus
+    networks:
+      - voda_net
+
+  # =======================================================
+  # GOACCESS (Log Analyzer)
+  # =======================================================
+  goaccess:
+    image: allinurl/goaccess
+    container_name: voda-goaccess-prod
+    restart: always
+    ports:
+      - "7890:7890"
+    environment:
+      - TZ=Asia/Jakarta
+    volumes:
+      - nginx_logs:/srv/logs
+    command: >
+      sh -c "touch /srv/logs/access.log && goaccess /srv/logs/access.log -o /srv/logs/report.html --log-format=COMBINED --real-time-html --port=7890 --ws-url=wss://api.vodatrip.id:443/stats/ws"
     networks:
       - voda_net
 
@@ -187,3 +206,4 @@ volumes:
   directus_database_prod:
   certbot_conf:
   certbot_www:
+  nginx_logs:

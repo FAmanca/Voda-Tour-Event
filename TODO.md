@@ -491,11 +491,11 @@ Buat di Directus Admin Panel:
 - [ ] Verifikasi role `Public` di panel admin Directus agar tidak memiliki hak akses berlebih ke tabel sistem atau data sensitif.
 
 ### 13.4 AI Agent Discovery (DNS-AID)
-- [ ] Publish DNS untuk AI Discovery (DNS-AID) di dashboard provider DNS (misal Cloudflare, Route53, Namecheap).
-- [ ] Buat record tipe `SVCB` (atau `HTTPS`) dengan nama `_a2a._agents` dan target `vodatrip.id.`.
-- [ ] Set Parameter: `alpn="a2a" port=443 mandatory=alpn,port`.
-- [ ] Aktifkan DNSSEC pada provider DNS untuk autentikasi data.
-- [ ] Verifikasi penyiapan menggunakan API pemindai `https://isitagentready.com/api/scan`.
+- [x] Publish DNS untuk AI Discovery (DNS-AID) di dashboard provider DNS (misal Cloudflare, Route53, Namecheap).
+- [x] Buat record tipe `SVCB` (atau `HTTPS`) dengan nama `_a2a._agents` dan target `vodatrip.id.`.
+- [x] Set Parameter: `alpn="a2a" port=443 mandatory=alpn,port`.
+- [x] Aktifkan DNSSEC pada provider DNS untuk autentikasi data.
+- [x] Verifikasi penyiapan menggunakan API pemindai `https://isitagentready.com/api/scan`.
 
 ### 13.5 Server Monitoring & Anti-DDoS
 - [ ] Konfigurasi GoAccess di `docker-compose.yml` untuk menganalisa `access.log` Nginx (deteksi IP spam/crawler).
