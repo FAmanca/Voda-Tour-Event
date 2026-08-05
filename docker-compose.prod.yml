@@ -179,7 +179,7 @@ services:
       - nginx_logs:/srv/logs
     # Use default entrypoint from allinurl/goaccess
     command:
-      - /srv/logs/access.log
+      - /srv/logs/access_real.log
       - -o
       - /srv/logs/report.html
       - --log-format=COMBINED
