@@ -41,6 +41,9 @@
 | Image Processing | Directus Assets API | WebP/AVIF auto conversion, resize |
 | Container | **Docker Compose** | Satu file untuk semua service |
 | Reverse Proxy | **Nginx** | Routing ke Directus & Astro |
+| Server Analytics | **GoAccess** | Log analyzer via Nginx access log, statis diupdate per 10s |
+| Server Monitoring| **Netdata** | Pantau CPU, RAM, Disk real-time via Netdata Cloud |
+| Security | **Cloudflare WAF & DNSSEC** | Anti-DDoS, IP Whitelist untuk /stats/, otentikasi DNS |
 | Analytics | **Google Analytics** | Gratis, informatif untuk atasan |
 
 ## Why Cloudflare R2 for Images?

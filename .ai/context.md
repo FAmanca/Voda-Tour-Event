@@ -18,6 +18,8 @@
 | Backend & Admin | Directus 12 (Headless CMS) | REST API, PostgreSQL, file management |
 | Frontend | Astro 7 (SSR) | Static + SSR hybrid |
 | Database | PostgreSQL 16 | Via Docker |
+| Infrastructure | Docker + Nginx + Cloudflare | HTTPS, WAF IP Whitelisting, DNSSEC |
+| Monitoring | GoAccess + Netdata | GoAccess (Web traffic per 10s), Netdata (VPS hardware) |
 | Image Storage | Cloudflare R2 | S3-compatible, zero egress fee |
 | CSS | Tailwind CSS 4 | Utility-first, custom theme di global.css |
 | Font | **Poppins** (headings) + **Playfair Display** italic (accent) + **Inter** (body/UI) | Google Fonts |
