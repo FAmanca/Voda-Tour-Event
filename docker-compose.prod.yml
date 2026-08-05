@@ -177,10 +177,15 @@ services:
       - TZ=Asia/Jakarta
     volumes:
       - nginx_logs:/srv/logs
-    entrypoint: /bin/sh
-    command: 
-      - -c
-      - "touch /srv/logs/access.log || true; goaccess /srv/logs/access.log -o /srv/logs/report.html --log-format=COMBINED --real-time-html --port=7890 --ws-url=wss://api.vodatrip.id/stats/ws"
+    # Use default entrypoint from allinurl/goaccess
+    command:
+      - /srv/logs/access.log
+      - -o
+      - /srv/logs/report.html
+      - --log-format=COMBINED
+      - --real-time-html
+      - --port=7890
+      - --ws-url=wss://api.vodatrip.id/stats/ws
     networks:
       - voda_net
 
