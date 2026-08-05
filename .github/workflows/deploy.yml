@@ -99,10 +99,13 @@ jobs:
           # Deploy all services including nginx and certbot for a standalone Docker-only VPS setup
           docker compose -f docker-compose.prod.yml \$COMPOSE_ENV_FILE up -d --build
 
+          echo "Restarting Nginx to clear upstream IP cache..."
+          docker compose -f docker-compose.prod.yml \$COMPOSE_ENV_FILE restart nginx
+
           # ── Health check ──────────────────────────────────────────
           echo "Checking application health via Nginx..."
           DEPLOY_SUCCESS=false
-          for i in \$(seq 1 15); do
+          for i in \$(seq 1 30); do
             # Check Astro Web and Directus through Nginx on port 443 using Host headers (with -k for SSL)
             WEB_STATUS=\$(curl -k -o /dev/null -s -w "%{http_code}" -H "Host: vodatrip.id" https://localhost || echo "failed")
             CMS_STATUS=\$(curl -k -o /dev/null -s -w "%{http_code}" -H "Host: api.vodatrip.id" https://localhost/server/ping || echo "failed")
