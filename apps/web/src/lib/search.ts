@@ -7,6 +7,12 @@ import { getStartingPrice, stripHtml } from "./utils";
 
 const DIRECTUS_URL = (window as unknown as { __DIRECTUS_URL__?: string }).__DIRECTUS_URL__ || 'http://localhost:8055';
 
+function logError(message: string, error?: unknown): void {
+  if (import.meta && import.meta.env && import.meta.env.DEV) {
+    console.error(message, error);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Debounce
 // ---------------------------------------------------------------------------
@@ -52,9 +58,7 @@ async function fetchAllPackages(): Promise<(PackageWithDestination & { activity_
     __pkgCache = packages as (PackageWithDestination & { activity_types?: PackageActivityType[] })[];
     return __pkgCache;
   } catch (error) {
-    if (import.meta && import.meta.env && import.meta.env.DEV) {
-      console.error("Fetch packages error:", error);
-    }
+    logError("Fetch packages error:", error);
     return [];
   }
 }
@@ -165,9 +169,7 @@ export async function getSuggestions(query: string): Promise<Suggestion[]> {
       });
     }
   } catch (error) {
-    if (import.meta && import.meta.env && import.meta.env.DEV) {
-       console.error("Suggestions packages error", error);
-    }
+    logError("Suggestions packages error:", error);
   }
 
   try {
@@ -180,9 +182,7 @@ export async function getSuggestions(query: string): Promise<Suggestion[]> {
       });
     }
   } catch (error) {
-    if (import.meta && import.meta.env && import.meta.env.DEV) {
-       console.error("Suggestions destinations error", error);
-    }
+    logError("Suggestions destinations error:", error);
   }
 
   results.sort((a, b) => a.type === 'package' ? -1 : 1);
@@ -231,9 +231,7 @@ export async function logSearch(data: SearchLogData): Promise<boolean> {
     });
     return res.ok;
   } catch (error) {
-    if (import.meta && import.meta.env && import.meta.env.DEV) {
-      console.error("Log search error", error);
-    }
+    logError("Log search error:", error);
     return false;
   }
 }
@@ -491,9 +489,16 @@ export function initAutocomplete(inputId: string, dropdownId: string, opts?: Aut
       const icon = item.type === 'package'
         ? '<div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm"><i class="fa-solid fa-gift"></i></div>'
         : '<div class="w-8 h-8 rounded-full bg-navy-100 text-navy-500 flex items-center justify-center text-sm"><i class="fa-solid fa-location-dot"></i></div>';
-      return '<button type="button" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-navy-50 transition-colors text-left border-b border-navy-100 last:border-0 cursor-pointer" data-index="' + i + '" data-name="' + esc(item.name) + '">'
-        + icon + '<div class="flex-1 min-w-0"><div class="text-navy-800 text-xs font-semibold truncate">' + esc(item.name) + '</div><div class="text-navy-400 text-[11px] truncate">' + esc(item.subtitle) + '</div></div>'
-        + '<i class="fa-solid fa-arrow-right text-navy-300 text-[10px]"></i></button>';
+      return `
+        <button type="button" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-navy-50 transition-colors text-left border-b border-navy-100 last:border-0 cursor-pointer" data-index="${i}" data-name="${esc(item.name)}">
+          ${icon}
+          <div class="flex-1 min-w-0">
+            <div class="text-navy-800 text-xs font-semibold truncate">${esc(item.name)}</div>
+            <div class="text-navy-400 text-[11px] truncate">${esc(item.subtitle)}</div>
+          </div>
+          <i class="fa-solid fa-arrow-right text-navy-300 text-[10px]"></i>
+        </button>
+      `;
     }).join('');
     dropdown.classList.remove('hidden');
   }
