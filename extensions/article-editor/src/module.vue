@@ -1585,7 +1585,7 @@ export default {
     };
 
     const autoSave = async () => {
-      if (!currentArticle.value || autoSaveStatus.value !== 'unsaved') return;
+      if (!currentArticle.value || !currentArticle.value.id || autoSaveStatus.value !== 'unsaved') return;
       autoSaveStatus.value = 'saving';
       
       const payload = {
@@ -2561,7 +2561,6 @@ export default {
   z-index: 10;
 }
 .autosave-status {
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 6px;
