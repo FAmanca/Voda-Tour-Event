@@ -1033,10 +1033,6 @@ export default {
           currentArticle.value.content = editor.value.getHTML();
           runSeoAnalysis();
           syncTocAndHeadings();
-          // Trigger auto-save
-          autoSaveStatus.value = 'unsaved';
-          if (autoSaveTimer) clearTimeout(autoSaveTimer);
-          autoSaveTimer = setTimeout(() => autoSave(), 30000); // 30 detik
         }
       }
     });
@@ -1441,10 +1437,27 @@ export default {
         pillar_parent: null,
         SEO: { title: '', metaDescription: '', focus_keyword: '', secondary_keywords: '' }
       };
-      keywordsList.value = [];
+      
+      const localBackup = localStorage.getItem('voda_article_backup_new');
+      if (localBackup) {
+        try {
+          const parsedBackup = JSON.parse(localBackup);
+          Object.assign(currentArticle.value, parsedBackup);
+          showToast('⚠️ Memulihkan draf baru yang belum sempat tersimpan.');
+        } catch(e) {
+          localStorage.removeItem('voda_article_backup_new');
+        }
+      }
+
+      const fk = currentArticle.value.SEO.focus_keyword || '';
+      const sk = currentArticle.value.SEO.secondary_keywords ? currentArticle.value.SEO.secondary_keywords.split(',').map(s=>s.trim()).filter(s=>s) : [];
+      const kws = [];
+      if (fk) kws.push(fk);
+      keywordsList.value = [...kws, ...sk];
+      
       ads.value = [];
       nextTick(() => {
-        editor.value.commands.setContent('');
+        editor.value.commands.setContent(currentArticle.value.content || '');
         runSeoAnalysis();
       });
     };
@@ -1472,6 +1485,20 @@ export default {
           pillar_parent: pilParent,
           publish_date: art.publish_date ? art.publish_date.slice(0, 16) : ''
         };
+        
+        // Cek LocalStorage Fallback (Offline Backup)
+        const localBackup = localStorage.getItem(`voda_article_backup_${art.id}`);
+        if (localBackup) {
+          try {
+            const parsedBackup = JSON.parse(localBackup);
+            Object.assign(currentArticle.value, parsedBackup);
+            // Timpa referensi 'art' agar editor dan keywords ikut menyesuaikan
+            Object.assign(art, parsedBackup);
+            showToast('⚠️ Memulihkan draf lokal karena sebelumnya internet terputus.');
+          } catch(e) {
+            localStorage.removeItem(`voda_article_backup_${art.id}`);
+          }
+        }
         
         // Parse Keywords
         const fk = art.SEO.focus_keyword || '';
@@ -1545,6 +1572,11 @@ export default {
           currentArticle.value.id = articleId;
         }
 
+        // Hapus backup lokal jika sukses tersimpan ke server
+        if (articleId) {
+          localStorage.removeItem(`voda_article_backup_${articleId}`);
+        }
+
         // Save Ads
         await api.delete('/items/ads', { data: { query: { filter: { articles_id: { _eq: articleId } } } } }).catch(()=>console.log("no ads to del"));
         
@@ -1569,27 +1601,53 @@ export default {
       isSaving.value = false;
     };
 
-    // Auto-save setiap 30 detik saat ada perubahan (simpan ke draft tanpa notifikasi)
     const autoSave = async () => {
       if (!currentArticle.value || autoSaveStatus.value !== 'unsaved') return;
       autoSaveStatus.value = 'saving';
+      
+      const payload = {
+        title: currentArticle.value.title,
+        slug: currentArticle.value.slug,
+        content: currentArticle.value.content,
+        status: currentArticle.value.status,
+        featured_image: currentArticle.value.featured_image,
+        SEO: currentArticle.value.SEO,
+      };
+
       try {
-        const payload = {
-          title: currentArticle.value.title,
-          slug: currentArticle.value.slug,
-          content: currentArticle.value.content,
-          status: currentArticle.value.status,
-          featured_image: currentArticle.value.featured_image,
-          SEO: currentArticle.value.SEO,
-        };
-        if (currentArticle.value.id) {
-          await api.patch(`/items/articles/${currentArticle.value.id}`, payload);
-          autoSaveStatus.value = 'saved';
+        let savedId = currentArticle.value.id;
+        if (savedId) {
+          await api.patch(`/items/articles/${savedId}`, payload);
+        } else {
+          const res = await api.post('/items/articles', payload);
+          savedId = res.data.data.id;
+          currentArticle.value.id = savedId; // Update ID supaya kedepannya jadi PATCH
         }
+        
+        autoSaveStatus.value = 'saved';
+        localStorage.removeItem(`voda_article_backup_${savedId || 'new'}`);
+        
       } catch {
         autoSaveStatus.value = 'unsaved'; // Tetap unsaved jika gagal
+        // Offline Fallback Backup
+        const backupId = currentArticle.value.id || 'new';
+        localStorage.setItem(`voda_article_backup_${backupId}`, JSON.stringify(payload));
       }
     };
+
+    const triggerAutoSave = () => {
+      if (!currentArticle.value) return;
+      autoSaveStatus.value = 'unsaved';
+      if (autoSaveTimer) clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(() => autoSave(), 30000);
+    };
+
+    watch(currentArticle, (newVal, oldVal) => {
+      // Hanya trigger auto-save jika ini bukan load awal (oldVal !== null)
+      if (newVal && oldVal) {
+        triggerAutoSave();
+      }
+    }, { deep: true });
 
     // Duplikasi Artikel (Salin sebagai Draft Baru)
     const duplicateArticle = async (art) => {
@@ -2526,7 +2584,6 @@ export default {
   z-index: 10;
 }
 .autosave-status {
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 6px;

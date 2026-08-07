@@ -498,7 +498,7 @@ Buat di Directus Admin Panel:
 - [x] Verifikasi penyiapan menggunakan API pemindai `https://isitagentready.com/api/scan`.
 
 ### 13.5 Server Monitoring & Anti-DDoS
-- [ ] Konfigurasi GoAccess di `docker-compose.yml` untuk menganalisa `access.log` Nginx (deteksi IP spam/crawler).
+- [x] Konfigurasi GoAccess di `docker-compose.yml` untuk menganalisa `access.log` Nginx (deteksi IP spam/crawler).
 - [ ] Instalasi agen Netdata di VPS untuk memonitor beban hardware (CPU, RAM, Jaringan) secara *real-time*.
 - [ ] Cloudflare Hardening: Aktifkan "Bot Fight Mode" dan sesuaikan rule WAF di dashboard Cloudflare.
 
