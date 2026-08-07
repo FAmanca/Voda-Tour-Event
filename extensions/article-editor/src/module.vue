@@ -1033,10 +1033,6 @@ export default {
           currentArticle.value.content = editor.value.getHTML();
           runSeoAnalysis();
           syncTocAndHeadings();
-          // Trigger auto-save
-          autoSaveStatus.value = 'unsaved';
-          if (autoSaveTimer) clearTimeout(autoSaveTimer);
-          autoSaveTimer = setTimeout(() => autoSave(), 30000); // 30 detik
         }
       }
     });
@@ -1473,6 +1469,20 @@ export default {
           publish_date: art.publish_date ? art.publish_date.slice(0, 16) : ''
         };
         
+        // Cek LocalStorage Fallback (Offline Backup)
+        const localBackup = localStorage.getItem(`voda_article_backup_${art.id}`);
+        if (localBackup) {
+          try {
+            const parsedBackup = JSON.parse(localBackup);
+            Object.assign(currentArticle.value, parsedBackup);
+            // Timpa referensi 'art' agar editor dan keywords ikut menyesuaikan
+            Object.assign(art, parsedBackup);
+            showToast('⚠️ Memulihkan draf lokal karena sebelumnya internet terputus.');
+          } catch(e) {
+            localStorage.removeItem(`voda_article_backup_${art.id}`);
+          }
+        }
+        
         // Parse Keywords
         const fk = art.SEO.focus_keyword || '';
         const sk = art.SEO.secondary_keywords ? art.SEO.secondary_keywords.split(',').map(s=>s.trim()).filter(s=>s) : [];
@@ -1545,6 +1555,11 @@ export default {
           currentArticle.value.id = articleId;
         }
 
+        // Hapus backup lokal jika sukses tersimpan ke server
+        if (articleId) {
+          localStorage.removeItem(`voda_article_backup_${articleId}`);
+        }
+
         // Save Ads
         await api.delete('/items/ads', { data: { query: { filter: { articles_id: { _eq: articleId } } } } }).catch(()=>console.log("no ads to del"));
         
@@ -1569,27 +1584,47 @@ export default {
       isSaving.value = false;
     };
 
-    // Auto-save setiap 30 detik saat ada perubahan (simpan ke draft tanpa notifikasi)
     const autoSave = async () => {
       if (!currentArticle.value || autoSaveStatus.value !== 'unsaved') return;
       autoSaveStatus.value = 'saving';
+      
+      const payload = {
+        title: currentArticle.value.title,
+        slug: currentArticle.value.slug,
+        content: currentArticle.value.content,
+        status: currentArticle.value.status,
+        featured_image: currentArticle.value.featured_image,
+        SEO: currentArticle.value.SEO,
+      };
+
       try {
-        const payload = {
-          title: currentArticle.value.title,
-          slug: currentArticle.value.slug,
-          content: currentArticle.value.content,
-          status: currentArticle.value.status,
-          featured_image: currentArticle.value.featured_image,
-          SEO: currentArticle.value.SEO,
-        };
         if (currentArticle.value.id) {
           await api.patch(`/items/articles/${currentArticle.value.id}`, payload);
           autoSaveStatus.value = 'saved';
+          localStorage.removeItem(`voda_article_backup_${currentArticle.value.id}`);
         }
       } catch {
         autoSaveStatus.value = 'unsaved'; // Tetap unsaved jika gagal
+        // Offline Fallback Backup
+        if (currentArticle.value.id) {
+          localStorage.setItem(`voda_article_backup_${currentArticle.value.id}`, JSON.stringify(payload));
+        }
       }
     };
+
+    const triggerAutoSave = () => {
+      if (!currentArticle.value) return;
+      autoSaveStatus.value = 'unsaved';
+      if (autoSaveTimer) clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(() => autoSave(), 30000);
+    };
+
+    watch(currentArticle, (newVal, oldVal) => {
+      // Hanya trigger auto-save jika ini bukan load awal (oldVal !== null)
+      if (newVal && oldVal) {
+        triggerAutoSave();
+      }
+    }, { deep: true });
 
     // Duplikasi Artikel (Salin sebagai Draft Baru)
     const duplicateArticle = async (art) => {
