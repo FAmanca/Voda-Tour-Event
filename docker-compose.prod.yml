@@ -171,15 +171,21 @@ services:
     image: allinurl/goaccess
     container_name: voda-goaccess-prod
     restart: always
-    ports:
-      - "7890:7890"
     environment:
       - TZ=Asia/Jakarta
     volumes:
       - nginx_logs:/srv/logs
-    entrypoint: ["/bin/sh", "-c"]
+    # Generate static HTML periodically to avoid WebSocket Cloudflare issues
+    entrypoint: /bin/sh
     command:
-      - "touch /srv/logs/access.log && /bin/goaccess /srv/logs/access.log -o /srv/logs/report.html --log-format=COMBINED --real-time-html --port=7890 --ws-url=wss://api.vodatrip.id:443/stats/ws"
+      - -c
+      - |
+        while true; do
+          if [ -f /srv/logs/access_real.log ]; then
+            goaccess /srv/logs/access_real.log -o /srv/logs/report.html --log-format=COMBINED || true
+          fi
+          sleep 10
+        done
     networks:
       - voda_net
 
