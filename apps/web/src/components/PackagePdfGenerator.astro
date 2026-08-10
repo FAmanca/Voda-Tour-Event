@@ -1,0 +1,410 @@
+---
+import type { Package } from "../types/directus";
+import { formatPrice } from "../lib/utils";
+
+interface Props {
+  pkg: Package;
+  waNumber: string;
+  class?: string;
+}
+
+const { pkg, waNumber, class: className = "inline-flex items-center justify-center gap-[8px] bg-white text-navy-700 rounded-[999px] px-[24px] py-[12px] font-semibold text-[13px] border border-gray-300 shadow-sm hover:bg-gray-50 transition-all w-full sm:w-auto mt-2 sm:mt-0 cursor-pointer" } = Astro.props;
+---
+
+<!-- Button Download PDF -->
+<button 
+  id="download-pdf-btn"
+  class={className}
+>
+  <i class="fa-solid fa-file-pdf text-red-500 text-[16px]"></i>
+  <span>Download Itinerary (PDF)</span>
+</button>
+
+<!-- pdfMake JS -->
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+<script define:vars={{ pkg, waNumber, packageName: pkg.name }}>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('download-pdf-btn');
+
+    if (btn) {
+      btn.addEventListener('click', () => {
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyusun PDF...';
+        btn.disabled = true;
+
+        try {
+          const NAVY   = '#0B2340';
+          const ORANGE = '#EE7D0F';
+          const LIGHT  = '#F5F7FA';
+          const MUTED  = '#6B7280';
+          const WHITE  = '#FFFFFF';
+          const BORDER = '#E5E7EB';
+
+          const formatIdr = (price) => {
+            if (!price && price !== 0) return '-';
+            if (price === 0) return 'Menyesuaikan';
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(price);
+          };
+
+          const paxLabel = (t) => {
+            if (!t.max_pax)                       return `${t.min_pax}+ Pax`;
+            if (t.min_pax === t.max_pax)           return `${t.min_pax} Pax`;
+            return `${t.min_pax} – ${t.max_pax} Pax`;
+          };
+
+          const stripHtml = (html) =>
+            (html || '').replace(/<\/?(h[1-6]|p|li|ul|ol|strong|em|br)[^>]*>/gi, ' ')
+                         .replace(/<[^>]+>/g, '')
+                         .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+                         .replace(/\s+/g, ' ').trim();
+
+          // ─── CUSTOM TABLE LAYOUT ───────────────────────────────────────
+          const elegantLayout = {
+            hLineWidth: (i, node) => (i === 0 || i === 1 || i === node.table.body.length) ? 1.5 : 0.5,
+            vLineWidth: () => 0,
+            hLineColor: (i) => i === 1 ? ORANGE : BORDER,
+            paddingLeft:   () => 12,
+            paddingRight:  () => 12,
+            paddingTop:    () => 8,
+            paddingBottom: () => 8,
+            fillColor: (i) => i === 0 ? NAVY : (i % 2 === 0 ? LIGHT : WHITE),
+          };
+
+          // ─── HELPERS ──────────────────────────────────────────────────
+          const sectionHeader = (title, icon = '●') => ({
+            columns: [
+              {
+                canvas: [
+                  { type: 'rect', x: 0, y: 2, w: 4, h: 14, r: 2, color: ORANGE }
+                ],
+                width: 12,
+                margin: [0, 1, 0, 0]
+              },
+              {
+                text: title,
+                fontSize: 13,
+                bold: true,
+                color: NAVY,
+                margin: [4, 0, 0, 0]
+              }
+            ],
+            margin: [0, 18, 0, 10]
+          });
+
+          const divider = () => ({
+            canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 0.5, lineColor: BORDER }],
+            margin: [0, 8, 0, 8]
+          });
+
+          // ─── CONTENT ──────────────────────────────────────────────────
+          const content = [];
+
+          // ── 1. KOP ────────────────────────────────────────────────────
+          content.push({
+            columns: [
+              {
+                stack: [
+                  {
+                    text: [
+                      { text: 'VODA TOUR ', fontSize: 22, bold: true, color: NAVY, letterSpacing: 1 },
+                      { text: '& EVENT',    fontSize: 22, bold: true, color: ORANGE, letterSpacing: 1 }
+                    ]
+                  },
+                  { text: 'PT ONO VODA PRO', fontSize: 9, color: MUTED, margin: [0, 3, 0, 0] }
+                ],
+                width: '*'
+              },
+              {
+                stack: [
+                  { text: 'PAKET WISATA',     fontSize: 8,  color: ORANGE, bold: true, characterSpacing: 2, alignment: 'right' },
+                  { text: 'RESMI & TERPERCAYA', fontSize: 7, color: MUTED, alignment: 'right', margin: [0, 1, 0, 6] },
+                  { text: `WA: +${waNumber}`,  fontSize: 9,  color: NAVY,   alignment: 'right' },
+                  { text: 'www.vodatrip.id',   fontSize: 9,  color: MUTED,  alignment: 'right', margin: [0, 2, 0, 0] }
+                ],
+                width: 'auto'
+              }
+            ],
+            margin: [0, 0, 0, 8]
+          });
+
+          // Thick orange line + thin navy line below kop
+          content.push({
+            canvas: [
+              { type: 'line', x1: 0, y1: 0,   x2: 515, y2: 0,   lineWidth: 2.5, lineColor: ORANGE },
+              { type: 'line', x1: 0, y1: 4.5, x2: 515, y2: 4.5, lineWidth: 0.5, lineColor: NAVY }
+            ],
+            margin: [0, 0, 0, 20]
+          });
+
+          // ── 2. PACKAGE TITLE BLOCK ────────────────────────────────────
+          content.push({
+            stack: [
+              {
+                text: pkg.name.toUpperCase(),
+                fontSize: 17,
+                bold: true,
+                color: NAVY,
+                alignment: 'center',
+                characterSpacing: 0.5
+              },
+              {
+                canvas: [{ type: 'line', x1: 160, y1: 0, x2: 355, y2: 0, lineWidth: 1.5, lineColor: ORANGE }],
+                margin: [0, 6, 0, 8]
+              },
+              // Meta badges row
+              {
+                columns: [
+                  pkg.duration ? {
+                    text: [ { text: 'Durasi: ', bold: true, color: ORANGE }, { text: pkg.duration } ],
+                    fontSize: 10, color: NAVY, alignment: 'center'
+                  } : {},
+                  {
+                    text: [ { text: 'Kategori: ', bold: true, color: ORANGE }, { text: 'Paket Wisata Pilihan' } ],
+                    fontSize: 10, color: NAVY, alignment: 'center'
+                  }
+                ],
+                columnGap: 10,
+                margin: [0, 0, 0, 0]
+              }
+            ],
+            fillColor: LIGHT,
+            margin: [0, 0, 0, 18]
+          });
+
+          // ── 3. DESCRIPTION ────────────────────────────────────────────
+          if (pkg.description) {
+            const clean = stripHtml(pkg.description);
+            if (clean) {
+              content.push(sectionHeader('Tentang Paket'));
+              content.push({
+                text: clean,
+                fontSize: 10,
+                color: '#374151',
+                lineHeight: 1.55,
+                alignment: 'justify',
+                margin: [0, 0, 0, 4]
+              });
+            }
+          }
+
+          // ── 4. FACILITIES in 2-column grid ───────────────────────────
+          if (pkg.facilities && pkg.facilities.length > 0) {
+            content.push(sectionHeader('Fasilitas Termasuk'));
+
+            // Split facilities into 2 columns
+            const half    = Math.ceil(pkg.facilities.length / 2);
+            const col1    = pkg.facilities.slice(0, half);
+            const col2    = pkg.facilities.slice(half);
+
+            const facilityItem = (f) => ({
+              columns: [
+                { text: '+', color: ORANGE, bold: true, width: 14, fontSize: 11, margin: [0, 1, 0, 0] },
+                { text: f, fontSize: 10, color: '#374151', lineHeight: 1.4 }
+              ],
+              margin: [0, 2, 0, 2]
+            });
+
+            content.push({
+              columns: [
+                { stack: col1.map(facilityItem), width: '*' },
+                { stack: col2.map(facilityItem), width: '*' }
+              ],
+              columnGap: 16,
+              margin: [0, 0, 0, 4]
+            });
+          }
+
+          // ── 5. ITINERARY ──────────────────────────────────────────────
+          if (pkg.itinerary && pkg.itinerary.length > 0) {
+            content.push(sectionHeader('Rencana Perjalanan'));
+
+            pkg.itinerary.forEach((day, idx) => {
+              // Day header block
+              content.push({
+                columns: [
+                  {
+                    stack: [
+                      { text: `HARI ${String(day.day).padStart(2, '0')}`, fontSize: 8, color: WHITE, bold: true, characterSpacing: 1, alignment: 'center', margin: [0, 0, 0, 1] },
+                    ],
+                    fillColor: NAVY,
+                    width: 40,
+                    margin: [0, 0, 0, 0]
+                  },
+                  {
+                    text: day.title,
+                    fontSize: 11,
+                    bold: true,
+                    color: NAVY,
+                    margin: [10, 1, 0, 0],
+                    width: '*'
+                  }
+                ],
+                margin: [0, idx === 0 ? 0 : 10, 0, 5]
+              });
+
+              if (day.activities && day.activities.length > 0) {
+                content.push({
+                  stack: day.activities.map((act, i) => ({
+                    columns: [
+                      { text: `${String(i + 1).padStart(2, '0')}.`, fontSize: 9, color: ORANGE, bold: true, width: 22, margin: [8, 1, 0, 0] },
+                      { text: act, fontSize: 10, color: '#374151', lineHeight: 1.4, width: '*' }
+                    ],
+                    margin: [0, 2, 0, 2]
+                  })),
+                  fillColor: LIGHT,
+                  margin: [0, 0, 0, 0]
+                });
+              }
+            });
+          }
+
+          // ── 6. PRICE TIERS ────────────────────────────────────────────
+          if (pkg.price_tiers && pkg.price_tiers.length > 0) {
+            content.push(sectionHeader('Harga Paket'));
+
+            pkg.price_tiers.forEach((pt) => {
+              if (pt.table_title) {
+                content.push({
+                  text: pt.table_title,
+                  fontSize: 10,
+                  bold: true,
+                  color: MUTED,
+                  italics: true,
+                  margin: [0, 0, 0, 6]
+                });
+              }
+
+              const tableBody = [
+                [
+                  { text: 'Jumlah Peserta', style: 'th', alignment: 'center' },
+                  { text: 'Harga / Orang',  style: 'th', alignment: 'center' },
+                  { text: 'Keterangan',     style: 'th', alignment: 'center' }
+                ],
+                ...(pt.tiers || []).map((t) => [
+                  { text: paxLabel(t), fontSize: 10, alignment: 'center', bold: true, color: NAVY },
+                  { text: formatIdr(t.price_per_pax), fontSize: 11, bold: true, color: ORANGE, alignment: 'center' },
+                  { text: t.description || '—', fontSize: 10, color: MUTED, alignment: 'center' }
+                ])
+              ];
+
+              content.push({
+                table: {
+                  headerRows: 1,
+                  widths: ['auto', '*', '*'],
+                  body: tableBody
+                },
+                layout: elegantLayout,
+                margin: [0, 0, 0, 16]
+              });
+            });
+          }
+
+          // ── 7. ADDONS ─────────────────────────────────────────────────
+          if (pkg.addons && pkg.addons.length > 0) {
+            content.push(sectionHeader('Biaya Tidak Termasuk / Catatan'));
+
+            content.push({
+              stack: pkg.addons.map((ad, i) => ({
+                columns: [
+                  { text: '!', fontSize: 10, bold: true, color: '#F59E0B', width: 16, margin: [0, 1, 0, 0] },
+                  { text: ad.addon_name || ad.description || '-', fontSize: 10, color: '#374151', lineHeight: 1.4 }
+                ],
+                margin: [0, 3, 0, 3]
+              })),
+              margin: [0, 0, 0, 4]
+            });
+          }
+
+          // ── 8. DISCLAIMER BOX ─────────────────────────────────────────
+          content.push({
+            canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 0.5, lineColor: BORDER }],
+            margin: [0, 14, 0, 10]
+          });
+
+          content.push({
+            columns: [
+              {
+                stack: [
+                  { text: 'Catatan Penting', fontSize: 9, bold: true, color: NAVY },
+                  { text: '• Harga sewaktu-waktu dapat berubah.', fontSize: 8.5, color: MUTED, lineHeight: 1.5 },
+                  { text: '• Harga di atas adalah harga per orang sesuai jumlah peserta.', fontSize: 8.5, color: MUTED, lineHeight: 1.5 },
+                  { text: '• Hubungi kami untuk konfirmasi ketersediaan tanggal.', fontSize: 8.5, color: MUTED, lineHeight: 1.5 }
+                ],
+                width: '*'
+              },
+              {
+                stack: [
+                  { text: 'Hubungi Kami Sekarang', fontSize: 9, bold: true, color: NAVY, alignment: 'right' },
+                  { text: `WhatsApp: +${waNumber}`, fontSize: 9, color: ORANGE, bold: true, alignment: 'right', margin: [0, 2, 0, 0] },
+                  { text: 'www.vodatrip.id', fontSize: 8.5, color: MUTED, alignment: 'right', margin: [0, 2, 0, 0] }
+                ],
+                width: 180
+              }
+            ]
+          });
+
+          // ─── DOC DEFINITION ───────────────────────────────────────────
+          const docDefinition = {
+            pageSize:    'A4',
+            pageMargins: [40, 40, 40, 50],
+            content:     content,
+            footer: (currentPage, pageCount) => ({
+              columns: [
+                {
+                  canvas: [{ type: 'rect', x: 0, y: 0, w: 595, h: 24, color: NAVY }],
+                  absolutePosition: { x: 0, y: 0 },
+                  width: 595
+                },
+                {
+                  text: `VODA TOUR & EVENT  •  www.vodatrip.id  •  +${waNumber}`,
+                  fontSize: 8,
+                  color: WHITE,
+                  alignment: 'left',
+                  margin: [40, 6, 0, 0],
+                  width: '*'
+                },
+                {
+                  text: `${currentPage} / ${pageCount}`,
+                  fontSize: 8,
+                  color: WHITE,
+                  alignment: 'right',
+                  margin: [0, 6, 40, 0],
+                  width: 'auto'
+                }
+              ]
+            }),
+            styles: {
+              th: {
+                bold:      true,
+                fontSize:  10,
+                color:     WHITE,
+                fillColor: NAVY,
+              },
+            },
+            defaultStyle: {
+              font:     'Roboto',
+              fontSize: 11,
+              color:    '#1F2937'
+            }
+          };
+
+          const filename = `Itinerary-${packageName.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+          pdfMake.createPdf(docDefinition).download(filename);
+
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.disabled  = false;
+          }, 1000);
+
+        } catch (error) {
+          console.error('pdfMake Error:', error);
+          alert('Gagal menyusun PDF. ' + error.message);
+          btn.innerHTML = originalText;
+          btn.disabled  = false;
+        }
+      });
+    }
+  });
+</script>
