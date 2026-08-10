@@ -1,0 +1,70 @@
+[
+  {
+    "name": "Paket Eksplorasi Bali 3 Hari 2 Malam",
+    "slug": "paket-eksplorasi-bali-3h2m",
+    "destination_id": "", 
+    "status": "published",
+    "duration": "3 Hari 2 Malam",
+    "description": "<h2>Eksplorasi Keindahan Pulau Dewata</h2><p>Paket wisata eksklusif menikmati pemandangan alam dan budaya Bali.</p>",
+    "facilities": [
+      "Transportasi AC selama tour (Innova/Hiace)",
+      "Akomodasi Hotel Bintang 3 selama 2 malam",
+      "Makan pagi 2x, Siang 2x, Malam 2x",
+      "Tiket masuk semua objek wisata",
+      "Air mineral harian"
+    ],
+    "itinerary": [
+      {
+        "day": 1,
+        "title": "Tiba di Bali, GWK, dan Sunset Jimbaran",
+        "activities": [
+          "13:00 - Penjemputan di Bandara Ngurah Rai",
+          "14:30 - Tour Garuda Wisnu Kencana (GWK)",
+          "17:30 - Makan malam seafood di Jimbaran",
+          "20:00 - Check-in Hotel dan Istirahat"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Kintamani & Penglipuran Tour",
+        "activities": [
+          "08:00 - Sarapan di Hotel",
+          "10:30 - Mengunjungi Desa Adat Penglipuran",
+          "13:00 - Makan siang dengan pemandangan Gunung Batur di Kintamani",
+          "16:00 - Menikmati sore di Tirta Empul",
+          "19:00 - Makan malam lokal"
+        ]
+      }
+    ],
+    "price_tiers": [
+      {
+        "table_title": "Harga Domestik (WNI) - Hotel Bintang 3",
+        "tiers": [
+          {
+            "min_pax": 2,
+            "max_pax": 3,
+            "price_per_pax": 2850000,
+            "description": "Termasuk sarapan"
+          },
+          {
+            "min_pax": 4,
+            "max_pax": 6,
+            "price_per_pax": 2450000,
+            "description": "Termasuk sarapan"
+          }
+        ]
+      }
+    ],
+    "addons": [
+      {
+        "addon_name": "Dokumentasi Foto & Video Drone",
+        "price": 1500000,
+        "description": "Termasuk fotografer profesional dan cinematic video 1 menit"
+      }
+    ],
+    "image": "", 
+    "poster": "", 
+    "gallery": [],
+    "activity_types": []
+  }
+]
