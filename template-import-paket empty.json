@@ -1,0 +1,33 @@
+{
+  "name": "",
+  "slug": "",
+  "destination_id": "",
+  "status": "published",
+  "duration": "",
+  "description": "",
+  "facilities": [],
+  "itinerary": [
+    {
+      "day": 1,
+      "title": "",
+      "activities": []
+    }
+  ],
+  "price_tiers": [
+    {
+      "table_title": "",
+      "tiers": [
+        {
+          "min_pax": 0,
+          "max_pax": 0,
+          "price_per_pax": 0,
+          "description": ""
+        }
+      ]
+    }
+  ],
+  "addons": [],
+  "image": "",
+  "poster": "",
+  "gallery": []
+}

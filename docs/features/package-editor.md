@@ -118,3 +118,7 @@ docker restart voda-directus
 ```
 
 Setelah itu, lakukan **Hard Refresh** (**Shift + F5** atau **Ctrl + F5**) di browser pada panel admin Directus untuk melihat hasil pembaruannya.
+
+7. 📥 **Fitur Import JSON**:
+   - Memungkinkan admin untuk mengimpor paket wisata dari format JSON (baik *single object* untuk *replace* data di editor, maupun *array of objects* untuk *bulk insert* ke database).
+   - Memudahkan migrasi data atau duplikasi massal antar environment.
