@@ -25,43 +25,34 @@ const ALERT_EMAIL_FROM = 'noreply@vodatrip.id';
 /**
  * Kirim email notifikasi via Resend API
  */
+function escapeHtml(value) {
+  if (!value) return '-';
+  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 async function sendAlertEmail(resendApiKey, alertData) {
   const { ip, scenario, duration, message } = alertData;
 
-  const html = `
-    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-      <div style="background: #dc2626; color: white; padding: 16px 24px; border-radius: 8px 8px 0 0;">
-        <h2 style="margin: 0;">🚨 Security Alert — Voda Tour</h2>
-      </div>
-      <div style="background: #f9fafb; padding: 24px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="padding: 8px 0; color: #6b7280; width: 120px;">IP Address</td>
-            <td style="padding: 8px 0; font-weight: bold; color: #111827;">${ip || '-'}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px 0; color: #6b7280;">Scenario</td>
-            <td style="padding: 8px 0; font-weight: bold; color: #111827;">${scenario || '-'}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px 0; color: #6b7280;">Durasi Ban</td>
-            <td style="padding: 8px 0; font-weight: bold; color: #111827;">${duration || '-'}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px 0; color: #6b7280;">Pesan</td>
-            <td style="padding: 8px 0; color: #111827;">${message || '-'}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px 0; color: #6b7280;">Waktu</td>
-            <td style="padding: 8px 0; color: #111827;">${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })} WIB</td>
-          </tr>
-        </table>
-        <p style="margin-top: 16px; color: #6b7280; font-size: 13px;">
-          IP tersebut telah otomatis diblokir oleh CrowdSec firewall bouncer.
-        </p>
-      </div>
-    </div>
-  `;
+  const subject = `🚨 [Voda Tour] Security Alert: ${scenario || 'Unknown'} — IP ${ip || 'Unknown'}`;
+  
+  const textLines = [
+    `Severity: CRITICAL`,
+    `Host: vodatrip-prod`,
+    `Event: ${scenario}`,
+    `Source IP: ${ip || '-'}`,
+    `Duration: ${duration || '-'}`,
+    `Message: ${message || '-'}`,
+    `Time: ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })} WIB`
+  ];
+  const text = textLines.join('\n');
+
+  const html = [
+    '<div style="font-family:monospace;max-width:640px;margin:0 auto">',
+    `<h2 style="color:#c0392b">${escapeHtml(subject)}</h2>`,
+    `<pre style="white-space:pre-wrap;background:#f8f9fa;padding:16px;border-radius:8px">${escapeHtml(text)}</pre>`,
+    '<p style="color:#7f8c8d;font-size:12px">Dikirim otomatis oleh sistem keamanan Voda Tour</p>',
+    '</div>',
+  ].join('\n');
 
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -70,7 +61,7 @@ async function sendAlertEmail(resendApiKey, alertData) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: ALERT_EMAIL_FROM,
+      from: 'Voda Tour Security <noreply@vodatrip.id>',
       to: [ALERT_EMAIL_TO],
       subject: `🚨 [Voda Tour] Security Alert: ${scenario || 'Unknown'} — IP ${ip || 'Unknown'}`,
       html,
