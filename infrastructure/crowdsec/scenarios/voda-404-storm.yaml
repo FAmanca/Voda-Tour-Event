@@ -4,7 +4,7 @@ description: 'Enumerasi endpoint / scanner bot (404 storm)'
 filter: |
   evt.Parsed.verb == 'GET'
   && evt.Meta.http_path matches '^/'
-  && evt.Parsed.http_status == '404'
+  && evt.Meta.http_status == '404'
 leakspeed: 60s
 capacity: 29
 groupby: evt.Parsed.source_ip
