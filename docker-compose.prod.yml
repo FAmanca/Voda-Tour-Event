@@ -101,6 +101,10 @@ services:
 
       MARKETPLACE_TRUST: "all"
 
+      # Security / Notifications
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      CROWDSEC_WEBHOOK_SECRET: ${CROWDSEC_WEBHOOK_SECRET}
+
     volumes:
       - directus_uploads:/directus/uploads
       - directus_database_prod:/directus/database
