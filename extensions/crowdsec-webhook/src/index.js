@@ -85,88 +85,87 @@ async function sendAlertEmail(resendApiKey, alertData) {
   return response.json();
 }
 
-export default (router, { services, env }) => {
-  const { ItemsService } = services;
+export default {
+  id: 'crowdsec-webhook',
+  handler: (router, { services, env }) => {
+    const { ItemsService } = services;
 
-  /**
-   * POST /custom/crowdsec-webhook
-   * Dipanggil oleh CrowdSec saat ada IP yang terkena decision (ban).
-   */
-  router.post('/', async (req, res) => {
-    try {
-      // 1. Validasi secret key dari header
-      const webhookSecret = env['CROWDSEC_WEBHOOK_SECRET'];
-      const incomingKey = req.headers['x-crowdsec-key'];
+    /**
+     * POST /crowdsec-webhook/
+     * Dipanggil oleh CrowdSec saat ada IP yang terkena decision (ban).
+     */
+    router.post('/', async (req, res) => {
+      try {
+        // 1. Validasi secret key dari header
+        const webhookSecret = env['CROWDSEC_WEBHOOK_SECRET'];
+        const incomingKey = req.headers['x-crowdsec-key'];
 
-      if (!webhookSecret || incomingKey !== webhookSecret) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
-
-      // 2. Parse payload dari CrowdSec
-      // CrowdSec mengirim satu JSON per baris (newline-delimited)
-      // Body bisa berupa string multi-baris atau object langsung
-      let alerts = [];
-
-      if (typeof req.body === 'string') {
-        // Parse newline-delimited JSON
-        alerts = req.body
-          .split('\n')
-          .map((line) => line.trim())
-          .filter((line) => line.length > 0)
-          .map((line) => {
-            try { return JSON.parse(line); } catch { return null; }
-          })
-          .filter(Boolean);
-      } else if (Array.isArray(req.body)) {
-        alerts = req.body;
-      } else if (req.body && typeof req.body === 'object') {
-        alerts = [req.body];
-      }
-
-      if (alerts.length === 0) {
-        return res.status(400).json({ error: 'No valid alert payload found' });
-      }
-
-      const resendApiKey = env['RESEND_API_KEY'];
-      const schema = req.schema;
-
-      // 3. Proses setiap alert
-      for (const alert of alerts) {
-        const alertData = {
-          ip: alert.ip || null,
-          scenario: alert.scenario || null,
-          duration: alert.duration || null,
-          message: alert.message || null,
-          source: alert.source || 'crowdsec',
-          raw: alert,
-        };
-
-        // 3a. Simpan ke collection security_alerts
-        try {
-          const alertsService = new ItemsService('security_alerts', { schema });
-          await alertsService.createOne(alertData);
-        } catch (dbErr) {
-          console.error('[crowdsec-webhook] DB error:', dbErr.message);
-          // Lanjutkan ke email meski DB gagal
+        if (!webhookSecret || incomingKey !== webhookSecret) {
+          return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        // 3b. Kirim email via Resend
-        if (resendApiKey) {
+        // 2. Parse payload dari CrowdSec
+        let alerts = [];
+
+        if (typeof req.body === 'string') {
+          alerts = req.body
+            .split('\n')
+            .map((line) => line.trim())
+            .filter((line) => line.length > 0)
+            .map((line) => {
+              try { return JSON.parse(line); } catch { return null; }
+            })
+            .filter(Boolean);
+        } else if (Array.isArray(req.body)) {
+          alerts = req.body;
+        } else if (req.body && typeof req.body === 'object') {
+          alerts = [req.body];
+        }
+
+        if (alerts.length === 0) {
+          return res.status(400).json({ error: 'No valid alert payload found' });
+        }
+
+        const resendApiKey = env['RESEND_API_KEY'];
+        const schema = req.schema;
+
+        // 3. Proses setiap alert
+        for (const alert of alerts) {
+          const alertData = {
+            ip: alert.ip || null,
+            scenario: alert.scenario || null,
+            duration: alert.duration || null,
+            message: alert.message || null,
+            source: alert.source || 'crowdsec',
+            raw: alert,
+          };
+
+          // 3a. Simpan ke collection security_alerts
           try {
-            await sendAlertEmail(resendApiKey, alertData);
-          } catch (emailErr) {
-            console.error('[crowdsec-webhook] Email error:', emailErr.message);
+            const alertsService = new ItemsService('security_alerts', { schema });
+            await alertsService.createOne(alertData);
+          } catch (dbErr) {
+            console.error('[crowdsec-webhook] DB error:', dbErr.message);
           }
-        } else {
-          console.warn('[crowdsec-webhook] RESEND_API_KEY tidak ada, email tidak terkirim');
+
+          // 3b. Kirim email via Resend
+          if (resendApiKey) {
+            try {
+              await sendAlertEmail(resendApiKey, alertData);
+            } catch (emailErr) {
+              console.error('[crowdsec-webhook] Email error:', emailErr.message);
+            }
+          } else {
+            console.warn('[crowdsec-webhook] RESEND_API_KEY tidak ada, email tidak terkirim');
+          }
         }
+
+        return res.status(200).json({ received: alerts.length });
+
+      } catch (err) {
+        console.error('[crowdsec-webhook] Unexpected error:', err.message || err);
+        return res.status(500).json({ error: 'Internal server error' });
       }
-
-      return res.status(200).json({ received: alerts.length });
-
-    } catch (err) {
-      console.error('[crowdsec-webhook] Unexpected error:', err.message || err);
-      return res.status(500).json({ error: 'Internal server error' });
-    }
-  });
+    });
+  }
 };
