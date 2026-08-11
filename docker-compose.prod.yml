@@ -202,6 +202,32 @@ services:
     networks:
       - voda_net
 
+  # =======================================================
+  # CROWDSEC (Security Engine — IDS/IPS)
+  # =======================================================
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: voda-crowdsec-prod
+    restart: unless-stopped
+    environment:
+      COLLECTIONS: "crowdsecurity/nginx crowdsecurity/linux"
+      LOG_LEVEL: info
+      GID: "0"
+      UID: "0"
+    ports:
+      # Hanya localhost — firewall-bouncer host (apt package) butuh akses LAPI
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./infrastructure/crowdsec/config:/etc/crowdsec/acquis.d:ro
+      - ./infrastructure/crowdsec/scenarios:/etc/crowdsec/scenarios/custom:ro
+      - crowdsec_db:/var/lib/crowdsec/data
+      - crowdsec_config:/etc/crowdsec
+      # Baca log Nginx dari named volume milik stack ini
+      - nginx_logs:/var/log/nginx:ro
+      # NOTIFIKASI: jangan di-mount — salin manual ke volume (lihat infrastructure/crowdsec/notifications/alert-gateway.yaml)
+    networks:
+      - voda_net
+
 networks:
   voda_net:
     driver: bridge
@@ -214,3 +240,5 @@ volumes:
   certbot_conf:
   certbot_www:
   nginx_logs:
+  crowdsec_db:
+  crowdsec_config:
