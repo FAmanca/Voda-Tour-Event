@@ -1,5 +1,6 @@
 # Acquisition — baca access log nginx dari named volume voda-tour-event_nginx_logs
 # Log dibaca langsung dari file (bukan container socket).
+source: file
 filenames:
   - /var/log/nginx/access_real.log
   - /var/log/nginx/error_real.log
