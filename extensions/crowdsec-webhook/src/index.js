@@ -92,7 +92,7 @@ export default (router, { services, env }) => {
    * POST /custom/crowdsec-webhook
    * Dipanggil oleh CrowdSec saat ada IP yang terkena decision (ban).
    */
-  router.post('/crowdsec-webhook', async (req, res) => {
+  router.post('/', async (req, res) => {
     try {
       // 1. Validasi secret key dari header
       const webhookSecret = env['CROWDSEC_WEBHOOK_SECRET'];
