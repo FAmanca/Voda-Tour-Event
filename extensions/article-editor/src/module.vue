@@ -6,7 +6,12 @@
         <v-button class="header-icon" rounded disabled icon="article" />
       </template>
       <template #actions>
-        <v-button icon round @click="createNew" title="Tulis Baru"><v-icon name="add" /></v-button>
+        <div style="position: relative; display: inline-block;">
+          <v-button icon round @click="handleCreateClick" title="Tulis Baru"><v-icon name="add" /></v-button>
+          <div v-if="offlineDrafts.length > 0" style="position: absolute; top: -5px; right: -5px; background-color: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: bold; box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4); pointer-events: none;">
+            {{ offlineDrafts.length }}
+          </div>
+        </div>
       </template>
       <template #navigation>
         <div class="directus-nav-sidebar">
@@ -433,6 +438,37 @@
         <v-card-actions>
           <v-button secondary @click="showDeleteDialog = false">Batal</v-button>
           <v-button kind="danger" @click="executeDelete">Hapus Permanen</v-button>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Offline Drafts Dialog -->
+    <v-dialog v-model="showOfflineDraftsDialog" @esc="showOfflineDraftsDialog = false">
+      <v-card>
+        <v-card-title>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <v-icon name="cloud_off" style="color: #f59e0b;" /> 
+            Draf Offline Ditemukan
+          </div>
+        </v-card-title>
+        <v-card-text>
+          Ada <b>{{ offlineDrafts.length }}</b> draf yang belum tersimpan ke server. Apakah Anda ingin melanjutkan draf ini atau membuat artikel baru dari nol?
+          <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto;">
+            <div v-for="draft in offlineDrafts" :key="draft.key" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <div style="width: 70%;">
+                <div style="font-weight: 600; color: #0b2340; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ draft.title }}</div>
+                <div style="font-size: 12px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ draft.contentSnippet }}</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <v-button secondary icon round @click="deleteOfflineDraft(draft.key)" title="Hapus Draf"><v-icon name="delete" /></v-button>
+                <v-button @click="restoreOfflineDraft(draft.key)">Lanjutkan</v-button>
+              </div>
+            </div>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-button secondary @click="showOfflineDraftsDialog = false">Tutup</v-button>
+          <v-button @click="createNewBlank">Buat Artikel Baru Kosong</v-button>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -888,6 +924,28 @@ export default {
     const fileInput = ref(null);
     
     const toastMessage = ref('');
+    const offlineDrafts = ref([]);
+    const showOfflineDraftsDialog = ref(false);
+
+    const scanOfflineDrafts = () => {
+      const drafts = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('voda_article_backup_')) {
+          try {
+            const data = JSON.parse(localStorage.getItem(key));
+            drafts.push({
+              key,
+              title: data.title || '(Tanpa Judul)',
+              contentSnippet: data.content ? data.content.replace(/<[^>]*>?/gm, '').substring(0, 50) + '...' : 'Tidak ada konten'
+            });
+          } catch(e) {
+            console.error(e);
+          }
+        }
+      }
+      offlineDrafts.value = drafts;
+    };
     let tocSyncTimeout = null;
     let cannibalTimeout = null;
 
@@ -1156,6 +1214,7 @@ export default {
 
     // Lifecycle
     onMounted(() => {
+      scanOfflineDrafts();
       fetchArticles();
       fetchPillars();
     });
@@ -1424,7 +1483,7 @@ export default {
       }
     };
 
-    const createNew = () => {
+    const createNew = (skipRecovery = false) => {
       currentArticle.value = {
         id: null,
         title: '',
@@ -1438,14 +1497,16 @@ export default {
         SEO: { title: '', metaDescription: '', focus_keyword: '', secondary_keywords: '' }
       };
       
-      const localBackup = localStorage.getItem('voda_article_backup_new');
-      if (localBackup) {
-        try {
-          const parsedBackup = JSON.parse(localBackup);
-          Object.assign(currentArticle.value, parsedBackup);
-          showToast('⚠️ Memulihkan draf baru yang belum sempat tersimpan.');
-        } catch(e) {
-          localStorage.removeItem('voda_article_backup_new');
+      if (!skipRecovery) {
+        const localBackup = localStorage.getItem('voda_article_backup_new');
+        if (localBackup) {
+          try {
+            const parsedBackup = JSON.parse(localBackup);
+            Object.assign(currentArticle.value, parsedBackup);
+            showToast('⚠️ Memulihkan draf baru yang belum sempat tersimpan.');
+          } catch(e) {
+            localStorage.removeItem('voda_article_backup_new');
+          }
         }
       }
 
@@ -1461,6 +1522,71 @@ export default {
         runSeoAnalysis();
       });
     };
+
+    const handleCreateClick = () => {
+      scanOfflineDrafts();
+      if (offlineDrafts.value.length > 0) {
+        showOfflineDraftsDialog.value = true;
+      } else {
+        createNew();
+      }
+    };
+
+    const createNewBlank = () => {
+      showOfflineDraftsDialog.value = false;
+      createNew(true);
+    };
+
+    const deleteOfflineDraft = (key) => {
+      localStorage.removeItem(key);
+      scanOfflineDrafts();
+      if (offlineDrafts.value.length === 0) {
+        showOfflineDraftsDialog.value = false;
+      }
+    };
+
+    const restoreOfflineDraft = (key) => {
+      showOfflineDraftsDialog.value = false;
+      const localBackup = localStorage.getItem(key);
+      try {
+        const parsedBackup = JSON.parse(localBackup);
+        
+        currentArticle.value = {
+          id: null,
+          title: '',
+          slug: '',
+          content: '',
+          status: 'draft',
+          publish_date: new Date().toISOString().slice(0, 16),
+          featured_image: null,
+          is_pillar: false,
+          pillar_parent: null,
+          SEO: { title: '', metaDescription: '', focus_keyword: '', secondary_keywords: '' }
+        };
+        
+        Object.assign(currentArticle.value, parsedBackup);
+        currentArticle.value.id = null; // Strip ID so it saves as new
+        
+        const fk = currentArticle.value.SEO.focus_keyword || '';
+        const sk = currentArticle.value.SEO.secondary_keywords ? currentArticle.value.SEO.secondary_keywords.split(',').map(s=>s.trim()).filter(s=>s) : [];
+        const kws = [];
+        if (fk) kws.push(fk);
+        keywordsList.value = [...kws, ...sk];
+        
+        ads.value = [];
+        nextTick(() => {
+          editor.value.commands.setContent(currentArticle.value.content || '');
+          runSeoAnalysis();
+        });
+        
+        showToast('⚠️ Draf offline dimuat sebagai artikel baru.');
+        localStorage.removeItem(key);
+        scanOfflineDrafts();
+      } catch(e) {
+        showToast('❌ Gagal memuat draf.');
+      }
+    };
+
 
     const editArticle = async (articleStub) => {
       try {
@@ -2044,6 +2170,12 @@ export default {
 
 
     return {
+      offlineDrafts,
+      showOfflineDraftsDialog,
+      handleCreateClick,
+      createNewBlank,
+      deleteOfflineDraft,
+      restoreOfflineDraft,
       articles, loading, searchQuery, activeFilter, filteredArticles,
       currentPage, totalPages, paginatedArticles,
       currentArticle, isSaving, sidebarTab, checkTab,

@@ -1,0 +1,16 @@
+type: leaky
+name: voda/api-404-storm
+description: 'Enumerasi endpoint / scanner bot (404 storm)'
+filter: |
+  evt.Parsed.verb == 'GET'
+  && evt.Meta.http_path matches '^/'
+  && evt.Meta.http_status == '404'
+leakspeed: 60s
+capacity: 29
+groupby: evt.Parsed.source_ip
+labels:
+  type: scan
+  service: vodatrip
+  behavior: 'http:scan'
+  severity: critical
+  remediation: true

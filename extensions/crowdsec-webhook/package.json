@@ -1,0 +1,17 @@
+{
+  "name": "crowdsec-webhook",
+  "version": "1.0.0",
+  "description": "Directus endpoint to receive CrowdSec alerts, store to collection, and send email via Resend",
+  "directus:extension": {
+    "type": "endpoint",
+    "path": "dist/index.js",
+    "source": "src/index.js",
+    "host": "^12.0.0"
+  },
+  "scripts": {
+    "build": "directus-extension build"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "^12.0.0"
+  }
+}

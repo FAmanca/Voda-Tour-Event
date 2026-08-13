@@ -9,6 +9,7 @@ import CTABand from "../../components/CTABand.astro";
 import PackageHero from "../../components/PackageHero.astro";
 import PackageFacilities from "../../components/PackageFacilities.astro";
 import PackageSimilar from "../../components/PackageSimilar.astro";
+import PackagePdfGenerator from "../../components/PackagePdfGenerator.astro";
 import { getAssetUrl, getSettings } from "../../lib/directus";
 import { getStartingPrice, formatPrice, getPriceRange } from "../../lib/utils";
 
@@ -224,6 +225,7 @@ const priceRange = pkg?.price_tiers ? getPriceRange(pkg.price_tiers) : null;
         <p class="text-white/60 text-[14px] mt-[8px] max-w-[400px] mx-auto">Hubungi kami via WhatsApp untuk konsultasi gratis.</p>
         <div class="mt-[24px] flex flex-wrap justify-center gap-[12px]">
           <WaButton phone={waNumber} variant="primary" message={encodeURIComponent(`Halo Voda Tour & Event, saya tertarik dengan paket ${pkg.name}.`)}>Pesan via WhatsApp</WaButton>
+          <PackagePdfGenerator pkg={pkg} waNumber={waNumber} class="inline-flex items-center gap-[8px] bg-white text-navy-800 rounded-[999px] px-[24px] py-[12px] font-semibold text-[13px] no-underline border border-white/20 transition-all hover:bg-gray-100 cursor-pointer shadow-md" />
           <a href="/kontak" class="inline-flex items-center gap-[8px] bg-white/10 text-white rounded-[999px] px-[24px] py-[12px] font-semibold text-[13px] no-underline border border-white/20 transition-all hover:bg-white/20">
             <i class="fa-regular fa-envelope"></i>Hubungi Kami
           </a>

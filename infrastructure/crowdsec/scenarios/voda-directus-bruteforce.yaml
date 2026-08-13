@@ -1,0 +1,18 @@
+type: leaky
+name: voda/directus-bruteforce
+description: 'Brute force pada endpoint login Directus (/directus/auth/login atau /auth/login)'
+filter: |
+  evt.Meta.log_type == 'http_access-log'
+  && evt.Meta.http_status == '401'
+  && evt.Parsed.verb == 'POST'
+  && evt.Meta.http_path matches '^/directus/auth/'
+leakspeed: 60s
+capacity: 4
+groupby: evt.Meta.source_ip
+reprocess: true
+labels:
+  type: bruteforce
+  service: vodatrip
+  behavior: 'http:bruteforce'
+  severity: critical
+  remediation: true

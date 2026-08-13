@@ -1,0 +1,27 @@
+# Teruskan decision CrowdSec ke Directus Custom Endpoint (lalu diteruskan ke Resend email).
+#
+# Aktivasi di VPS (CrowdSec tidak mensubstitusi env variable, jadi secret harus diisi manual):
+#   docker cp infrastructure/crowdsec/notifications/alert-gateway.yaml \
+#     voda-crowdsec-prod:/etc/crowdsec/notifications/voda-alert-gateway.yaml
+#   docker exec voda-crowdsec-prod sed -i "s/SECRET_PLACEHOLDER/<isi CROWDSEC_WEBHOOK_SECRET>/g" \
+#     /etc/crowdsec/notifications/voda-alert-gateway.yaml
+#   docker restart voda-crowdsec-prod
+#   docker exec voda-crowdsec-prod cscli notifications add voda-alert-gateway
+#
+# Catatan penting (dari pengalaman ahlipanggilan):
+# - Plugin http CrowdSec mengirim literal `format:` sebagai body request (bukan key `payload:`)
+# - Template menerima LIST alert — gunakan {{range .}} untuk iterasi
+# - Field .Severity tidak ada di models.Alert — hardcode value-nya
+# - URL harus full domain (bukan localhost)
+
+name: voda-alert-gateway
+type: http
+format: |
+  {{range . -}}
+  {"scenario": "{{.Scenario}}", "message": "{{range .Decisions}}{{.Value}} diblokir selama {{.Duration}}{{end}}", "source": "crowdsec", "ip": "{{.Source.IP}}", "duration": "{{range .Decisions}}{{.Duration}}{{end}}"}
+  {{end -}}
+url: https://api.vodatrip.id/custom/crowdsec-webhook
+method: POST
+headers:
+  Content-Type: application/json
+  X-Crowdsec-Key: SECRET_PLACEHOLDER

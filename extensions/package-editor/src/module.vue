@@ -2,6 +2,9 @@
   <private-view v-if="!editingPackage" title="Daftar Paket Wisata">
     <!-- Top Action: Icon Only Plus Button -->
     <template #actions>
+      <v-button icon round @click="showImportDialog = true" title="Import JSON Paket Wisata" style="margin-right: 8px;">
+        <v-icon name="data_object" />
+      </v-button>
       <v-button icon round @click="createNewPackage" title="Buat Paket Wisata Baru">
         <v-icon name="add" />
       </v-button>
@@ -573,6 +576,21 @@
   <div v-if="toastMessage" class="toast-notification">
     {{ toastMessage }}
   </div>
+
+  <!-- Import JSON Dialog -->
+  <v-dialog v-model="showImportDialog" @esc="showImportDialog = false">
+    <v-card>
+      <v-card-title>Import Data Paket JSON</v-card-title>
+      <v-card-text>
+        <p style="margin-bottom: 12px; font-size: 13px; color: var(--theme--foreground-subdued);">Paste full JSON (object atau array) dari data paket ke sini.</p>
+        <v-textarea v-model="jsonImportData" placeholder='[{"name": "Paket Bali", "duration": "3D2N", "itinerary": [...]}]' rows="15" style="width: 100%; font-family: monospace;"></v-textarea>
+      </v-card-text>
+      <v-card-actions>
+        <v-button secondary @click="showImportDialog = false">Batal</v-button>
+        <v-button @click="processJSONImport" :loading="saving">Import Data</v-button>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -637,6 +655,10 @@ export default {
     const showDeleteDialog = ref(false);
     const packageToDelete = ref(null);
     const deleting = ref(false);
+
+    // Import JSON State
+    const showImportDialog = ref(false);
+    const jsonImportData = ref('');
 
     // TipTap Editor Setup
     const editor = useEditor({
@@ -826,6 +848,90 @@ export default {
       originalActivityTypeIds.value = [];
       selectedActivityTypes.value = [];
       if (editor.value) editor.value.commands.setContent(editingPackage.value.description);
+    };
+
+    const processJSONImport = async () => {
+      try {
+        const parsed = JSON.parse(jsonImportData.value);
+        let itemsToImport = Array.isArray(parsed) ? parsed : [parsed];
+
+        if (itemsToImport.length === 0) {
+          showToast('❌ Data JSON kosong!');
+          return;
+        }
+
+        if (itemsToImport.length === 1) {
+          // If only 1 item, just load it into editor so they can review/edit
+          createNewPackage();
+          const pkgData = itemsToImport[0];
+          editingPackage.value = { ...editingPackage.value, ...pkgData };
+          
+          if (pkgData.gallery && Array.isArray(pkgData.gallery)) {
+            originalGalleryIds.value = pkgData.gallery.map(g => g.directus_files_id?.id || g.directus_files_id || g);
+            galleryImages.value = [...originalGalleryIds.value];
+          }
+
+          if (pkgData.activity_types && Array.isArray(pkgData.activity_types)) {
+            originalActivityTypeIds.value = pkgData.activity_types.map(a => a.activity_types_id?.id || a.activity_types_id || a);
+            selectedActivityTypes.value = [...originalActivityTypeIds.value];
+          }
+
+          if (editor.value) {
+            editor.value.commands.setContent(editingPackage.value.description || '');
+          }
+
+          showImportDialog.value = false;
+          jsonImportData.value = '';
+          showToast('✅ Data JSON berhasil di-load ke editor! Silakan simpan.');
+        } else {
+          // If array > 1, bulk create directly (to save time)
+          let successCount = 0;
+          saving.value = true;
+          for (const pkgData of itemsToImport) {
+             const payload = {
+                name: pkgData.name || 'Paket Tanpa Nama',
+                slug: pkgData.slug || (pkgData.name ? pkgData.name.toLowerCase().replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-') : 'paket-' + Date.now()),
+                destination_id: pkgData.destination_id || null,
+                status: pkgData.status || 'draft',
+                duration: pkgData.duration || '',
+                description: pkgData.description || '',
+                facilities: pkgData.facilities || [],
+                itinerary: pkgData.itinerary || [],
+                price_tiers: pkgData.price_tiers || [],
+                addons: pkgData.addons || [],
+                image: pkgData.image || null,
+                poster: pkgData.poster || null
+             };
+             const res = await api.post('/items/packages', payload);
+             const newId = res.data.data.id;
+
+             // Process gallery
+             if (pkgData.gallery && Array.isArray(pkgData.gallery)) {
+               const gIds = pkgData.gallery.map(g => g.directus_files_id?.id || g.directus_files_id || g);
+               const galToAdd = gIds.map(fid => ({ packages_id: newId, directus_files_id: fid }));
+               if (galToAdd.length > 0) await api.post('/items/packages_files', galToAdd);
+             }
+
+             // Process activity types
+             if (pkgData.activity_types && Array.isArray(pkgData.activity_types)) {
+               const aIds = pkgData.activity_types.map(a => a.activity_types_id?.id || a.activity_types_id || a);
+               const actToAdd = aIds.map(id => ({ packages_id: newId, activity_types_id: id }));
+               if (actToAdd.length > 0) await api.post('/items/packages_activity_types', actToAdd);
+             }
+             successCount++;
+          }
+          
+          await fetchPackages();
+          showImportDialog.value = false;
+          jsonImportData.value = '';
+          showToast(`✅ Berhasil bulk import ${successCount} paket wisata!`);
+        }
+      } catch (err) {
+        showToast('❌ Format JSON tidak valid atau terjadi error!');
+        console.error(err);
+      } finally {
+        saving.value = false;
+      }
     };
 
     const editPackage = async (pkg) => {
@@ -1109,7 +1215,8 @@ export default {
       galleryImages, removeGalleryImage,
       showDeleteDialog, packageToDelete, confirmDelete, executeDelete, deleting,
       editor,
-      toastMessage, showToast
+      toastMessage, showToast,
+      showImportDialog, jsonImportData, processJSONImport
     };
   }
 };
