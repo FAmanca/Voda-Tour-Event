@@ -159,7 +159,16 @@ export async function getPackages(
     fields: `${fields},destination_id.*`,
     filter: JSON.stringify({ status: { _eq: "published" } }),
     limit: String(limit),
-    sort: "-id",
+    sort: "-date_created",
+  });
+}
+
+export async function getLatestPackages(limit = 6): Promise<Package[]> {
+  return fetchApi<Package>("packages", {
+    fields: "*,destination_id.*",
+    filter: JSON.stringify({ status: { _eq: "published" } }),
+    limit: String(limit),
+    sort: "-date_created",
   });
 }
 
@@ -170,7 +179,7 @@ export async function getPaginatedPackages(
   const url = new URL(`${BASE}/packages`);
   url.searchParams.set("fields", "*,destination_id.*");
   url.searchParams.set("filter", JSON.stringify({ status: { _eq: "published" } }));
-  url.searchParams.set("sort", "-id");
+  url.searchParams.set("sort", "destination_id.name");
   url.searchParams.set("limit", String(limit));
   url.searchParams.set("page", String(page));
   url.searchParams.set("meta", "filter_count");
@@ -221,10 +230,10 @@ export async function getPackagesByDestination(
       const packages = await getPackages(100);
       if (packages.length === 0) return [];
   
-      // 2. Fetch junction records with expanded activity_types_id details using admin token (bypass Public permission issue)
+      // 2. Fetch junction records with expanded activity_types_id details (Requires Public Read access on packages_activity_types)
       // The relation in Directus is configured such that:
       // many_collection = packages_activity_types, many_field = packages_id, one_field = activity_types_id
-      const actsUrl = `${DIRECTUS_URL}/items/packages_activity_types?fields=packages_id,activity_types_id.*&limit=300&access_token=super-secret-admin-token`;
+      const actsUrl = `${DIRECTUS_URL}/items/packages_activity_types?fields=packages_id,activity_types_id.*&limit=300`;
       const res = await fetch(actsUrl);
       if (!res.ok) {
         // If junction fetch fails, log it and return empty array so we don't accidentally leak all packages
