@@ -305,6 +305,30 @@ export async function getArticles(limit = 12): Promise<Article[]> {
   });
 }
 
+export async function getPaginatedArticles(
+  page: number = 1,
+  limit: number = 12
+): Promise<{ articles: Article[]; total: number }> {
+  const url = new URL(`${BASE}/articles`);
+  url.searchParams.set("fields", "*,ads.*,pillar_parent.*");
+  url.searchParams.set("filter", JSON.stringify({ status: { _eq: "published" } }));
+  url.searchParams.set("sort", "-publish_date");
+  url.searchParams.set("limit", String(limit));
+  url.searchParams.set("page", String(page));
+  url.searchParams.set("meta", "filter_count");
+  
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: { "Cache-Control": "no-cache" },
+  });
+  if (!res.ok) throw new Error(`Directus error: ${res.status}`);
+  const json = await res.json();
+  return {
+    articles: (json.data || []) as Article[],
+    total: json.meta?.filter_count || 0,
+  };
+}
+
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
   const items = await fetchApi<Article>("articles", {
     filter: JSON.stringify({
