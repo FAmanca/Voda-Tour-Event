@@ -19,7 +19,11 @@ try {
   const result = await getPaginatedArticles(currentPage, limit);
   articles = result.articles;
   totalArticles = result.total;
-  totalPages = Math.ceil(totalArticles / limit);
+  totalPages = Math.max(1, Math.ceil(totalArticles / limit));
+  
+  if (currentPage > totalPages) {
+    return Astro.redirect(`/artikel?page=${totalPages}`);
+  }
 } catch {
   fetchError = true;
 }
