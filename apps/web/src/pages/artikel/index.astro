@@ -2,21 +2,31 @@
 import Layout from "../../layouts/Layout.astro";
 import Eyebrow from "../../components/Eyebrow.astro";
 import ErrorAlert from "../../components/ErrorAlert.astro";
-import { getArticles, getAssetUrl } from "../../lib/directus";
+import { getPaginatedArticles, getAssetUrl } from "../../lib/directus";
 import type { Article } from "../../types/directus";
 
 let articles: Article[] = [];
+let totalArticles = 0;
+let totalPages = 1;
 let fetchError = false;
 
+const pageParam = Astro.url.searchParams.get("page") || "1";
+let currentPage = parseInt(pageParam, 10);
+if (isNaN(currentPage) || currentPage < 1) currentPage = 1;
+const limit = 12;
+
 try {
-  articles = await getArticles(12);
+  const result = await getPaginatedArticles(currentPage, limit);
+  articles = result.articles;
+  totalArticles = result.total;
+  totalPages = Math.ceil(totalArticles / limit);
 } catch {
   fetchError = true;
 }
 
-// Split into featured (first) + rest
-const featured: Article | null = articles.length > 0 ? articles[0] : null;
-const gridArticles: Article[] = articles.length > 1 ? articles.slice(1) : [];
+// Split into featured (first) + rest ONLY for page 1
+const featured: Article | null = (currentPage === 1 && articles.length > 0) ? articles[0] : null;
+const gridArticles: Article[] = (currentPage === 1 && articles.length > 1) ? articles.slice(1) : (currentPage > 1 ? articles : []);
 
 /**
  * Strip HTML tags from article content and return a plain-text excerpt.
@@ -225,6 +235,35 @@ function formatDate(dateStr: string | null): string {
                 </a>
               );
             })}
+          </div>
+        )}
+
+        {/* ------- Pagination UI ------- */}
+        {totalPages > 1 && (
+          <div class="flex justify-center items-center gap-[8px] mt-[48px]">
+            {currentPage > 1 ? (
+              <a href={`?page=${currentPage - 1}`} class="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-white border border-navy-200 text-navy-600 hover:border-orange-500 hover:text-orange-500 hover:bg-orange-50 transition-all">
+                <i class="fa-solid fa-chevron-left text-[14px]"></i>
+              </a>
+            ) : (
+              <span class="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-slate-50 border border-slate-100 text-slate-300 cursor-not-allowed">
+                <i class="fa-solid fa-chevron-left text-[14px]"></i>
+              </span>
+            )}
+            
+            <span class="text-navy-600 font-semibold text-[14px] mx-[8px]">
+              Hal {currentPage} dari {totalPages}
+            </span>
+
+            {currentPage < totalPages ? (
+              <a href={`?page=${currentPage + 1}`} class="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-white border border-navy-200 text-navy-600 hover:border-orange-500 hover:text-orange-500 hover:bg-orange-50 transition-all">
+                <i class="fa-solid fa-chevron-right text-[14px]"></i>
+              </a>
+            ) : (
+              <span class="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-slate-50 border border-slate-100 text-slate-300 cursor-not-allowed">
+                <i class="fa-solid fa-chevron-right text-[14px]"></i>
+              </span>
+            )}
           </div>
         )}
 
