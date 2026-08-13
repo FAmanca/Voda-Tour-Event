@@ -3,10 +3,11 @@ import Layout from "../layouts/Layout.astro";
 import PackageCard from "../components/PackageCard.astro";
 import Eyebrow from "../components/Eyebrow.astro";
 import ErrorAlert from "../components/ErrorAlert.astro";
-import { getPaginatedPackages, getDestinationCount, getActivityTypes } from "../lib/directus";
+import { getPaginatedPackages, getDestinationCount, getActivityTypes, getLatestPackages } from "../lib/directus";
 import type { PackageWithDestination, ActivityType } from "../types/directus";
 
 let packages: PackageWithDestination[] = [];
+let latestPackages: PackageWithDestination[] = [];
 let activityTypes: ActivityType[] = [];
 let destinationCount = 0;
 let fetchError = false;
@@ -19,14 +20,16 @@ let totalPackages = 0;
 let totalPages = 1;
 
 try {
-  const [destCount, paginatedPkgs, activities] = await Promise.all([
+  const [destCount, paginatedPkgs, activities, latestPkgs] = await Promise.all([
     getDestinationCount(),
     getPaginatedPackages(currentPage, limit),
-    getActivityTypes()
+    getActivityTypes(),
+    getLatestPackages(6)
   ]);
 
   destinationCount = destCount;
   packages = paginatedPkgs.packages as PackageWithDestination[];
+  latestPackages = latestPkgs as PackageWithDestination[];
   totalPackages = paginatedPkgs.total;
   totalPages = Math.ceil(totalPackages / limit);
   activityTypes = activities;
@@ -82,13 +85,33 @@ try {
       </div></section>
     )}
 
+    {!fetchError && latestPackages.length > 0 && currentPage === 1 && (
+      <section class="pt-[60px] max-lg:pt-[40px] pb-[10px]"><div class="wrap">
+        <div class="mb-[24px]">
+          <h2 class="font-[family-name:var(--font-display)] text-[28px] max-lg:text-[24px] font-bold text-navy-900">Rilis Terbaru</h2>
+          <p class="text-navy-500 text-[14px] mt-[4px]">Paket fresh yang baru saja ditambahkan.</p>
+        </div>
+        <div class="flex gap-[20px] overflow-x-auto snap-x snap-mandatory scrollbar-none pb-[20px] -mx-[20px] px-[20px] lg:mx-0 lg:px-0">
+          {latestPackages.map((pkg, index) => (
+            <div class="w-[280px] sm:w-[320px] snap-start shrink-0">
+              <PackageCard package={pkg} showDestination lcp={index === 0} />
+            </div>
+          ))}
+        </div>
+      </div></section>
+    )}
+
     {!fetchError && (
-      <section class="py-[60px] max-lg:py-[40px]"><div class="wrap">
+      <section class="py-[40px] max-lg:py-[30px]"><div class="wrap">
+        <div class="mb-[28px] flex flex-col md:flex-row md:items-end justify-between gap-[12px]">
+          <div>
+            <h2 class="font-[family-name:var(--font-display)] text-[24px] font-bold text-navy-900">Semua Paket Wisata</h2>
+            <p class="text-navy-500 text-[14px] mt-[4px]">Tersortir rapi berdasarkan destinasi (A-Z).</p>
+          </div>
+          <p class="text-navy-400 text-[13px]"><strong class="text-navy-800">{totalPackages}</strong> paket ditemukan</p>
+        </div>
         {packages.length > 0 ? (
           <>
-            <div class="flex items-center justify-between mb-[28px]">
-              <p class="text-navy-500 text-[13px]"><strong class="text-navy-800">{totalPackages}</strong> paket ditemukan</p>
-            </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[24px]">
               {packages.map((pkg, index) => <PackageCard package={pkg} showDestination lcp={index === 0} />)}
             </div>
