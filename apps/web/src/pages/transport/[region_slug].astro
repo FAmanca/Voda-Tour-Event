@@ -1,0 +1,229 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Eyebrow from "../../components/Eyebrow.astro";
+import ErrorAlert from "../../components/ErrorAlert.astro";
+import { getTransportRegions, getTransportsByRegion, getAssetUrl, getSettings } from "../../lib/directus";
+import type { Transport, TransportRegion } from "../../types/directus";
+
+const { region_slug } = Astro.params;
+
+let currentRegion: TransportRegion | null = null;
+let vehicles: Transport[] = [];
+let fetchError = false;
+let settings: Record<string, string> = {};
+
+try {
+  [settings] = await Promise.all([getSettings()]);
+  const regions = await getTransportRegions();
+  currentRegion = regions.find((r) => r.slug === region_slug) ?? null;
+
+  if (currentRegion) {
+    vehicles = await getTransportsByRegion(region_slug!);
+  }
+} catch {
+  fetchError = true;
+}
+
+if (!fetchError && !currentRegion) {
+  return Astro.redirect("/transport");
+}
+
+const waNumber = settings.wa_number || settings.whatsapp || "6282112345678";
+
+function formatPrice(price: number | null) {
+  if (!price) return null;
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(price);
+}
+
+const heroImgUrl = currentRegion?.image
+  ? getAssetUrl(currentRegion.image, { width: 1400, height: 700, format: "webp", quality: 80 })
+  : null;
+---
+
+<Layout
+  title={`Sewa Kendaraan di ${currentRegion?.name || ""} | Voda Tour & Event`}
+  description={`Daftar armada transport terbaik di wilayah ${currentRegion?.name || ""}. Sopir profesional, AC, BBM termasuk.`}
+  active="transport"
+>
+  <main>
+    <!-- HERO -->
+    <section class="relative overflow-hidden bg-navy-900 min-h-[360px] max-lg:min-h-[280px] flex items-center">
+      {heroImgUrl && (
+        <img
+          src={heroImgUrl}
+          alt={currentRegion?.name}
+          class="absolute inset-0 w-full h-full object-cover opacity-25"
+          fetchpriority="high"
+          loading="eager"
+        />
+      )}
+      <div class="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-900/80 to-navy-900/40"></div>
+
+      <div class="wrap relative z-10 py-20 max-lg:py-14">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-white/50 text-sm mb-6" aria-label="Breadcrumb">
+          <a href="/transport" class="hover:text-white/80 transition-colors no-underline">Sewa Kendaraan</a>
+          <i class="fa-solid fa-chevron-right text-[9px]"></i>
+          <span class="text-white/80">{currentRegion?.name}</span>
+        </nav>
+
+        <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-orange-400 text-xs font-semibold px-3.5 py-1.5 rounded-full mb-4">
+          <i class="fa-solid fa-location-dot"></i>{currentRegion?.name}
+        </div>
+        <h1 class="font-[family-name:var(--font-display)] text-white text-[40px] max-lg:text-[30px] font-bold leading-tight max-w-2xl">
+          Rental Mobil & Bus <br class="max-lg:hidden" />di <span class="text-orange-400">{currentRegion?.name}</span>
+        </h1>
+        <p class="text-white/60 text-[15px] mt-3 max-w-xl">
+          {vehicles.length > 0 ? `${vehicles.length} pilihan armada tersedia di area ini.` : "Armada siap melayani perjalanan wisata Anda."}
+        </p>
+      </div>
+    </section>
+
+    <!-- VEHICLE GRID -->
+    <section class="py-[90px] max-lg:py-[60px] bg-gray-50">
+      <div class="wrap">
+
+        {fetchError && <ErrorAlert variant="block" message="Gagal memuat data kendaraan." />}
+
+        {!fetchError && vehicles.length === 0 && (
+          <div class="text-center py-24">
+            <div class="w-20 h-20 mx-auto rounded-2xl bg-navy-100 flex items-center justify-center mb-5">
+              <i class="fa-solid fa-car text-[32px] text-navy-300"></i>
+            </div>
+            <h3 class="font-[family-name:var(--font-display)] text-navy-700 text-xl font-bold">Belum Ada Armada</h3>
+            <p class="text-navy-400 text-sm mt-2 max-w-xs mx-auto">Kendaraan untuk area ini akan segera tersedia. Hubungi kami untuk informasi lebih lanjut.</p>
+            <a href={`https://wa.me/${waNumber}?text=${encodeURIComponent("Halo Voda Tour, saya ingin tanya tentang ketersediaan kendaraan.")}`} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 mt-6 bg-orange-600 text-white rounded-full px-6 py-3 font-semibold text-sm no-underline transition-all hover:bg-orange-500">
+              <i class="fa-brands fa-whatsapp"></i>Tanya Ketersediaan
+            </a>
+          </div>
+        )}
+
+        {!fetchError && vehicles.length > 0 && (
+          <>
+            <div class="flex items-center justify-between mb-10 max-sm:flex-col max-sm:gap-4 max-sm:items-start">
+              <div>
+                <span class="text-[12px] font-bold text-orange-500 uppercase tracking-[0.14em]">Pilihan Armada</span>
+                <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[24px] font-bold mt-1">
+                  Kendaraan di {currentRegion?.name}
+                </h2>
+              </div>
+              <p class="text-navy-400 text-sm">
+                <strong class="text-navy-700">{vehicles.length}</strong> armada tersedia
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7">
+              {vehicles.map((vehicle, index) => {
+                const price = formatPrice(vehicle.starting_price);
+                const imgUrl = vehicle.featured_image
+                  ? getAssetUrl(vehicle.featured_image, { width: 800, height: 520, format: "webp", quality: 82 })
+                  : null;
+                const waMsg = encodeURIComponent(
+                  `Halo Voda Tour & Event, saya tertarik menyewa *${vehicle.name}* di area *${currentRegion?.name}*. Mohon info lebih lanjut ya.`
+                );
+
+                return (
+                  <article class="group bg-white rounded-[18px] shadow-[0_4px_20px_rgba(0,0,0,0.07)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.12)] transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-1">
+                    <!-- Image -->
+                    <div class="relative overflow-hidden bg-navy-100" style="aspect-ratio: 16/10;">
+                      {imgUrl ? (
+                        <img
+                          src={imgUrl}
+                          alt={vehicle.name}
+                          class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                          loading={index < 3 ? "eager" : "lazy"}
+                        />
+                      ) : (
+                        <div class="absolute inset-0 bg-gradient-to-br from-navy-100 to-navy-200 flex flex-col items-center justify-center">
+                          <i class="fa-solid fa-car text-[48px] text-navy-300 mb-2"></i>
+                        </div>
+                      )}
+
+                      <!-- Type badge -->
+                      {vehicle.type && (
+                        <div class="absolute top-3 left-3 bg-navy-900/80 backdrop-blur-sm text-white text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                          {vehicle.type}
+                        </div>
+                      )}
+
+                      <!-- Capacity badge -->
+                      {vehicle.capacity && (
+                        <div class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-2.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                          <i class="fa-solid fa-user-group text-orange-500 text-[10px]"></i>
+                          <span class="text-navy-800 text-[12px] font-bold">{vehicle.capacity} Pax</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <!-- Body -->
+                    <div class="flex flex-col flex-1 p-6">
+                      <h3 class="font-[family-name:var(--font-display)] text-navy-800 text-[20px] font-bold leading-snug">
+                        {vehicle.name}
+                      </h3>
+
+                      {vehicle.description && (
+                        <div
+                          class="text-navy-500 text-[13.5px] leading-relaxed mt-3 line-clamp-4 prose-sm prose-strong:text-navy-700"
+                          set:html={vehicle.description}
+                        />
+                      )}
+
+                      <!-- Divider + Price + CTA -->
+                      <div class="mt-auto pt-5 border-t border-dashed border-gray-200 mt-5">
+                        {price ? (
+                          <div class="flex items-end justify-between mb-4">
+                            <div>
+                              <p class="text-navy-400 text-[10.5px] font-semibold uppercase tracking-wider">Mulai Dari</p>
+                              <p class="text-orange-600 font-bold text-[26px] leading-none">{price}</p>
+                            </div>
+                            <span class="text-navy-300 text-[11px]">/hari</span>
+                          </div>
+                        ) : (
+                          <p class="text-navy-400 text-sm mb-4 italic">Hubungi kami untuk penawaran harga.</p>
+                        )}
+
+                        <a
+                          href={`https://wa.me/${waNumber}?text=${waMsg}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="flex items-center justify-center gap-2 w-full py-3.5 bg-navy-800 text-white rounded-[12px] font-semibold text-[14px] no-underline hover:bg-orange-600 transition-colors shadow-sm"
+                          aria-label={`Booking ${vehicle.name}`}
+                        >
+                          <i class="fa-brands fa-whatsapp text-[16px]"></i>
+                          Booking Sekarang
+                        </a>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+      </div>
+    </section>
+
+    <!-- BACK + CTA -->
+    <section class="py-12 bg-white border-t border-gray-100">
+      <div class="wrap flex flex-wrap items-center justify-between gap-4">
+        <a href="/transport" class="inline-flex items-center gap-2 text-navy-600 hover:text-navy-800 font-semibold text-sm transition-colors no-underline">
+          <i class="fa-solid fa-arrow-left text-[11px]"></i> Kembali ke Daftar Area
+        </a>
+        <a
+          href={`https://wa.me/${waNumber}?text=${encodeURIComponent("Halo Voda Tour, saya butuh bantuan memilih kendaraan yang tepat.")}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 bg-orange-600 text-white rounded-full px-6 py-3 font-semibold text-sm no-underline shadow-md shadow-orange-400/30 hover:bg-orange-500 hover:-translate-y-px transition-all"
+        >
+          <i class="fa-brands fa-whatsapp"></i>Minta Rekomendasi
+        </a>
+      </div>
+    </section>
+
+  </main>
+</Layout>

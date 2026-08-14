@@ -12,6 +12,8 @@ import type {
   Status,
   Article,
   PopupAd,
+  TransportRegion,
+  Transport,
 } from "../types/directus";
 
 
@@ -78,6 +80,32 @@ export async function getRegions(): Promise<Region[]> {
   return fetchApi<Region>("regions", {
     filter: JSON.stringify({ status: { _eq: "published" } }),
     sort: "name",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Transports
+// ---------------------------------------------------------------------------
+
+/**
+ * Mengambil daftar daerah/domisili kendaraan sewa yang aktif.
+ */
+export async function getTransportRegions(): Promise<TransportRegion[]> {
+  return fetchApi<TransportRegion>("transport_regions", {
+    filter: JSON.stringify({ status: { _eq: "published" } }),
+  });
+}
+
+/**
+ * Mengambil daftar kendaraan berdasarkan slug region.
+ */
+export async function getTransportsByRegion(regionSlug: string): Promise<Transport[]> {
+  return fetchApi<Transport>("transports", {
+    fields: "*,region_id.*",
+    filter: JSON.stringify({ 
+      status: { _eq: "published" },
+      region_id: { slug: { _eq: regionSlug } }
+    }),
   });
 }
 

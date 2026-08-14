@@ -58,6 +58,34 @@ export type UserUuid = string;
 // Business Collections
 // ---------------------------------------------------------------------------
 
+export interface TransportRegion {
+  id: string;
+  name: string;
+  slug: string;
+  image: FileUuid | null;
+  status: Status;
+  date_created: string;
+  date_updated: string;
+  user_created: UserUuid | null;
+  user_updated: UserUuid | null;
+}
+
+export interface Transport {
+  id: string;
+  region_id: string | TransportRegion;
+  name: string;
+  type: string | null;
+  capacity: number | null;
+  starting_price: number | null;
+  featured_image: FileUuid | null;
+  description: string | null;
+  status: Status;
+  date_created: string;
+  date_updated: string;
+  user_created: UserUuid | null;
+  user_updated: UserUuid | null;
+}
+
 export interface Region {
   id: string;
   name: string;
