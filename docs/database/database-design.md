@@ -71,6 +71,36 @@ Berikut collection yang **harus dibuat manual** di admin panel Directus.
 | sort_order | integer | Urutan tampilan |
 | status | string | published / draft |
 
+### `transport_regions`
+
+Koleksi untuk domisili/daerah penyewaan kendaraan (terpisah dari daerah paket wisata).
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | uuid (PK) | gen_random_uuid() |
+| name | string | Nama daerah (Bandung, Bali, dll) |
+| slug | string (unique) | Auto dari name |
+| image | uuid (FK) | Relasi ke directus_files. Gunakan file UUID untuk getAssetUrl() |
+| sort_order | integer | Urutan tampilan |
+| status | string | published / draft |
+
+### `transports`
+
+Koleksi untuk daftar kendaraan yang disewakan.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | uuid (PK) | gen_random_uuid() |
+| region_id | uuid (FK) | Relasi ke transport_regions |
+| name | string | Nama kendaraan (misal: Hiace Commuter 15 Seat) |
+| type | string | Jenis (Minibus, Big Bus, MPV, dll) |
+| capacity | integer | Kapasitas penumpang maksimal |
+| starting_price | integer | Harga sewa mulai dari (Rp) |
+| featured_image | uuid (FK) | Relasi ke directus_files. Gunakan file UUID untuk getAssetUrl() |
+| description | text | Spesifikasi atau teks penawaran (opsional) |
+| sort_order | integer | Urutan tampilan |
+| status | string | published / draft |
+
 ### `activity_types`
 
 Master data jenis kegiatan (Private Trip, Corporate Gathering, Team Building, dll).
@@ -128,6 +158,7 @@ Tabel penghubung Many-to-Many antara `packages` dan `activity_types`.
 
 ```
 regions (1) ----< destinations (M) ----< packages (M) >----< packages_activity_types >----< activity_types (M)
+transport_regions (1) ----< transports (M)
 articles (1) ---< ads (M)
 ```
 

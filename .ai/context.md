@@ -30,11 +30,15 @@
 ## Content Hierarchy
 
 ```
+[Paket Wisata]
 Regions (1) ──→ Destinations (M) ──→ Packages (M)
                                             │
                                   many-to-many (junction: packages_activity_types)
                                             │
                                      Activity Types (activity_types)
+
+[Sewa Kendaraan]
+Transport Regions (1) ──→ Transports (M)
 ```
 
 ### Contoh Data Real
@@ -179,5 +183,6 @@ Proyek ini menggunakan 5 ekstensi kustom di dalam folder `extensions/` yang di-c
 | DB Design (per tabel) | `docs/database/tables/*.md` |
 | Types | `apps/web/src/types/directus.ts` |
 | Search Feature | `docs/features/search.md` |
+| Transport Feature | `docs/features/transport.md` |
 | SEO | `docs/frontend/seo.md` |
 | Docker | `infrastructure/docker-compose.yml` |

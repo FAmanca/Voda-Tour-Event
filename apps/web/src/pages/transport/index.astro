@@ -1,0 +1,168 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getTransportRegions, getAssetUrl, getSettings } from "../../lib/directus";
+import ErrorAlert from "../../components/ErrorAlert.astro";
+import type { TransportRegion } from "../../types/directus";
+
+let regions: TransportRegion[] = [];
+let fetchError = false;
+let settings: Record<string, string> = {};
+
+try {
+  regions = await getTransportRegions();
+} catch (error) {
+  fetchError = true;
+}
+try {
+  settings = await getSettings();
+} catch (error) {
+  // best effort
+}
+
+const waNumber = settings.wa_number || settings.whatsapp || "6282112345678";
+const waMsg = encodeURIComponent("Halo Voda Tour, saya ingin bertanya mengenai layanan Sewa Kendaraan.");
+---
+
+<Layout
+  title="Sewa Kendaraan Wisata | Voda Tour & Event"
+  description="Armada lengkap, bersih, dan nyaman untuk setiap perjalanan wisata. Didampingi pengemudi profesional berpengalaman."
+  active="transport"
+>
+  <main>
+    <!-- HERO -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-navy-900 via-navy-800 to-navy-950 py-24 max-lg:py-16">
+      <div class="absolute inset-0 opacity-[0.04]" style="background-image: repeating-linear-gradient(0deg, transparent, transparent 40px, #fff 40px, #fff 41px), repeating-linear-gradient(90deg, transparent, transparent 40px, #fff 40px, #fff 41px);" aria-hidden="true"></div>
+      <div class="absolute -top-20 -right-10 w-80 h-80 rounded-full bg-orange-500/10 blur-[90px]" aria-hidden="true"></div>
+      <div class="absolute -bottom-10 -left-20 w-64 h-64 rounded-full bg-sky-400/10 blur-[70px]" aria-hidden="true"></div>
+
+      <div class="wrap relative z-10 text-center">
+        <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-orange-400 text-xs font-semibold px-3.5 py-1.5 rounded-full mb-5">
+          <i class="fa-solid fa-car"></i>SEWA KENDARAAN
+        </div>
+        <h1 class="font-[family-name:var(--font-display)] text-white text-[46px] max-lg:text-[32px] font-bold leading-tight">
+          Armada Wisata <span class="text-orange-400">Profesional</span>
+        </h1>
+        <p class="text-white/65 text-[16px] max-lg:text-[14px] mt-4 max-w-[560px] mx-auto leading-relaxed">
+          Pilih kendaraan sesuai kebutuhan grup Anda. Armada bersih, ber-AC, dan dikemudikan oleh sopir berpengalaman.
+        </p>
+
+        <!-- Quick stats -->
+        <div class="flex flex-wrap justify-center gap-6 mt-10">
+          {[
+            { icon: "fa-shield-halved", label: "Sopir Berpengalaman" },
+            { icon: "fa-snowflake", label: "Full AC & Bersih" },
+            { icon: "fa-gas-pump", label: "BBM Termasuk" },
+            { icon: "fa-headset", label: "Responsif 24 Jam" },
+          ].map((item) => (
+            <div class="flex items-center gap-2 text-white/70 text-sm">
+              <i class={`fa-solid ${item.icon} text-orange-400`}></i>
+              <span>{item.label}</span>
+            </div>
+          ))}
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-3 mt-8">
+          <a href="#area" class="inline-flex items-center gap-2 bg-orange-600 text-white rounded-full px-6 py-3 font-semibold text-sm no-underline shadow-lg shadow-orange-500/40 transition-all hover:-translate-y-px hover:bg-orange-500">
+            Lihat Armada <i class="fa-solid fa-arrow-down"></i>
+          </a>
+          <a href={`https://wa.me/${waNumber}?text=${waMsg}`} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-white/10 text-white rounded-full px-6 py-3 font-semibold text-sm no-underline border border-white/20 transition-all hover:bg-white/20">
+            <i class="fa-brands fa-whatsapp"></i>Tanya Harga
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- AREA SELECTION -->
+    <section id="area" class="py-[90px] max-lg:py-[60px]">
+      <div class="wrap">
+
+        <div class="text-center mb-12">
+          <span class="text-[12.5px] font-bold text-orange-500 uppercase tracking-[0.14em] inline-flex items-center gap-2 before:block before:w-[22px] before:h-[2px] before:bg-orange-500 after:block after:w-[22px] after:h-[2px] after:bg-orange-500">Wilayah Layanan</span>
+          <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[30px] max-lg:text-[24px] font-bold mt-3">
+            Pilih <span class="text-orange-500">Area Penjemputan</span>
+          </h2>
+          <p class="text-navy-400 text-[15px] mt-2 max-w-md mx-auto">Kami beroperasi di berbagai wilayah. Klik area pilihan Anda untuk melihat armada yang tersedia.</p>
+        </div>
+
+        {fetchError && <ErrorAlert variant="block" message="Gagal memuat daftar area kendaraan." />}
+
+        {!fetchError && regions.length === 0 && (
+          <div class="text-center py-20">
+            <i class="fa-solid fa-map-location-dot text-[56px] text-navy-200 block mb-4"></i>
+            <h3 class="font-[family-name:var(--font-display)] text-navy-600 text-xl font-semibold">Segera Hadir</h3>
+            <p class="text-navy-400 text-sm mt-2">Area layanan akan segera ditambahkan.</p>
+          </div>
+        )}
+
+        {!fetchError && regions.length > 0 && (
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {regions.map((region, index) => {
+              const imgUrl = region.image
+                ? getAssetUrl(region.image, { width: 700, height: 500, format: "webp", quality: 82 })
+                : null;
+              return (
+                <a
+                  href={`/transport/${region.slug}`}
+                  class="group relative flex flex-col rounded-[18px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.14)] transition-all duration-400 no-underline hover:-translate-y-[6px]"
+                  aria-label={`Lihat kendaraan di ${region.name}`}
+                >
+                  <!-- Image -->
+                  <div class="aspect-[4/3] relative overflow-hidden bg-navy-100">
+                    {imgUrl ? (
+                      <img
+                        src={imgUrl}
+                        alt={region.name}
+                        class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        loading={index < 4 ? "eager" : "lazy"}
+                      />
+                    ) : (
+                      <div class="absolute inset-0 bg-gradient-to-br from-navy-800 to-navy-700 flex items-center justify-center">
+                        <i class="fa-solid fa-map-location-dot text-[48px] text-white/20"></i>
+                      </div>
+                    )}
+                    <!-- gradient overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-navy-950/90 via-navy-900/30 to-transparent"></div>
+                  </div>
+
+                  <!-- Content at bottom -->
+                  <div class="absolute bottom-0 left-0 right-0 p-5">
+                    <div class="flex items-end justify-between">
+                      <div>
+                        <h3 class="font-[family-name:var(--font-display)] text-white text-[20px] font-bold leading-snug">{region.name}</h3>
+                        <span class="inline-flex items-center gap-1.5 text-orange-400 text-[12.5px] font-semibold mt-1 group-hover:gap-2.5 transition-all">
+                          Lihat Armada <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </span>
+                      </div>
+                      <!-- Arrow button -->
+                      <div class="w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20 group-hover:bg-orange-500 group-hover:border-orange-500 transition-all shrink-0">
+                        <i class="fa-solid fa-chevron-right text-white text-[11px]"></i>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        )}
+
+      </div>
+    </section>
+
+    <!-- CTA BAND -->
+    <section class="py-14 bg-navy-50">
+      <div class="wrap text-center">
+        <h2 class="font-[family-name:var(--font-display)] text-navy-800 text-[24px] font-bold">Belum yakin pilih kendaraan mana?</h2>
+        <p class="text-navy-500 text-[14px] mt-2 max-w-sm mx-auto">Ceritakan kebutuhan Anda, tim kami bantu rekomendasikan armada terbaik.</p>
+        <a
+          href={`https://wa.me/${waNumber}?text=${waMsg}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 mt-6 bg-orange-600 text-white rounded-full px-7 py-3.5 font-semibold text-sm no-underline shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-px hover:bg-orange-500"
+        >
+          <i class="fa-brands fa-whatsapp text-[16px]"></i>Konsultasi Gratis via WA
+        </a>
+      </div>
+    </section>
+
+  </main>
+</Layout>

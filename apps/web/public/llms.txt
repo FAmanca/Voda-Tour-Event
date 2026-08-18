@@ -12,6 +12,7 @@ Website ini mendukung Content Negotiation. Jika Anda mengirimkan HTTP Request de
 - **Daftar Destinasi Populer**: `https://vodatrip.id/destinasi` (Accept: text/markdown)
 - **Artikel & Blog Perjalanan**: `https://vodatrip.id/artikel` (Accept: text/markdown)
 - **Pencarian Paket Wisata**: `https://vodatrip.id/cari?q={query}` (Accept: text/markdown)
+- **Sewa Kendaraan (Rental Mobil & Bus)**: `https://vodatrip.id/transport` (Accept: text/markdown)
 
 ## Mekanisme WebMCP
 Jika Anda berjalan di konteks browser klien yang mendukung WebMCP (`navigator.modelContext`), Anda dapat menggunakan tool berikut:
