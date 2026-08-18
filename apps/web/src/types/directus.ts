@@ -63,7 +63,6 @@ export interface TransportRegion {
   name: string;
   slug: string;
   image: FileUuid | null;
-  sort_order: number | null;
   status: Status;
   date_created: string;
   date_updated: string;
@@ -80,7 +79,6 @@ export interface Transport {
   starting_price: number | null;
   featured_image: FileUuid | null;
   description: string | null;
-  sort_order: number | null;
   status: Status;
   date_created: string;
   date_updated: string;
