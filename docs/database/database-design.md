@@ -80,7 +80,8 @@ Koleksi untuk domisili/daerah penyewaan kendaraan (terpisah dari daerah paket wi
 | id | uuid (PK) | gen_random_uuid() |
 | name | string | Nama daerah (Bandung, Bali, dll) |
 | slug | string (unique) | Auto dari name |
-| image | string | Foto representasi daerah |
+| image | uuid (FK) | Relasi ke directus_files. Gunakan file UUID untuk getAssetUrl() |
+| sort_order | integer | Urutan tampilan |
 | status | string | published / draft |
 
 ### `transports`
@@ -95,8 +96,9 @@ Koleksi untuk daftar kendaraan yang disewakan.
 | type | string | Jenis (Minibus, Big Bus, MPV, dll) |
 | capacity | integer | Kapasitas penumpang maksimal |
 | starting_price | integer | Harga sewa mulai dari (Rp) |
-| featured_image | string | Foto kendaraan |
+| featured_image | uuid (FK) | Relasi ke directus_files. Gunakan file UUID untuk getAssetUrl() |
 | description | text | Spesifikasi atau teks penawaran (opsional) |
+| sort_order | integer | Urutan tampilan |
 | status | string | published / draft |
 
 ### `activity_types`

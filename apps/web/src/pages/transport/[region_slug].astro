@@ -13,7 +13,11 @@ let fetchError = false;
 let settings: Record<string, string> = {};
 
 try {
-  [settings] = await Promise.all([getSettings()]);
+  settings = await getSettings();
+} catch {
+  // best effort
+}
+try {
   const regions = await getTransportRegions();
   currentRegion = regions.find((r) => r.slug === region_slug) ?? null;
 
@@ -31,7 +35,7 @@ if (!fetchError && !currentRegion) {
 const waNumber = settings.wa_number || settings.whatsapp || "6282112345678";
 
 function formatPrice(price: number | null) {
-  if (!price) return null;
+  if (price === null) return null;
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
@@ -168,8 +172,9 @@ const heroImgUrl = currentRegion?.image
                       {vehicle.description && (
                         <div
                           class="text-navy-500 text-[13.5px] leading-relaxed mt-3 line-clamp-4 prose-sm prose-strong:text-navy-700"
-                          set:html={vehicle.description}
-                        />
+                        >
+                          {vehicle.description}
+                        </div>
                       )}
 
                       <!-- Divider + Price + CTA -->

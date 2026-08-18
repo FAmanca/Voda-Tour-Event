@@ -93,6 +93,7 @@ export async function getRegions(): Promise<Region[]> {
 export async function getTransportRegions(): Promise<TransportRegion[]> {
   return fetchApi<TransportRegion>("transport_regions", {
     filter: JSON.stringify({ status: { _eq: "published" } }),
+    sort: "sort_order",
   });
 }
 
@@ -106,6 +107,7 @@ export async function getTransportsByRegion(regionSlug: string): Promise<Transpo
       status: { _eq: "published" },
       region_id: { slug: { _eq: regionSlug } }
     }),
+    sort: "sort_order",
   });
 }
 

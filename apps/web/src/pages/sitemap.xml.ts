@@ -25,18 +25,16 @@ export const GET: APIRoute = async () => {
   let articles: { slug: string; date_created?: string | null; date_updated?: string | null }[] = [];
   let transportRegions: { slug: string; date_created?: string | null; date_updated?: string | null }[] = [];
 
-  try {
-    const [destRes, pkgRes, articleRes, transportRes] = await Promise.all([
-      fetch(DIRECTUS_URL + "/items/destinations?fields=slug,date_created,date_updated&filter[status][_eq]=published", { cache: "no-store" }),
-      fetch(DIRECTUS_URL + "/items/packages?fields=slug,date_created,date_updated&filter[status][_eq]=published", { cache: "no-store" }),
-      fetch(DIRECTUS_URL + "/items/articles?fields=slug,date_created,date_updated&filter[status][_eq]=published", { cache: "no-store" }),
-      fetch(DIRECTUS_URL + "/items/transport_regions?fields=slug,date_created,date_updated&filter[status][_eq]=published", { cache: "no-store" }),
-    ]);
-    if (destRes.ok) { const data = await destRes.json(); destinations = data.data || []; }
-    if (pkgRes.ok) { const data = await pkgRes.json(); packages = data.data || []; }
-    if (articleRes.ok) { const data = await articleRes.json(); articles = data.data || []; }
-    if (transportRes.ok) { const data = await transportRes.json(); transportRegions = data.data || []; }
-  } catch {}
+  const [destRes, pkgRes, articleRes, transportRes] = await Promise.all([
+    fetch(DIRECTUS_URL + "/items/destinations?fields=slug,date_created,date_updated&filter[status][_eq]=published", { cache: "no-store" }).catch(() => null),
+    fetch(DIRECTUS_URL + "/items/packages?fields=slug,date_created,date_updated&filter[status][_eq]=published", { cache: "no-store" }).catch(() => null),
+    fetch(DIRECTUS_URL + "/items/articles?fields=slug,date_created,date_updated&filter[status][_eq]=published", { cache: "no-store" }).catch(() => null),
+    fetch(DIRECTUS_URL + "/items/transport_regions?fields=slug,date_created,date_updated&filter[status][_eq]=published", { cache: "no-store" }).catch(() => null),
+  ]);
+  if (destRes?.ok) { try { const data = await destRes.json(); destinations = data.data || []; } catch {} }
+  if (pkgRes?.ok) { try { const data = await pkgRes.json(); packages = data.data || []; } catch {} }
+  if (articleRes?.ok) { try { const data = await articleRes.json(); articles = data.data || []; } catch {} }
+  if (transportRes?.ok) { try { const data = await transportRes.json(); transportRegions = data.data || []; } catch {} }
 
   const staticPages = [
     { loc: "/", priority: "1.0", changefreq: "weekly" },

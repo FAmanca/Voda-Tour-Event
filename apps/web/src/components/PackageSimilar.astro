@@ -25,12 +25,9 @@ const { similarPackages, destinationName, destinationSlug } = Astro.props;
       <a href={"/paket/" + similarPkg.slug} class="group block bg-white rounded-[var(--radius-lg)] shadow-[var(--shadow-soft)] overflow-hidden no-underline hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-1.5">
         <div class="aspect-video overflow-hidden bg-navy-100">
           {(() => {
-            const imgId = typeof similarPkg.image === "string" && similarPkg.image
-              ? similarPkg.image
-              : typeof similarPkg.image === "object" && similarPkg.image !== null
-                ? (similarPkg.image as any)?.id ?? null
-                : null;
-            const resolvedId = imgId || (typeof similarPkg.poster === "string" ? similarPkg.poster : (similarPkg.poster as any)?.id ?? null);
+            const firstGalleryId = Array.isArray(similarPkg.gallery) && similarPkg.gallery.length > 0 ? similarPkg.gallery[0] : null;
+            const resolvedId = (typeof firstGalleryId === "string" ? firstGalleryId : (firstGalleryId as any)?.directus_files_id ?? (firstGalleryId as any)?.id) 
+              || (typeof similarPkg.poster === "string" ? similarPkg.poster : (similarPkg.poster as any)?.id ?? null);
             return resolvedId ? (
               <img src={getAssetUrl(resolvedId, { width: 600, height: 338, format: "webp", quality: 85 })} alt={similarPkg.name} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />
             ) : (

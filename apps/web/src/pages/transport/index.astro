@@ -9,9 +9,14 @@ let fetchError = false;
 let settings: Record<string, string> = {};
 
 try {
-  [regions, settings] = await Promise.all([getTransportRegions(), getSettings()]);
+  regions = await getTransportRegions();
 } catch (error) {
   fetchError = true;
+}
+try {
+  settings = await getSettings();
+} catch (error) {
+  // best effort
 }
 
 const waNumber = settings.wa_number || settings.whatsapp || "6282112345678";
