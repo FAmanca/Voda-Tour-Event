@@ -11,7 +11,7 @@ import PackageFacilities from "../../components/PackageFacilities.astro";
 import PackageSimilar from "../../components/PackageSimilar.astro";
 import PackagePdfGenerator from "../../components/PackagePdfGenerator.astro";
 import { getAssetUrl, getSettings } from "../../lib/directus";
-import { getStartingPrice, formatPrice, getPriceRange } from "../../lib/utils";
+import { getStartingPrice, formatPrice, getPriceRange, stripHtml } from "../../lib/utils";
 
 import type { Package, ActivityType } from "../../types/directus";
 
@@ -81,19 +81,35 @@ if (!coverImageId && galleryImages.length > 0) {
 
 const startingPrice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
 const priceRange = pkg?.price_tiers ? getPriceRange(pkg.price_tiers) : null;
+
+let cleanDescription = "";
+if (pkg?.description) {
+  cleanDescription = stripHtml(pkg.description);
+  if (cleanDescription.length > 155) {
+    const truncated = cleanDescription.substring(0, 155);
+    cleanDescription = truncated.substring(0, Math.min(truncated.length, truncated.lastIndexOf(" "))) + "...";
+  }
+}
+
+// Ensure the OG image uses the production domain, falling back properly
+const siteUrl = import.meta.env.SITE_URL || "https://vodatrip.id";
+const ogImageUrl = coverImageId ? `${siteUrl}/assets/${coverImageId}?width=1200&height=630&fit=cover&format=webp` : "";
+const jsonLdImages = galleryImages.length > 0 
+  ? galleryImages.map(g => `${siteUrl}/assets/${g}?width=800&format=webp`)
+  : (coverImageId ? [`${siteUrl}/assets/${coverImageId}?width=800&format=webp`] : []);
 ---
 
 
 <Layout title={pkg ? pkg.name + " | Paket Voda Tour & Event" : "Paket Tidak Ditemukan"}
-  description={pkg?.description || ""}
-  image={coverImageId ? (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + coverImageId + "?width=1200&height=630&format=webp" : ""}
+  description={cleanDescription}
+  image={ogImageUrl}
   canonical={pkg ? "https://vodatrip.id/paket/" + pkg.slug : ""}
   jsonld={pkg ? JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Product",
     "name": pkg.name,
-    "description": pkg.description,
-    "image": galleryImages.length ? galleryImages.map(g => (import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + g + "?width=800&format=webp") : (coverImageId ? [(import.meta.env.PUBLIC_DIRECTUS_URL || "http://localhost:8055") + "/assets/" + coverImageId + "?width=800&format=webp"] : []),
+    "description": cleanDescription,
+    "image": jsonLdImages,
     "url": "https://vodatrip.id/paket/" + pkg.slug,
     "brand": { "@type": "Brand", "name": "Voda Tour & Event" },
     "offers": {
