@@ -79,6 +79,10 @@ if (!coverImageId && galleryImages.length > 0) {
   coverImageId = galleryImages[0];
 }
 
+if (!coverImageId && pkg?.poster) {
+  coverImageId = typeof pkg.poster === "object" ? (pkg.poster as any).id : pkg.poster;
+}
+
 const startingPrice = pkg?.price_tiers ? getStartingPrice(pkg.price_tiers) : null;
 const priceRange = pkg?.price_tiers ? getPriceRange(pkg.price_tiers) : null;
 
