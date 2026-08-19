@@ -91,12 +91,14 @@ if (pkg?.description) {
   }
 }
 
-// Ensure the OG image uses the production domain, falling back properly
+// Ensure the OG image uses the correct API domain for assets
 const siteUrl = import.meta.env.SITE_URL || "https://vodatrip.id";
-const ogImageUrl = coverImageId ? `${siteUrl}/assets/${coverImageId}?width=1200&height=630&fit=cover&format=webp` : "";
+const assetDomain = import.meta.env.PUBLIC_DIRECTUS_URL || "https://api.vodatrip.id";
+
+const ogImageUrl = coverImageId ? `${assetDomain}/assets/${coverImageId}?width=1200&height=630&fit=cover&format=webp` : "";
 const jsonLdImages = galleryImages.length > 0 
-  ? galleryImages.map(g => `${siteUrl}/assets/${g}?width=800&format=webp`)
-  : (coverImageId ? [`${siteUrl}/assets/${coverImageId}?width=800&format=webp`] : []);
+  ? galleryImages.map(g => `${assetDomain}/assets/${g}?width=800&format=webp`)
+  : (coverImageId ? [`${assetDomain}/assets/${coverImageId}?width=800&format=webp`] : []);
 ---
 
 
