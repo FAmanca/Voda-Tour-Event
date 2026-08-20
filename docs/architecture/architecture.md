@@ -64,4 +64,4 @@ Untuk mengatasi keterbatasan antarmuka tabel bawaan Directus dalam manajemen kon
 4. **`auto-compress-webp` (Action Hook)**: Hook backend otomatis yang mengompresi dan mengonversi setiap gambar yang diunggah ke Directus menjadi format WebP sebelum disimpan ke Cloudflare R2.
 
 > [!TIP]
-> **Panduan Alur Kerja Ekstensi**: Baca dokumentasi lengkap alur kompilasi Vue 3, deployment Docker, dan aturan komponen UI Directus pada berkas [`docs/development/directus-extensions.md`](file:///home/famanca/voda-tour-event/docs/development/directus-extensions.md).
+> **Panduan Alur Kerja Ekstensi**: Baca dokumentasi lengkap alur kompilasi Vue 3, deployment Docker, dan aturan komponen UI Directus pada berkas [`docs/development/directus-extensions.md`](file:///home/famanca/voda-tour-event/docs/development/directus-extensions.md).\n## Backup Strategy\n- **Database & Assets**: Automated daily backups (2 AM) via shell script to Google Drive using `rclone`.\n- **Retention**: Rolling 7-day retention policy to prevent storage exhaustion.
