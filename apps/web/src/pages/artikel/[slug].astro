@@ -90,15 +90,61 @@ if (article && article.seo && typeof article.seo === 'object') {
   if (seo.canonical) canonicalUrl = seo.canonical;
 }
 
+// Handle Breadcrumb Schema
+const breadcrumbItems = [
+  {
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Beranda",
+    "item": "https://vodatrip.id/"
+  },
+  {
+    "@type": "ListItem",
+    "position": 2,
+    "name": "Artikel",
+    "item": "https://vodatrip.id/artikel"
+  }
+];
+
+if (parentPillar) {
+  breadcrumbItems.push({
+    "@type": "ListItem",
+    "position": 3,
+    "name": (parentPillar as any).title,
+    "item": "https://vodatrip.id/artikel/" + (parentPillar as any).slug
+  });
+  breadcrumbItems.push({
+    "@type": "ListItem",
+    "position": 4,
+    "name": metaTitle,
+    "item": canonicalUrl || ("https://vodatrip.id/artikel/" + slug)
+  });
+} else {
+  breadcrumbItems.push({
+    "@type": "ListItem",
+    "position": 3,
+    "name": metaTitle,
+    "item": canonicalUrl || ("https://vodatrip.id/artikel/" + slug)
+  });
+}
+
 const jsonldData = article ? JSON.stringify({
   "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  "headline": metaTitle,
-  "description": metaDesc,
-  "image": imgUrl ? [imgUrl] : [],
-  "datePublished": article.publish_date || new Date().toISOString(),
-  "author": { "@type": "Organization", "name": "Voda Tour & Event" },
-  "publisher": { "@type": "Organization", "name": "Voda Tour & Event" }
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "headline": metaTitle,
+      "description": metaDesc,
+      "image": imgUrl ? [imgUrl] : [],
+      "datePublished": article.publish_date || new Date().toISOString(),
+      "author": { "@type": "Organization", "name": "Voda Tour & Event" },
+      "publisher": { "@type": "Organization", "name": "Voda Tour & Event" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": breadcrumbItems
+    }
+  ]
 }) : "";
 ---
 <Layout title={`${metaTitle} | Voda Tour & Event`} description={metaDesc} canonical={canonicalUrl} jsonld={jsonldData} active="artikel" image={imgUrl || undefined}>
